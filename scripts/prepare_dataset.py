@@ -34,8 +34,10 @@ def _tag_rows(rows: list[dict], source_split: str) -> list[dict]:
 
 def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str, str]:
     defaults = {
+        "L0": "너는 세계관 규칙을 JSON IR로만 답하는 도우미다.",
         "L3": "너는 석기시대 서사 도우미다. JSON으로만 답하라.",
         "L4": "너는 석기시대 서사 도우미다. JSON으로만 답하라. 한국어와 영어를 함께 써라.",
+        "L5": "너는 신탁 해석 도우미다. bilingual JSON으로만 답하라.",
         "NEG": "너는 학습 샘플 감시자다. 제시된 답안이 버릴 예시인지 retain 또는 reject 한 단어로만 답하라.",
         "GEN": "너는 한국어 문장 도우미다. 자연스러운 일반 한국어 한 문장으로 답하라.",
     }
@@ -43,14 +45,20 @@ def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str
         return defaults
 
     training_prompts = settings.get("prompts", {}).get("training", {})
+    layer0_path = training_prompts.get("layer0_system")
     layer3_path = training_prompts.get("layer3_system")
     layer4_path = training_prompts.get("layer4_system")
+    layer5_path = training_prompts.get("layer5_system")
     negative_path = training_prompts.get("negative_system")
     general_path = training_prompts.get("general_system")
+    if layer0_path:
+        defaults["L0"] = resolve_path(repo_root, layer0_path).read_text(encoding="utf-8").strip()
     if layer3_path:
         defaults["L3"] = resolve_path(repo_root, layer3_path).read_text(encoding="utf-8").strip()
     if layer4_path:
         defaults["L4"] = resolve_path(repo_root, layer4_path).read_text(encoding="utf-8").strip()
+    if layer5_path:
+        defaults["L5"] = resolve_path(repo_root, layer5_path).read_text(encoding="utf-8").strip()
     if negative_path:
         defaults["NEG"] = resolve_path(repo_root, negative_path).read_text(encoding="utf-8").strip()
     if general_path:
@@ -85,8 +93,9 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
     task = row.get("task")
     prompt = row.get("prompt")
     output = row.get("output")
-    if task in {"A", "B", "C", "D", "E", "F"} and prompt and output:
-        layer = row.get("layer", "L3" if task in {"E", "F"} else "L4")
+    if task in {"A", "B", "C", "D", "E", "F", "G", "H"} and prompt and output:
+        default_layers = {"E": "L3", "F": "L3", "G": "L5", "H": "L0"}
+        layer = row.get("layer", default_layers.get(task, "L4"))
         assistant_content = _assistant_content(output, task=task)
         return {
             "task": task,
@@ -98,7 +107,7 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
                 {"role": "assistant", "content": assistant_content},
             ],
         }
-    if task in {"A", "B", "C", "D", "E", "F"}:
+    if task in {"A", "B", "C", "D", "E", "F", "G", "H"}:
         raise ValueError(f"Unsupported dataset row for task {task}: missing prompt/output")
     if task == "NEG" and output:
         sample_output = _assistant_content(output, task=task)

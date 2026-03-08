@@ -1,0 +1,24 @@
+root ::= "{" ws
+  "\"interpretation_ko\"" ws ":" ws ko-str ws "," ws
+  "\"interpretation_en\"" ws ":" ws en-str ws "," ws
+  "\"action_tendency\"" ws ":" ws action-tendency ws "," ws
+  "\"confidence\"" ws ":" ws confidence ws "," ws
+  "\"register\"" ws ":" ws register ws "," ws
+  "\"misinterpretation_type\"" ws ":" ws misinterpretation ws "," ws
+  "\"temperament_bias\"" ws ":" ws snake-str ws
+"}"
+
+action-tendency ::= "\"mobilize\"" | "\"defend\"" | "\"wait\"" | "\"retreat\"" | "\"celebrate\"" | "\"mourn\""
+confidence ::= "0" ("." [0-9] [0-9]?)? | "1" (".0" "0"?)?
+register ::= "\"haera\"" | "\"hao\"" | "\"hae\""
+misinterpretation ::= "\"overconfident_literal\"" | "\"cautious_reversal\"" | "\"optimistic_expansion\"" | "\"passive_deferral\"" | "\"symbolic_abstraction\""
+ko-str ::= "\"" ko-chars "\""
+en-str ::= "\"" en-chars "\""
+snake-str ::= "\"" snake-chars "\""
+ko-chars ::= ko-char ko-chars | ko-char
+en-chars ::= en-char en-chars | en-char
+snake-chars ::= snake-char snake-chars | snake-char
+ko-char ::= [가-힣] | " " | "," | "." | "!" | "?"
+en-char ::= [a-zA-Z] | " " | "," | "." | "!" | "?" | "'" | "-"
+snake-char ::= [a-z] | "_"
+ws ::= [ \t\n]*

@@ -146,11 +146,11 @@ validation:
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_a.txt").write_text(
-        '{"text_ko":"...", "text_en":"...", "register":"haera", "dominant_trait":"{dominant_trait}"}\n',
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "dominant_trait":"{dominant_trait}", "temperament_expressed":"mixed"}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_b.txt").write_text(
-        '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"]}\n',
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"], "temperament_influence":"mixed_temperament_restrained_fear"}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_c.txt").write_text(
@@ -162,11 +162,11 @@ validation:
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_e.txt").write_text(
-        '{"action_id":0, "confidence":0.9, "hint_ko":"...", "hint_en":"...", "personality_reasoning":"{personality_reasoning}"}\n',
+        '{"action_id":0, "confidence":0.9, "hint_ko":"...", "hint_en":"...", "personality_reasoning":"{personality_reasoning}", "temperament_factor":"mixed_temperament_balanced_choice"}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_f.txt").write_text(
-        '{"emotion":"fear", "intensity":0.9, "cause_ko":"...", "cause_en":"...", "previous_emotion":"{current_emotion_id}", "transition_type":"sudden"}\n',
+        '{"emotion":"fear", "intensity":0.9, "cause_ko":"...", "cause_en":"...", "previous_emotion":"{current_emotion_id}", "transition_type":"sudden", "temperament_amplifier":"mixed_temperament_balanced_fear"}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/training/layer3_system.txt").write_text("JSON only bilingual output.", encoding="utf-8")
@@ -185,7 +185,7 @@ def test_generate_data_builds_jobs_from_config_and_prompts(tmp_path: Path) -> No
     for job in jobs:
         counts[job["task"]] = counts.get(job["task"], 0) + 1
 
-    assert counts == {"A": 2, "B": 4, "C": 2, "D": 2, "E": 2, "F": 4}
+    assert counts == {"A": 2, "B": 4, "C": 6, "D": 2, "E": 2, "F": 4}
     assert jobs[0]["system_prompt"] == "JSON only bilingual output."
     assert jobs[0]["expected_format"] == "json"
 
@@ -200,7 +200,7 @@ def test_validate_data_splits_passed_and_failed_records(tmp_path: Path) -> None:
                 "task": "A",
                 "register": "haera",
                 "dominant_trait": "conscientiousness",
-                "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"}),
+                "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"}),
             },
             {
                 "task": "D",
@@ -226,7 +226,7 @@ def test_prepare_dataset_combines_validated_and_sample_streams(tmp_path: Path) -
     repo_root = bootstrap_repo(tmp_path)
     write_jsonl(
         repo_root / "data/validated/passed.jsonl",
-        [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"})}],
+        [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"})}],
     )
 
     module = load_module("prepare_dataset", Path.cwd() / "scripts/prepare_dataset.py")
@@ -254,7 +254,7 @@ def test_prepare_dataset_respects_dataset_mix_flags(tmp_path: Path) -> None:
     config_path.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False), encoding="utf-8")
     write_jsonl(
         repo_root / "data/validated/passed.jsonl",
-        [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"})}],
+        [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"})}],
     )
 
     module = load_module("prepare_dataset", Path.cwd() / "scripts/prepare_dataset.py")

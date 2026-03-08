@@ -1,0 +1,62 @@
+[과제] 아래 인물이 아래 신탁을 어떻게 받아들일지 이중언어 JSON으로만 답하라.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
+
+[인물 성격]
+{personality_keywords}
+
+[ROLE]
+{speaker_role}
+
+[STRESS]
+{stress}
+
+[RECENT]
+{recent_context}
+
+[WORLD]
+{world_id}
+
+[WORLD_DESC]
+{world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
+
+[ORACLE]
+{oracle_text_ko}
+
+[어투]
+{register_instruction}
+
+[어투 코드]
+{register}
+
+[행동 기울기 선택지]
+mobilize, defend, wait, retreat, celebrate, mourn
+
+[오해 방식 선택지]
+overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction
+
+[출력 형식]
+{{"interpretation_ko":"순우리말 1문장","interpretation_en":"English 1 sentence","action_tendency":"행동 기울기 1개","confidence":0.0,"register":"{register}","misinterpretation_type":"오해 방식 1개","temperament_bias":"English snake_case phrase"}}
+
+[규칙]
+- interpretation_ko는 신탁을 이 인물이 스스로 풀이한 순우리말 1문장 15~40글자로 써라
+- interpretation_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
+- action_tendency는 위 선택지 중 하나만 쓴다
+- confidence는 이 해석을 얼마나 굳게 믿는지 0.0~1.0으로 적어라
+- register는 반드시 "{register}"로 고정하라
+- misinterpretation_type은 위 선택지 중 하나만 쓴다
+- temperament_bias는 이 기질이 해석을 어떻게 비틀었는지 영어 snake_case 한 구절로 적어라
+- JSON만 출력하라
+
+[변형번호]
+{variant}

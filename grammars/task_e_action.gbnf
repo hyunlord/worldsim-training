@@ -3,16 +3,20 @@ root ::= "{" ws
   "\"confidence\"" ws ":" ws confidence ws "," ws
   "\"hint_ko\"" ws ":" ws ko-str ws "," ws
   "\"hint_en\"" ws ":" ws en-str ws "," ws
-  "\"personality_reasoning\"" ws ":" ws reasoning ws
+  "\"personality_reasoning\"" ws ":" ws reasoning ws "," ws
+  "\"temperament_factor\"" ws ":" ws snake-str ws
 "}"
 
 action-id ::= [0-9]
 confidence ::= "0" ("." [0-9] [0-9]?)? | "1" (".0" "0"?)?
 ko-str ::= "\"" ko-chars "\""
 en-str ::= "\"" en-chars "\""
+snake-str ::= "\"" snake-chars "\""
 ko-chars ::= ko-char ko-chars | ko-char
 en-chars ::= en-char en-chars | en-char
+snake-chars ::= snake-char snake-chars | snake-char
 ko-char ::= [가-힣] | " " | "," | "." | "!" | "?"
 en-char ::= [a-zA-Z] | " " | "," | "." | "!" | "?" | "'" | "-"
-reasoning ::= "\"high_honesty_humility\"" | "\"high_emotionality\"" | "\"high_extraversion\"" | "\"high_agreeableness\"" | "\"high_conscientiousness\"" | "\"high_openness\""
+snake-char ::= [a-z] | "_"
+reasoning ::= "\"high_NS\"" | "\"high_HA\"" | "\"high_RD\"" | "\"high_P\""
 ws ::= [ \t\n]*

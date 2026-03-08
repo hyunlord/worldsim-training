@@ -1,0 +1,51 @@
+root ::= "{" ws
+  "\"name\"" ws ":" ws pascal-str ws "," ws
+  "\"description_en\"" ws ":" ws en-str ws "," ws
+  "\"resource_modifiers\"" ws ":" ws resource-modifier-arr ws "," ws
+  "\"special_zones\"" ws ":" ws special-zone-arr ws "," ws
+  "\"special_resources\"" ws ":" ws special-resource-arr ws "," ws
+  "\"agent_modifiers\"" ws ":" ws agent-modifier-arr ws
+"}"
+
+resource-modifier-arr ::= "[" ws "]" | "[" ws resource-modifier (ws "," ws resource-modifier)* ws "]"
+resource-modifier ::= "{" ws
+  "\"target\"" ws ":" ws id-str ws "," ws
+  "\"multiplier\"" ws ":" ws multiplier
+ws "}"
+
+special-zone-arr ::= "[" ws "]" | "[" ws special-zone (ws "," ws special-zone)* ws "]"
+special-zone ::= "{" ws
+  "\"kind\"" ws ":" ws id-str ws "," ws
+  "\"spawn_count_min\"" ws ":" ws count ws "," ws
+  "\"spawn_count_max\"" ws ":" ws count
+ws "}"
+
+special-resource-arr ::= "[" ws "]" | "[" ws special-resource (ws "," ws special-resource)* ws "]"
+special-resource ::= "{" ws
+  "\"name\"" ws ":" ws id-str ws "," ws
+  "\"tags\"" ws ":" ws tag-arr
+ws "}"
+
+tag-arr ::= "[" ws "]" | "[" ws id-str (ws "," ws id-str)* ws "]"
+
+agent-modifier-arr ::= "[" ws "]" | "[" ws agent-modifier (ws "," ws agent-modifier)* ws "]"
+agent-modifier ::= "{" ws
+  "\"system\"" ws ":" ws id-str ws "," ws
+  "\"trigger\"" ws ":" ws id-str ws "," ws
+  "\"effect\"" ws ":" ws id-str
+ws "}"
+
+pascal-str ::= "\"" pascal pascal-tail "\""
+pascal ::= [A-Z]
+pascal-tail ::= pascal-char pascal-tail | pascal-char
+pascal-char ::= [a-zA-Z]
+en-str ::= "\"" en-chars "\""
+en-chars ::= en-char en-chars | en-char
+en-char ::= [a-zA-Z] | " " | "," | "." | "!" | "?" | "'" | "-"
+id-str ::= "\"" id-chars "\""
+id-chars ::= id-char id-chars | id-char
+id-char ::= [a-z] | [0-9] | "_"
+multiplier ::= digit ("." [0-9] [0-9]?)?
+digit ::= [0-5]
+count ::= [1-9] | "10"
+ws ::= [ \t\n]*

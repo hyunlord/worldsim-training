@@ -1,0 +1,18 @@
+[과제] 아래 세계관 텍스트를 WorldRuleset JSON IR로만 변환하라.
+
+[WORLDBUILDING]
+{worldbuilding_text}
+
+[출력 형식]
+{{"name":"PascalCase English name","description_en":"English one-sentence summary","resource_modifiers":[{{"target":"resource_id","multiplier":0.0}}],"special_zones":[{{"kind":"zone_kind","spawn_count_min":1,"spawn_count_max":10}}],"special_resources":[{{"name":"resource_name","tags":["tag_one"]}}],"agent_modifiers":[{{"system":"system_name","trigger":"trigger_name","effect":"effect_name"}}]}}
+
+[규칙]
+- 입력 텍스트에 언급된 것만 JSON에 넣어라
+- 언급되지 않은 슬롯은 빈 배열 []로 남겨라
+- name은 영어 PascalCase로 써라
+- description_en은 영어 1문장으로만 요약하라
+- target, kind, name, tags, system, trigger, effect는 모두 영어 id로 써라
+- JSON만 출력하라
+
+[변형번호]
+{variant}

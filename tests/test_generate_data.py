@@ -165,6 +165,217 @@ def bootstrap_bilingual_assets(tmp_path: Path) -> tuple[Path, Path]:
     return config_dir, prompts_dir
 
 
+def bootstrap_v31_assets(tmp_path: Path) -> tuple[Path, Path]:
+    config_dir = tmp_path / "config"
+    prompts_dir = tmp_path / "prompts"
+    grammars_dir = tmp_path / "grammars"
+    (prompts_dir / "teacher").mkdir(parents=True)
+    config_dir.mkdir()
+    grammars_dir.mkdir()
+
+    write_yaml(
+        config_dir / "situations.yaml",
+        {
+            "situations": [
+                {
+                    "id": "predator",
+                    "ko": "짐승발견",
+                    "desc": "날랜 짐승이 무리 곁에 나타났다",
+                    "action_options": ["도망", "숨기", "맞서기", "경고", "얼어붙기"],
+                }
+            ]
+        },
+    )
+    write_yaml(
+        config_dir / "personalities.yaml",
+        {
+            "personalities": [
+                {
+                    "id": "cautious_elder",
+                    "ko": "신중한원로",
+                    "keywords": ["겁많음", "꼼꼼함"],
+                    "desc": "위험을 먼저 살핀다",
+                    "default_register": "hao",
+                    "dominant_trait": "conscientiousness",
+                    "speaker_role": "elder",
+                    "personality_reasoning": "high_conscientiousness",
+                }
+            ]
+        },
+    )
+    write_yaml(
+        config_dir / "emotions.yaml",
+        {
+            "emotions": [
+                {"id": "fear", "ko": "두려움", "intensities": [0.9], "mimetics": ["오들오들"]},
+                {"id": "trust", "ko": "믿음", "intensities": [0.4], "mimetics": ["든든히"]},
+            ]
+        },
+    )
+    write_yaml(
+        config_dir / "generation.yaml",
+        {
+            "seed": 11,
+            "task_variants": {"A": 1, "B": 1, "C": 1, "D": 1, "E": 1, "F": 1, "G": 1, "H": 1},
+            "paths": {"raw_dir": "data/raw"},
+            "names": ["돌이"],
+            "provider": {
+                "require_parameters": False,
+                "pricing": {
+                    "input_per_million_tokens_usd": 3.0,
+                    "output_per_million_tokens_usd": 15.0,
+                },
+            },
+            "prompts": {
+                "teacher": {
+                    "system": "prompts/teacher/system.txt",
+                    "tasks": {
+                        "A": "prompts/teacher/task_a.txt",
+                        "B": "prompts/teacher/task_b.txt",
+                        "C": "prompts/teacher/task_c.txt",
+                        "D": "prompts/teacher/task_d.txt",
+                        "E": "prompts/teacher/task_e.txt",
+                        "F": "prompts/teacher/task_f.txt",
+                        "G": "prompts/teacher/task_g.txt",
+                        "H": "prompts/teacher/task_h.txt",
+                    },
+                },
+                "grammars": {
+                    "task_e_action": "grammars/task_e_action.gbnf",
+                    "task_f_emotion": "grammars/task_f_emotion.gbnf",
+                    "task_g_oracle": "grammars/task_g_oracle.gbnf",
+                    "task_h_worldruleset": "grammars/task_h_worldruleset.gbnf",
+                },
+            },
+            "temperaments": [
+                {
+                    "id": "choleric",
+                    "ko": "담즙질",
+                    "tci": {"NS": 0.8, "HA": 0.2, "RD": 0.5, "P": 0.7},
+                    "keywords": ["당당함", "충동적"],
+                    "bias": "action_oriented",
+                },
+                {
+                    "id": "melancholic",
+                    "ko": "우울질",
+                    "tci": {"NS": 0.2, "HA": 0.8, "RD": 0.6, "P": 0.4},
+                    "keywords": ["신중함", "비관적"],
+                    "bias": "cautious_conservative",
+                },
+            ],
+            "worlds": [
+                {"id": "default", "ko": "기본세계", "desc": "석기시대 기본 생태계", "vocab_additions": []},
+                {"id": "winter", "ko": "겨울세계", "desc": "눈보라와 불씨가 귀한 세계", "vocab_additions": ["눈보라", "불씨"]},
+            ],
+            "oracles": [
+                {
+                    "id": "oracle_01",
+                    "text_ko": "북쪽 산 너머에 풍요가 있다",
+                    "text_en": "Abundance lies beyond the northern mountain",
+                    "ambiguity": "high",
+                }
+            ],
+            "worldbuilding_texts": [
+                {
+                    "id": "wb_01",
+                    "text": "이 세계는 마녀의 저주로 지상이 황폐해졌고, 미궁에서만 자원이 나오며, 마석이 화폐이다.",
+                    "expected_world_type": "dungeon",
+                }
+            ],
+            "tasks": {
+                "H": {"teacher_model": "openai/gpt-4.1"},
+            },
+            "validation": {
+                "trait_axes": [
+                    "honesty_humility",
+                    "emotionality",
+                    "extraversion",
+                    "agreeableness",
+                    "conscientiousness",
+                    "openness",
+                ],
+                "reasoning_axes": [
+                    "high_honesty_humility",
+                    "high_emotionality",
+                    "high_extraversion",
+                    "high_agreeableness",
+                    "high_conscientiousness",
+                    "high_openness",
+                ],
+                "speaker_roles": ["elder", "hunter", "shaman", "warrior", "healer", "gatherer", "craftsman", "chief", "scout", "observer"],
+                "transition_types": ["gradual", "sudden", "sustained"],
+                "temperament_ids": ["choleric", "melancholic"],
+                "temperament_biases": ["action_oriented", "cautious_conservative"],
+                "world_ids": ["default", "winter"],
+                "oracle_action_tendencies": ["mobilize", "defend", "wait", "retreat", "celebrate", "mourn"],
+                "oracle_misinterpretations": [
+                    "overconfident_literal",
+                    "cautious_reversal",
+                    "optimistic_expansion",
+                    "passive_deferral",
+                    "symbolic_abstraction",
+                ],
+                "task_limits": {
+                    "A": {"min_chars": 20, "max_chars": 40, "sentences": 1},
+                    "B": {"min_chars": 30, "max_chars": 60, "sentences": 2},
+                    "C": {"min_chars": 15, "max_chars": 30, "sentences": 1},
+                    "D": {"min_chars": 10, "max_chars": 25, "sentences": 1},
+                    "E": {"min_chars": 10, "max_chars": 30, "sentences": 1},
+                    "F": {"min_chars": 10, "max_chars": 25, "sentences": 1},
+                    "G": {"min_chars": 15, "max_chars": 40, "sentences": 1},
+                },
+            },
+        },
+    )
+
+    (prompts_dir / "teacher" / "system.txt").write_text("teacher system", encoding="utf-8")
+    (prompts_dir / "teacher" / "task_a.txt").write_text(
+        '[TASK] A\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[PERS] {personality_keywords}\n'
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "dominant_trait":"{dominant_trait}", "temperament_expressed":"{temperament_id}"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_b.txt").write_text(
+        '[TASK] B\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[PERS] {personality_keywords}\n'
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"], "temperament_influence":"high_HA_amplified_fear"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_c.txt").write_text(
+        '[TASK] C\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[ROLE] {speaker_role}\n'
+        '{"speech_ko":"...", "speech_en":"...", "register":"{register}", "emotion_expressed":"{emotion_id}", "speaker_role":"{speaker_role}", "temperament_tone":"choleric_directness"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_d.txt").write_text(
+        '[TASK] D\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[NAME] {name}\n'
+        '{"text_ko":"...", "text_en":"...", "event_type":"{situation_id}"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_e.txt").write_text(
+        '[TASK] E\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[OPTIONS] {options_line}\n'
+        '{"action_id":0, "confidence":0.9, "hint_ko":"...", "hint_en":"...", "personality_reasoning":"{personality_reasoning}", "temperament_factor":"harm_avoidance_dominant"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_f.txt").write_text(
+        '[TASK] F\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[CURRENT_EMOT] {current_emotion_id}\n'
+        '{"emotion":"fear", "intensity":0.9, "cause_ko":"...", "cause_en":"...", "previous_emotion":"{current_emotion_id}", "transition_type":"sudden", "temperament_amplifier":"high_HA_intensifies_fear"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_g.txt").write_text(
+        '[TASK] G\n[TEMP] {temperament_line}\n[PERS] {personality_keywords}\n[ORACLE] {oracle_text_ko}\n[WORLD] {world_id}\n'
+        '{"interpretation_ko":"...", "interpretation_en":"...", "action_tendency":"mobilize", "confidence":0.9, "register":"hao", "misinterpretation_type":"overconfident_literal", "temperament_bias":"choleric_action_oriented"}',
+        encoding="utf-8",
+    )
+    (prompts_dir / "teacher" / "task_h.txt").write_text(
+        '[TASK] H\n[WORLD] {world_id}\n[WORLDBUILDING] {worldbuilding_text}\n'
+        '{"name":"DungeonEconomy", "description_en":"Cursed surface world with dungeon-based economy.", "resource_modifiers":[{"target":"dungeon_loot","multiplier":3.0}], "special_zones":[{"kind":"dungeon_node","spawn_count_min":3,"spawn_count_max":7}], "special_resources":[{"name":"magic_stone","tags":["currency","tradeable"]}], "agent_modifiers":[{"system":"temperament","trigger":"essence_equip","effect":"shift_random_axis"}]}',
+        encoding="utf-8",
+    )
+    (grammars_dir / "task_e_action.gbnf").write_text("root ::= \"{}\"", encoding="utf-8")
+    (grammars_dir / "task_f_emotion.gbnf").write_text("root ::= \"{}\"", encoding="utf-8")
+    (grammars_dir / "task_g_oracle.gbnf").write_text("root ::= \"{}\"", encoding="utf-8")
+    (grammars_dir / "task_h_worldruleset.gbnf").write_text("root ::= \"{}\"", encoding="utf-8")
+    return config_dir, prompts_dir
+
+
 def test_generate_data_builds_jobs_from_config_and_prompt_assets(tmp_path: Path) -> None:
     config_dir, prompts_dir = bootstrap_bilingual_assets(tmp_path)
 
@@ -174,7 +385,7 @@ def test_generate_data_builds_jobs_from_config_and_prompt_assets(tmp_path: Path)
 
     jobs = build_jobs(catalogs, settings)
 
-    assert len(jobs) == 11
+    assert len(jobs) == 13
     assert {job["task"] for job in jobs} == {"A", "B", "C", "D", "E", "F"}
     assert all(job["expected_format"] == "json" for job in jobs)
     assert next(job for job in jobs if job["task"] == "A")["dominant_trait"] == "conscientiousness"
@@ -216,15 +427,77 @@ def test_build_response_format_uses_structured_json_constraints_for_l4_and_l3(tm
 
     assert response_format_a["type"] == "json_schema"
     schema_a = response_format_a["json_schema"]["schema"]
-    assert schema_a["required"] == ["text_ko", "text_en", "register", "dominant_trait"]
+    assert schema_a["required"] == ["text_ko", "text_en", "register", "dominant_trait", "temperament_expressed"]
     assert schema_a["properties"]["dominant_trait"]["enum"] == ["conscientiousness"]
     assert schema_a["properties"]["register"]["enum"] == ["haera"]
+    assert schema_a["properties"]["temperament_expressed"]["enum"] == ["mixed"]
 
     schema_f = response_format_f["json_schema"]["schema"]
-    assert schema_f["required"] == ["emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type"]
+    assert schema_f["required"] == ["emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type", "temperament_amplifier"]
     assert schema_f["properties"]["previous_emotion"]["enum"] == ["fear", "trust"]
     assert schema_f["properties"]["transition_type"]["enum"] == ["gradual", "sudden", "sustained"]
     assert extra_body["provider"]["require_parameters"] is True
+
+
+def test_generate_data_builds_v31_jobs_with_context_and_new_tasks(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+
+    jobs = build_jobs(tmp_path)
+    counts = {task: [job["task"] for job in jobs].count(task) for task in {job["task"] for job in jobs}}
+
+    assert counts == {"A": 2, "B": 2, "C": 3, "D": 1, "E": 1, "F": 2, "G": 2, "H": 1}
+    task_a = next(job for job in jobs if job["task"] == "A" and job["temperament_id"] == "choleric")
+    task_g = next(job for job in jobs if job["task"] == "G")
+    task_h = next(job for job in jobs if job["task"] == "H")
+
+    assert task_a["world_id"] in {"default", "winter"}
+    assert task_a["temperament_line"] == "NS=0.8 HA=0.2 RD=0.5 P=0.7 type=choleric"
+    assert "[TEMP] NS=0.8 HA=0.2 RD=0.5 P=0.7 type=choleric" in task_a["prompt"]
+    assert "[STRESS]" in task_a["prompt"]
+    assert task_g["layer"] == "L5"
+    assert task_g["oracle_id"] == "oracle_01"
+    assert task_h["layer"] == "L0"
+    assert task_h["teacher_model"] == "openai/gpt-4.1"
+
+
+def test_build_response_format_uses_v31_required_fields_for_extended_tasks(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+    jobs = build_jobs(tmp_path)
+    settings = load_generation_config(tmp_path / "config")
+
+    task_a = next(job for job in jobs if job["task"] == "A")
+    task_g = next(job for job in jobs if job["task"] == "G")
+    task_h = next(job for job in jobs if job["task"] == "H")
+
+    response_format_a, _ = build_response_format(task_a, settings)
+    response_format_g, _ = build_response_format(task_g, settings)
+    response_format_h, _ = build_response_format(task_h, settings)
+
+    schema_a = response_format_a["json_schema"]["schema"]
+    schema_g = response_format_g["json_schema"]["schema"]
+    schema_h = response_format_h["json_schema"]["schema"]
+
+    assert schema_a["required"] == ["text_ko", "text_en", "register", "dominant_trait", "temperament_expressed"]
+    assert schema_a["properties"]["temperament_expressed"]["enum"] == ["choleric"]
+    assert schema_g["required"] == [
+        "interpretation_ko",
+        "interpretation_en",
+        "action_tendency",
+        "confidence",
+        "register",
+        "misinterpretation_type",
+        "temperament_bias",
+    ]
+    assert schema_g["properties"]["action_tendency"]["enum"] == ["mobilize", "defend", "wait", "retreat", "celebrate", "mourn"]
+    assert schema_h["required"] == [
+        "name",
+        "description_en",
+        "resource_modifiers",
+        "special_zones",
+        "special_resources",
+        "agent_modifiers",
+    ]
+    assert schema_h["properties"]["resource_modifiers"]["type"] == "array"
 
 
 def test_generate_dataset_prints_progress_and_final_usage_summary(tmp_path: Path, capsys) -> None:
@@ -233,8 +506,8 @@ def test_generate_dataset_prints_progress_and_final_usage_summary(tmp_path: Path
     def fake_generator(job: dict, system_prompt: str) -> dict:
         assert system_prompt == "teacher system"
         payloads = {
-            "A": {"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"},
-            "B": {"text_ko": "풀숲이 거세게 흔들렸다. 온몸이 오들오들 떨리며 물러섰다.", "text_en": "The bushes shook hard. Trembling all over, they backed away.", "register": "haera", "emotion_expressed": "fear", "intensity": 0.9, "mimetics": ["오들오들"]},
+            "A": {"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"},
+            "B": {"text_ko": "풀숲이 거세게 흔들렸다. 온몸이 오들오들 떨리며 물러섰다.", "text_en": "The bushes shook hard. Trembling all over, they backed away.", "register": "haera", "emotion_expressed": "fear", "intensity": 0.9, "mimetics": ["오들오들"], "temperament_influence": "mixed_temperament_restrained_fear"},
         }
         return {
             "output": compact_json(payloads[job["task"]]),
@@ -262,9 +535,9 @@ def test_generate_dataset_balances_limit_across_requested_tasks(tmp_path: Path) 
 
     def fake_generator(job: dict, system_prompt: str) -> dict:
         payload = (
-            {"action_id": 0, "confidence": 0.9, "hint_ko": "겁이 치밀어 곧바로 달아났다", "hint_en": "Fear surged, so they fled at once.", "personality_reasoning": "high_conscientiousness"}
+            {"action_id": 0, "confidence": 0.9, "hint_ko": "겁이 치밀어 곧바로 달아났다", "hint_en": "Fear surged, so they fled at once.", "personality_reasoning": "high_conscientiousness", "temperament_factor": "mixed_temperament_balanced_choice"}
             if job["task"] == "E"
-            else {"emotion": "fear", "intensity": 0.9, "cause_ko": "날랜 짐승이 바로 눈앞에 덮쳤다", "cause_en": "A fierce beast lunged right in front of them.", "previous_emotion": job["current_emotion_id"], "transition_type": "sudden"}
+            else {"emotion": "fear", "intensity": 0.9, "cause_ko": "날랜 짐승이 바로 눈앞에 덮쳤다", "cause_en": "A fierce beast lunged right in front of them.", "previous_emotion": job["current_emotion_id"], "transition_type": "sudden", "temperament_amplifier": "mixed_temperament_balanced_fear"}
         )
         return {
             "output": compact_json(payload),
@@ -296,13 +569,14 @@ def test_generate_dataset_retries_transient_failures_and_checkpoints_completed_r
             raise RuntimeError("persistent")
         return {
             "output": compact_json(
-                {
-                    "text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.",
-                    "text_en": "Fearless and always sees things through.",
-                    "register": "haera",
-                    "dominant_trait": "conscientiousness",
-                }
-            ),
+                    {
+                        "text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.",
+                        "text_en": "Fearless and always sees things through.",
+                        "register": "haera",
+                        "dominant_trait": "conscientiousness",
+                        "temperament_expressed": "mixed",
+                    }
+                ),
             "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
             "model": "test-model",
         }
@@ -313,6 +587,39 @@ def test_generate_dataset_retries_transient_failures_and_checkpoints_completed_r
 
     rows = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     assert attempts["count"] == 4
+    assert len(rows) == 1
+    assert json.loads(rows[0]["output"])["dominant_trait"] == "conscientiousness"
+
+
+def test_generate_dataset_retries_validation_failures_before_checkpointing(tmp_path: Path) -> None:
+    bootstrap_bilingual_assets(tmp_path)
+    settings = load_generation_config(tmp_path / "config")
+    settings["task_variants"] = {"A": 1, "B": 0, "C": 0, "D": 0, "E": 0, "F": 0}
+    settings["provider"]["retry_attempts"] = 2
+    settings["provider"]["retry_backoff_seconds"] = 0
+    write_yaml(tmp_path / "config" / "generation.yaml", settings)
+
+    attempts = {"count": 0}
+
+    def validation_flaky_generator(job: dict, system_prompt: str) -> dict:
+        attempts["count"] += 1
+        payload = (
+            {"text_ko": "끝맺음이 흐려 마음이놓", "text_en": "The ending trails off.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"}
+            if attempts["count"] == 1
+            else {"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"}
+        )
+        return {
+            "output": compact_json(payload),
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+            "model": "test-model",
+        }
+
+    output_path = tmp_path / "data" / "raw" / "validation_retry.jsonl"
+    result = generate_dataset(tmp_path, generator=validation_flaky_generator, limit=1, output_path=output_path, verbose=False)
+
+    rows = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert result.count == 1
+    assert attempts["count"] == 2
     assert len(rows) == 1
     assert json.loads(rows[0]["output"])["dominant_trait"] == "conscientiousness"
 

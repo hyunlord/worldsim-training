@@ -1,5 +1,14 @@
 [과제] 아래 인물이 아래 상황에서 어떤 행동을 고를지 JSON으로만 답하라.
 
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
+
 [이름]
 {name}
 
@@ -9,17 +18,29 @@
 [지금 느끼는 것]
 {emotion_name}:{emotion_intensity}
 
+[STRESS]
+{stress}
+
 [벌어진 일]
 {scenario_desc}
+
+[WORLD]
+{world_id}
+
+[WORLD_DESC]
+{world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
 
 [선택지]
 {action_options}
 
 [판단 근거 선택지]
-high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness
+high_NS, high_HA, high_RD, high_P
 
 [출력 형식]
-{{"action_id": 번호, "confidence": 0.0, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "personality_reasoning": "판단 근거 HEXACO 축"}}
+{{"action_id": 번호, "confidence": 0.0, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "personality_reasoning": "판단 근거 TCI 축", "temperament_factor": "English snake_case phrase"}}
 
 [규칙]
 - action_id는 위 선택지 번호 중 하나
@@ -27,6 +48,7 @@ high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness,
 - hint_ko는 왜 이 행동을 골랐는지 순우리말 10~30글자로 써라
 - hint_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
 - personality_reasoning은 위 선택지 중 하나로만 적어라
+- temperament_factor는 이 기질이 선택을 미는 힘을 영어 snake_case 한 구절로 적어라
 - JSON만 출력하고 다른 설명문은 쓰지 마라
 
 [변형번호]

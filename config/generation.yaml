@@ -5,11 +5,15 @@ provider:
   api_key_env: OPENROUTER_API_KEY
   model_env: OPENROUTER_MODEL
   default_model: anthropic/claude-sonnet-4-20250514
+  task_model_overrides:
+    H: openai/gpt-4.1
   temperature: 0.8
-  max_tokens: 256
-  require_parameters: true
+  max_tokens: 384
+  require_parameters: false
   retry_attempts: 3
   retry_backoff_seconds: 1.0
+  response_format: json_schema
+  response_format_fallback: json_object
   pricing:
     input_per_million_tokens_usd: 3.0
     output_per_million_tokens_usd: 15.0
@@ -38,9 +42,13 @@ prompts:
       D: prompts/teacher/task_d.txt
       E: prompts/teacher/task_e.txt
       F: prompts/teacher/task_f.txt
+      G: prompts/teacher/task_g.txt
+      H: prompts/teacher/task_h.txt
   training:
+    layer0_system: prompts/training/layer0_system.txt
     layer3_system: prompts/training/layer3_system.txt
     layer4_system: prompts/training/layer4_system.txt
+    layer5_system: prompts/training/layer5_system.txt
     negative_system: prompts/training/negative_system.txt
     general_system: prompts/training/general_system.txt
   validation:
@@ -49,14 +57,18 @@ prompts:
   grammars:
     task_e_action: grammars/task_e_action.gbnf
     task_f_emotion: grammars/task_f_emotion.gbnf
+    task_g_oracle: grammars/task_g_oracle.gbnf
+    task_h_world_ruleset: grammars/task_h_world_ruleset.gbnf
 
 task_variants:
-  A: 5
+  A: 2
   B: 2
-  C: 3
+  C: 1
   D: 5
-  E: 3
+  E: 2
   F: 1
+  G: 1
+  H: 5
 
 tasks:
   A:
@@ -66,7 +78,7 @@ tasks:
     output_fields:
       korean_primary: text_ko
       english_primary: text_en
-      required: [text_ko, text_en, register, dominant_trait]
+      required: [text_ko, text_en, register, dominant_trait, temperament_expressed]
   B:
     layer: L4
     expected_format: json
@@ -74,7 +86,7 @@ tasks:
     output_fields:
       korean_primary: text_ko
       english_primary: text_en
-      required: [text_ko, text_en, register, emotion_expressed, intensity, mimetics]
+      required: [text_ko, text_en, register, emotion_expressed, intensity, mimetics, temperament_influence]
   C:
     layer: L4
     expected_format: json
@@ -82,7 +94,7 @@ tasks:
     output_fields:
       korean_primary: speech_ko
       english_primary: speech_en
-      required: [speech_ko, speech_en, register, emotion_expressed, speaker_role]
+      required: [speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone]
   D:
     layer: L4
     expected_format: json
@@ -98,7 +110,7 @@ tasks:
     output_fields:
       korean_primary: hint_ko
       english_primary: hint_en
-      required: [action_id, confidence, hint_ko, hint_en, personality_reasoning]
+      required: [action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor]
   F:
     layer: L3
     expected_format: json
@@ -106,7 +118,23 @@ tasks:
     output_fields:
       korean_primary: cause_ko
       english_primary: cause_en
-      required: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type]
+      required: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type, temperament_amplifier]
+  G:
+    layer: L5
+    expected_format: json
+    description: 신탁 해석
+    output_fields:
+      korean_primary: interpretation_ko
+      english_primary: interpretation_en
+      required: [interpretation_ko, interpretation_en, action_tendency, confidence, register, misinterpretation_type, temperament_bias]
+  H:
+    layer: L0
+    expected_format: json
+    description: 세계관을 WorldRuleset JSON IR로 변환
+    output_fields:
+      machine_primary: name
+      english_primary: description_en
+      required: [name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers]
 
 names:
   - 돌이
@@ -120,28 +148,208 @@ names:
   - 바람
   - 씨앗
 
+v31_context:
+  input_tags: [TASK, TEMP, PERS, EMOT, STRESS, SITU, WORLD, REG, ORACLE, ROLE, RECENT, WORLDBUILDING]
+  temperament_axes:
+    NS: novelty_seeking
+    HA: harm_avoidance
+    RD: reward_dependence
+    P: persistence
+  default_world: default
+  default_register: haera
+  default_stress_range:
+    min: 0.1
+    max: 0.9
+  world_vocab_policy: "[WORLD_VOCAB]에 제시된 고유 낱말은 _ko 필드에서 예외적으로 그대로 쓸 수 있다."
+
 register_instructions:
   haera: 해라체로 써라. 문장을 -다, -는다, -았다, -었다 로 끝내라.
   hao: 하오체로 써라. 문장을 -오, -소, -시오 로 끝내라.
   hae: 해체로 써라. 문장을 -해, -야, -지, -어 로 끝내라.
 
+temperaments:
+  - id: choleric
+    ko: 담즙질
+    tci: {NS: 0.8, HA: 0.2, RD: 0.5, P: 0.7}
+    keywords: ["당당함", "충동적", "결단력", "지배적"]
+    bias: action_oriented
+  - id: melancholic
+    ko: 우울질
+    tci: {NS: 0.2, HA: 0.8, RD: 0.6, P: 0.4}
+    keywords: ["신중함", "불안함", "꼼꼼함", "비관적"]
+    bias: cautious_conservative
+  - id: sanguine
+    ko: 다혈질
+    tci: {NS: 0.7, HA: 0.3, RD: 0.8, P: 0.3}
+    keywords: ["낙천적", "사교적", "산만함", "열정적"]
+    bias: optimistic_social
+  - id: phlegmatic
+    ko: 점액질
+    tci: {NS: 0.3, HA: 0.4, RD: 0.3, P: 0.6}
+    keywords: ["차분함", "느긋함", "관망적", "끈기"]
+    bias: passive_steady
+  - id: mixed
+    ko: 혼합
+    tci: {NS: 0.5, HA: 0.5, RD: 0.5, P: 0.5}
+    keywords: ["균형적", "상황적"]
+    bias: context_dependent
+
+worlds:
+  - id: default
+    ko: 기본세계
+    desc: "석기시대, 지상자원 정상, 일반 생태계"
+    vocab_additions: []
+  - id: dungeon
+    ko: 미궁세계
+    desc: "지상 황폐, 미궁에서만 자원, 마석 화폐"
+    vocab_additions: ["마석", "정수", "미궁", "어둠길"]
+  - id: ocean
+    ko: 해양세계
+    desc: "섬과 바다, 항해와 교역 중심"
+    vocab_additions: ["돛", "뗏목", "물길", "갯바람"]
+  - id: winter
+    ko: 겨울세계
+    desc: "영구 동토, 극한 추위, 불의 가치 극대"
+    vocab_additions: ["얼음바람", "눈보라", "불씨", "얼어붙은"]
+  - id: magic
+    ko: 마법세계
+    desc: "마석 에너지, 정수 시스템, 기질 변화"
+    vocab_additions: ["마석", "정수", "기운", "빛줄기"]
+
+oracles:
+  - id: oracle_01
+    text_ko: "북쪽 산 너머에 풍요가 있다"
+    text_en: "Abundance lies beyond the northern mountain"
+    ambiguity: high
+  - id: oracle_02
+    text_ko: "물이 마르면 새 길이 열린다"
+    text_en: "When water dries, a new path opens"
+    ambiguity: high
+  - id: oracle_03
+    text_ko: "어둠 속에서 빛나는 것을 두려워하지 마라"
+    text_en: "Fear not what shines in darkness"
+    ambiguity: medium
+  - id: oracle_04
+    text_ko: "세 번 울면 하늘이 답한다"
+    text_en: "Cry thrice and the sky answers"
+    ambiguity: high
+  - id: oracle_05
+    text_ko: "뿌리 깊은 나무가 먼저 쓰러진다"
+    text_en: "The deep-rooted tree falls first"
+    ambiguity: high
+  - id: oracle_06
+    text_ko: "피를 나눈 자가 배신한다"
+    text_en: "The one who shared blood will betray"
+    ambiguity: medium
+  - id: oracle_07
+    text_ko: "불을 가진 자가 무리를 이끈다"
+    text_en: "The one who holds fire leads the tribe"
+    ambiguity: low
+  - id: oracle_08
+    text_ko: "달이 붉어지면 땅이 흔들린다"
+    text_en: "When the moon turns red, the earth trembles"
+    ambiguity: medium
+  - id: oracle_09
+    text_ko: "낯선 이의 손을 잡아라, 그것이 살 길이다"
+    text_en: "Take the stranger's hand, that is the way to live"
+    ambiguity: medium
+  - id: oracle_10
+    text_ko: "가장 작은 씨앗이 가장 큰 나무가 된다"
+    text_en: "The smallest seed becomes the greatest tree"
+    ambiguity: low
+  - id: oracle_11
+    text_ko: "강을 거슬러 올라가면 시작이 보인다"
+    text_en: "Go upstream and you will see the beginning"
+    ambiguity: high
+  - id: oracle_12
+    text_ko: "잠든 산을 깨우지 마라"
+    text_en: "Do not wake the sleeping mountain"
+    ambiguity: medium
+  - id: oracle_13
+    text_ko: "두 번째 비가 올 때 움직여라"
+    text_en: "Move when the second rain comes"
+    ambiguity: low
+  - id: oracle_14
+    text_ko: "그림자가 길어지면 돌아갈 때다"
+    text_en: "When shadows grow long, it is time to return"
+    ambiguity: medium
+  - id: oracle_15
+    text_ko: "흙 속에 묻은 것이 열매를 맺는다"
+    text_en: "What is buried in soil bears fruit"
+    ambiguity: medium
+  - id: oracle_16
+    text_ko: "바람이 부는 곳에 진실이 있다"
+    text_en: "Truth lies where the wind blows"
+    ambiguity: high
+  - id: oracle_17
+    text_ko: "짐승의 눈을 보아라, 거기에 답이 있다"
+    text_en: "Look into the beast's eyes, the answer is there"
+    ambiguity: high
+  - id: oracle_18
+    text_ko: "함께 울어야 함께 웃는다"
+    text_en: "Those who cry together will laugh together"
+    ambiguity: low
+  - id: oracle_19
+    text_ko: "높은 곳에 오르면 떨어질 곳도 높다"
+    text_en: "Climb high and the fall is high too"
+    ambiguity: medium
+  - id: oracle_20
+    text_ko: "첫 눈이 내리면 옛 것은 잊어라"
+    text_en: "When the first snow falls, forget the old"
+    ambiguity: medium
+
+worldbuilding_texts:
+  - id: wb_01
+    text: "이 세계는 마녀의 저주로 지상이 황폐해졌고, 미궁에서만 자원이 나오며, 마석이 화폐이고, 정수를 장착하면 기질이 변한다."
+    expected_world_type: dungeon
+  - id: wb_02
+    text: "끝없는 바다 위에 섬들이 흩어져 있다. 뗏목으로 섬 사이를 오가며 교역한다. 큰 물고기가 바다를 지배한다."
+    expected_world_type: ocean
+  - id: wb_03
+    text: "눈이 멈추지 않는다. 불씨가 가장 귀한 것이다. 얼어붙은 짐승의 가죽만이 추위를 막아준다."
+    expected_world_type: winter
+  - id: wb_04
+    text: "땅에서 빛나는 돌이 솟아난다. 이 돌을 만지면 힘이 솟고, 오래 만지면 마음이 변한다."
+    expected_world_type: magic
+  - id: wb_05
+    text: "평범한 석기시대. 숲과 강이 있고, 짐승을 사냥하고, 열매를 모은다. 불을 다룰 줄 아는 무리가 살아남는다."
+    expected_world_type: default
+  - id: wb_06
+    text: "하늘에서 불덩이가 떨어진 뒤, 땅이 갈라졌다. 갈라진 틈에서 이상한 기운이 올라온다. 이 기운을 마시면 힘이 세지지만 미쳐간다."
+    expected_world_type: magic
+  - id: wb_07
+    text: "큰 물이 나서 모든 것이 잠겼다. 살아남은 무리는 높은 곳으로 올라갔다. 물이 빠지면 아래로 내려가 먹거리를 찾는다."
+    expected_world_type: default
+  - id: wb_08
+    text: "거대한 나무가 하늘까지 자란다. 나무 위에 무리가 산다. 땅에는 짐승이 가득하여 내려갈 수 없다."
+    expected_world_type: default
+  - id: wb_09
+    text: "밤이 끝나지 않는 세계. 달빛만이 유일한 빛이다. 어둠 속 짐승은 눈이 빛나고, 불을 두려워한다."
+    expected_world_type: winter
+  - id: wb_10
+    text: "두 무리가 강을 사이에 두고 산다. 강 건너편은 적이다. 다리를 놓으면 전쟁이고, 끊으면 평화다."
+    expected_world_type: default
+
 validation:
   registers: [haera, hao, hae]
   emotions: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
   trait_axes:
-    - honesty_humility
-    - emotionality
-    - extraversion
-    - agreeableness
-    - conscientiousness
-    - openness
+    - novelty_seeking
+    - harm_avoidance
+    - reward_dependence
+    - persistence
+  temperament_ids: [choleric, melancholic, sanguine, phlegmatic, mixed]
+  temperament_biases:
+    - action_oriented
+    - cautious_conservative
+    - optimistic_social
+    - passive_steady
+    - context_dependent
   reasoning_axes:
-    - high_honesty_humility
-    - high_emotionality
-    - high_extraversion
-    - high_agreeableness
-    - high_conscientiousness
-    - high_openness
+    - high_NS
+    - high_HA
+    - high_RD
+    - high_P
   speaker_roles:
     - elder
     - hunter
@@ -154,6 +362,16 @@ validation:
     - scout
     - observer
   transition_types: [gradual, sudden, sustained]
+  action_tendencies: [mobilize, defend, wait, retreat, celebrate, mourn]
+  misinterpretation_types:
+    - overconfident_literal
+    - cautious_reversal
+    - optimistic_expansion
+    - passive_deferral
+    - symbolic_abstraction
+  world_ids: [default, dungeon, ocean, winter, magic]
+  zone_kinds: [dungeon_node, ocean_island, frozen_cave, magic_spring, tree_village, river_crossing]
+  resource_tags: [currency, tradeable, equippable, weapon, food, fuel, building, temperament_modifier, medicine]
   forbidden_words:
     - 식량
     - 마을
@@ -207,21 +425,26 @@ validation:
     D: { korean_field: text_ko, min_chars: 10, max_chars: 25, sentences: 1 }
     E: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
     F: { korean_field: cause_ko, min_chars: 10, max_chars: 25, sentences: 1 }
+    G: { korean_field: interpretation_ko, min_chars: 15, max_chars: 40, sentences: 1 }
   structured_json:
     A:
-      required_fields: [text_ko, text_en, register, dominant_trait]
+      required_fields: [text_ko, text_en, register, dominant_trait, temperament_expressed]
       korean_fields: [text_ko]
       english_fields: [text_en]
-      dominant_trait_enum: [honesty_humility, emotionality, extraversion, agreeableness, conscientiousness, openness]
+      register_enum: [haera, hao, hae]
+      dominant_trait_enum: [novelty_seeking, harm_avoidance, reward_dependence, persistence]
+      temperament_expressed_enum: [choleric, melancholic, sanguine, phlegmatic, mixed]
     B:
-      required_fields: [text_ko, text_en, register, emotion_expressed, intensity, mimetics]
+      required_fields: [text_ko, text_en, register, emotion_expressed, intensity, mimetics, temperament_influence]
       korean_fields: [text_ko]
       english_fields: [text_en]
+      register_enum: [haera, hao, hae]
       emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
     C:
-      required_fields: [speech_ko, speech_en, register, emotion_expressed, speaker_role]
+      required_fields: [speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone]
       korean_fields: [speech_ko]
       english_fields: [speech_en]
+      register_enum: [haera, hao, hae]
       emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
       speaker_role_enum: [elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer]
     D:
@@ -230,17 +453,29 @@ validation:
       english_fields: [text_en]
       event_type_enum: [predator, food_found, storm, injury, kin_death, theft, migration, tool_craft, fire, strangers]
     E:
-      required_fields: [action_id, confidence, hint_ko, hint_en, personality_reasoning]
+      required_fields: [action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor]
       korean_fields: [hint_ko]
       english_fields: [hint_en]
-      reasoning_enum: [high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness]
+      reasoning_enum: [high_NS, high_HA, high_RD, high_P]
     F:
-      required_fields: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type]
+      required_fields: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type, temperament_amplifier]
       korean_fields: [cause_ko]
       english_fields: [cause_en]
       emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
       previous_emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
       transition_type_enum: [gradual, sudden, sustained]
+    G:
+      required_fields: [interpretation_ko, interpretation_en, action_tendency, confidence, register, misinterpretation_type, temperament_bias]
+      korean_fields: [interpretation_ko]
+      english_fields: [interpretation_en]
+      register_enum: [haera, hao, hae]
+      action_tendency_enum: [mobilize, defend, wait, retreat, celebrate, mourn]
+      misinterpretation_type_enum: [overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction]
+    H:
+      required_fields: [name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers]
+      english_fields: [description_en]
+      zone_kind_enum: [dungeon_node, ocean_island, frozen_cave, magic_spring, tree_village, river_crossing]
+      resource_tag_enum: [currency, tradeable, equippable, weapon, food, fuel, building, temperament_modifier, medicine]
   auto_replacements:
     "마을": "무리가 사는 곳"
     "식량": "먹거리"
@@ -260,20 +495,32 @@ validation:
     "기술": "솜씨"
   layer3_json:
     task_e:
-      required_fields: [action_id, confidence, hint_ko, hint_en, personality_reasoning]
+      required_fields: [action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor]
       action_id_min: 0
       action_id_max: 9
       confidence_min: 0.0
       confidence_max: 1.0
       text_fields: [hint_ko, hint_en]
-      valid_reasoning_axes: [high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness]
+      valid_reasoning_axes: [high_NS, high_HA, high_RD, high_P]
     task_f:
-      required_fields: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type]
+      required_fields: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type, temperament_amplifier]
       valid_emotions: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
       intensity_min: 0.0
       intensity_max: 1.0
       text_fields: [cause_ko, cause_en]
       valid_transition_types: [gradual, sudden, sustained]
+  layer5_json:
+    task_g:
+      required_fields: [interpretation_ko, interpretation_en, action_tendency, confidence, register, misinterpretation_type, temperament_bias]
+      text_fields: [interpretation_ko, interpretation_en]
+      valid_action_tendencies: [mobilize, defend, wait, retreat, celebrate, mourn]
+      valid_misinterpretation_types: [overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction]
+  layer0_json:
+    task_h:
+      required_fields: [name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers]
+      list_fields: [resource_modifiers, special_zones, special_resources, agent_modifiers]
+      multiplier_min: 0.0
+      multiplier_max: 5.0
 
 dataset_mix:
   include_negative_samples: true

@@ -4,16 +4,20 @@ root ::= "{" ws
   "\"cause_ko\"" ws ":" ws ko-str ws "," ws
   "\"cause_en\"" ws ":" ws en-str ws "," ws
   "\"previous_emotion\"" ws ":" ws emotion ws "," ws
-  "\"transition_type\"" ws ":" ws transition-type ws
+  "\"transition_type\"" ws ":" ws transition-type ws "," ws
+  "\"temperament_amplifier\"" ws ":" ws snake-str ws
 "}"
 
 emotion ::= "\"joy\"" | "\"sadness\"" | "\"fear\"" | "\"anger\"" | "\"trust\"" | "\"disgust\"" | "\"surprise\"" | "\"anticipation\""
 intensity ::= "0" ("." [0-9] [0-9]?)? | "1" (".0" "0"?)?
 ko-str ::= "\"" ko-chars "\""
 en-str ::= "\"" en-chars "\""
+snake-str ::= "\"" snake-chars "\""
 ko-chars ::= ko-char ko-chars | ko-char
 en-chars ::= en-char en-chars | en-char
+snake-chars ::= snake-char snake-chars | snake-char
 ko-char ::= [가-힣] | " " | "," | "." | "!" | "?"
 en-char ::= [a-zA-Z] | " " | "," | "." | "!" | "?" | "'" | "-"
+snake-char ::= [a-z] | "_"
 transition-type ::= "\"gradual\"" | "\"sudden\"" | "\"sustained\""
 ws ::= [ \t\n]*
