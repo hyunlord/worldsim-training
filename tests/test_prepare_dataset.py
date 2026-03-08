@@ -190,6 +190,82 @@ dataset_mix:
     assert json.loads(rows[1]["messages"][2]["content"])["hint_en"] == "Fear surged, so they fled at once."
 
 
+def test_prepare_dataset_converts_layer0_and_layer5_rows_to_messages(tmp_path: Path) -> None:
+    config_dir = tmp_path / "config"
+    prompts_dir = tmp_path / "prompts" / "training"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    prompts_dir.mkdir(parents=True, exist_ok=True)
+
+    (config_dir / "generation.yaml").write_text(
+        """
+paths:
+  validated_dir: data/validated
+  final_dir: data/final
+  manifest_dir: artifacts/manifests
+  negative_samples_file: data/samples/negative_examples.jsonl
+  general_samples_file: data/samples/general_korean.jsonl
+prompts:
+  training:
+    layer0_system: prompts/training/layer0_system.txt
+    layer5_system: prompts/training/layer5_system.txt
+dataset_mix:
+  include_negative_samples: false
+  include_general_samples: false
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (prompts_dir / "layer0_system.txt").write_text("너는 세계관 규칙을 JSON IR로만 적는 도우미다.", encoding="utf-8")
+    (prompts_dir / "layer5_system.txt").write_text("너는 신탁 해석을 bilingual JSON으로만 적는 도우미다.", encoding="utf-8")
+
+    passed_file = tmp_path / "data" / "validated" / "passed.jsonl"
+    write_jsonl(
+        passed_file,
+        [
+            {
+                "task": "G",
+                "layer": "L5",
+                "prompt": "[TASK] G\n[ORACLE] 북쪽 산 너머에 풍요가 있다",
+                "output": compact_json(
+                    {
+                        "interpretation_ko": "산을 넘어야 살 길이 열린다오.",
+                        "interpretation_en": "We must cross the mountain to live.",
+                        "action_tendency": "mobilize",
+                        "confidence": 0.9,
+                        "register": "hao",
+                        "misinterpretation_type": "overconfident_literal",
+                        "temperament_bias": "choleric_action_oriented",
+                    }
+                ),
+            },
+            {
+                "task": "H",
+                "layer": "L0",
+                "prompt": "[TASK] H\n[WORLDBUILDING] 지상이 황폐하고 미궁에서만 자원이 나온다",
+                "output": compact_json(
+                    {
+                        "name": "DungeonEconomy",
+                        "description_en": "Cursed surface world with dungeon-based economy.",
+                        "resource_modifiers": [{"target": "dungeon_loot", "multiplier": 3.0}],
+                        "special_zones": [{"kind": "dungeon_node", "spawn_count_min": 3, "spawn_count_max": 7}],
+                        "special_resources": [{"name": "magic_stone", "tags": ["currency", "tradeable"]}],
+                        "agent_modifiers": [{"system": "temperament", "trigger": "essence_equip", "effect": "shift_random_axis"}],
+                    }
+                ),
+            },
+        ],
+    )
+    write_jsonl(tmp_path / "data" / "samples" / "negative_examples.jsonl", [])
+    write_jsonl(tmp_path / "data" / "samples" / "general_korean.jsonl", [])
+
+    result = prepare_dataset(repo_root=tmp_path, dataset_name="worldsim-v31")
+    rows = [json.loads(line) for line in result.dataset_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    assert rows[0]["messages"][0]["content"] == "너는 신탁 해석을 bilingual JSON으로만 적는 도우미다."
+    assert rows[1]["messages"][0]["content"] == "너는 세계관 규칙을 JSON IR로만 적는 도우미다."
+    assert json.loads(rows[1]["messages"][2]["content"])["name"] == "DungeonEconomy"
+
+
 def test_prepare_dataset_rejects_unsafe_dataset_name(tmp_path: Path) -> None:
     config_dir = tmp_path / "config"
     config_dir.mkdir(parents=True, exist_ok=True)

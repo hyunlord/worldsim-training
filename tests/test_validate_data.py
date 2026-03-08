@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts.validate_data import _resolve_validated_output_dir, auto_repair, load_validation_rules, validate_dataset, validate_file, validate_json_output
+from scripts.validate_data import _resolve_validated_output_dir, auto_repair, latest_raw_file, load_validation_rules, validate_dataset, validate_file, validate_json_output
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -60,6 +60,7 @@ def test_validate_file_repairs_korean_json_fields_and_writes_report(tmp_path: Pa
                         "text_en": "Watched the camp and gathered food.",
                         "register": "haera",
                         "dominant_trait": "conscientiousness",
+                        "temperament_expressed": "choleric",
                     }
                 ),
             },
@@ -86,6 +87,7 @@ def test_validate_file_repairs_korean_json_fields_and_writes_report(tmp_path: Pa
     repaired_d = json.loads(passed_rows[1]["output"])
     assert repaired_a["text_ko"] == "무리가 사는 곳 곁을 살피며 먹거리를 챙겼다."
     assert repaired_d["text_ko"] == "돌이가 먹거리를 찾았다."
+    assert repaired_a["temperament_expressed"] == "choleric"
     assert passed_rows[0]["repair_count"] == 1
     assert (validated_dir / "report.json").exists()
 
@@ -223,6 +225,62 @@ def test_validate_file_marks_invalid_bilingual_rows_as_failures(tmp_path: Path) 
     assert "invalid_transition_type" in failed_rows[1]["violations"]
 
 
+def test_validate_json_output_supports_v31_task_g_and_h_contracts() -> None:
+    rules = load_validation_rules_for_inline()
+    rules["temperament_ids"] = ["choleric", "melancholic"]
+    rules["temperament_biases"] = ["action_oriented", "cautious_conservative"]
+    rules["oracle_action_tendencies"] = ["mobilize", "defend", "wait", "retreat", "celebrate", "mourn"]
+    rules["oracle_misinterpretations"] = [
+        "overconfident_literal",
+        "cautious_reversal",
+        "optimistic_expansion",
+        "passive_deferral",
+        "symbolic_abstraction",
+    ]
+
+    valid_g = validate_json_output(
+        {
+            "task": "G",
+            "register": "hao",
+            "temperament_id": "choleric",
+            "output": compact_json(
+                {
+                    "interpretation_ko": "산을 넘어가야 살 길이 열린다오.",
+                    "interpretation_en": "We must cross the mountain to live.",
+                    "action_tendency": "mobilize",
+                    "confidence": 0.9,
+                    "register": "hao",
+                    "misinterpretation_type": "overconfident_literal",
+                    "temperament_bias": "choleric_action_oriented",
+                }
+            ),
+        },
+        rules,
+    )
+    invalid_h = validate_json_output(
+        {
+            "task": "H",
+            "output": compact_json(
+                {
+                    "name": "dungeonEconomy",
+                    "description_en": "short",
+                    "resource_modifiers": [{"target": "dungeon_loot", "multiplier": 9.0}],
+                    "special_zones": "bad",
+                    "special_resources": [],
+                    "agent_modifiers": [],
+                }
+            ),
+        },
+        rules,
+    )
+
+    assert valid_g == []
+    assert "invalid_name_format" in invalid_h
+    assert "short_description" in invalid_h
+    assert "missing_or_invalid_special_zones" in invalid_h
+    assert "invalid_multiplier_range" in invalid_h
+
+
 def test_validate_dataset_raises_clear_error_when_raw_dir_is_empty(tmp_path: Path) -> None:
     (tmp_path / "config").mkdir()
     (tmp_path / "data" / "raw").mkdir(parents=True)
@@ -239,6 +297,19 @@ paths:
 
     with pytest.raises(FileNotFoundError, match="No raw JSONL files found"):
         validate_dataset(tmp_path)
+
+
+def test_latest_raw_file_uses_newest_mtime_not_lexicographic_name(tmp_path: Path) -> None:
+    raw_dir = tmp_path / "data" / "raw"
+    raw_dir.mkdir(parents=True)
+    older = raw_dir / "review_tmp_failure.jsonl"
+    newer = raw_dir / "generated_20260308T123000000000Z.jsonl"
+    older.write_text("{}\n", encoding="utf-8")
+    newer.write_text("{}\n", encoding="utf-8")
+
+    selected = latest_raw_file(raw_dir)
+
+    assert selected == newer
 
 
 def test_validate_file_raises_clear_error_when_input_file_is_missing(tmp_path: Path) -> None:

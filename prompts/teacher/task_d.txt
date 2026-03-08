@@ -1,5 +1,23 @@
 [과제] 아래 상황이 일어났다는 알림을 이중언어 JSON으로만 써라.
 
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[STRESS]
+{stress}
+
+[WORLD]
+{world_id}
+
+[WORLD_DESC]
+{world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
+
 [누가]
 {name}
 

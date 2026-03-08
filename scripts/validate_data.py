@@ -41,15 +41,33 @@ DEFAULT_TRAIT_AXES = {
     "openness",
 }
 DEFAULT_REASONING_AXES = {f"high_{axis}" for axis in DEFAULT_TRAIT_AXES}
+DEFAULT_TEMPERAMENT_IDS = {"choleric", "melancholic", "sanguine", "phlegmatic", "mixed"}
+DEFAULT_TEMPERAMENT_BIASES = {
+    "action_oriented",
+    "cautious_conservative",
+    "optimistic_social",
+    "passive_steady",
+    "context_dependent",
+}
 DEFAULT_SPEAKER_ROLES = {"elder", "hunter", "shaman", "warrior", "healer", "gatherer", "craftsman", "chief", "scout", "observer"}
 DEFAULT_TRANSITION_TYPES = {"gradual", "sudden", "sustained"}
+DEFAULT_ORACLE_ACTION_TENDENCIES = {"mobilize", "defend", "wait", "retreat", "celebrate", "mourn"}
+DEFAULT_ORACLE_MISINTERPRETATIONS = {
+    "overconfident_literal",
+    "cautious_reversal",
+    "optimistic_expansion",
+    "passive_deferral",
+    "symbolic_abstraction",
+}
 TASK_REQUIRED_FIELDS = {
-    "A": ["text_ko", "text_en", "register", "dominant_trait"],
-    "B": ["text_ko", "text_en", "register", "emotion_expressed", "intensity", "mimetics"],
-    "C": ["speech_ko", "speech_en", "register", "emotion_expressed", "speaker_role"],
+    "A": ["text_ko", "text_en", "register", "dominant_trait", "temperament_expressed"],
+    "B": ["text_ko", "text_en", "register", "emotion_expressed", "intensity", "mimetics", "temperament_influence"],
+    "C": ["speech_ko", "speech_en", "register", "emotion_expressed", "speaker_role", "temperament_tone"],
     "D": ["text_ko", "text_en", "event_type"],
-    "E": ["action_id", "confidence", "hint_ko", "hint_en", "personality_reasoning"],
-    "F": ["emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type"],
+    "E": ["action_id", "confidence", "hint_ko", "hint_en", "personality_reasoning", "temperament_factor"],
+    "F": ["emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type", "temperament_amplifier"],
+    "G": ["interpretation_ko", "interpretation_en", "action_tendency", "confidence", "register", "misinterpretation_type", "temperament_bias"],
+    "H": ["name", "description_en", "resource_modifiers", "special_zones", "special_resources", "agent_modifiers"],
 }
 TASK_KO_FIELDS = {
     "A": ["text_ko"],
@@ -58,6 +76,8 @@ TASK_KO_FIELDS = {
     "D": ["text_ko"],
     "E": ["hint_ko"],
     "F": ["cause_ko"],
+    "G": ["interpretation_ko"],
+    "H": [],
 }
 TASK_EN_FIELDS = {
     "A": ["text_en"],
@@ -66,6 +86,8 @@ TASK_EN_FIELDS = {
     "D": ["text_en"],
     "E": ["hint_en"],
     "F": ["cause_en"],
+    "G": ["interpretation_en"],
+    "H": ["description_en"],
 }
 TASK_PRIMARY_KO_FIELD = {
     "A": "text_ko",
@@ -74,6 +96,7 @@ TASK_PRIMARY_KO_FIELD = {
     "D": "text_ko",
     "E": "hint_ko",
     "F": "cause_ko",
+    "G": "interpretation_ko",
 }
 
 
@@ -198,9 +221,12 @@ def _parse_output(output: object) -> tuple[dict | None, list[str]]:
 
 def _contextual_allowed_values(record: dict, rules: dict) -> dict[str, set[str] | None]:
     emotions = _enum_values(rules, "emotions", DEFAULT_EMOTIONS)
+    action_tendencies = _enum_values(rules, "oracle_action_tendencies", set()) or _enum_values(rules, "action_tendencies", DEFAULT_ORACLE_ACTION_TENDENCIES)
+    misinterpretations = _enum_values(rules, "oracle_misinterpretations", set()) or _enum_values(rules, "misinterpretation_types", DEFAULT_ORACLE_MISINTERPRETATIONS)
     allowed: dict[str, set[str] | None] = {
         "register": {str(record["register"])} if record.get("register") else _register_values(),
         "dominant_trait": {record["dominant_trait"]} if record.get("dominant_trait") else _enum_values(rules, "trait_axes", DEFAULT_TRAIT_AXES),
+        "temperament_expressed": {record["temperament_id"]} if record.get("temperament_id") else _enum_values(rules, "temperament_ids", DEFAULT_TEMPERAMENT_IDS),
         "emotion_expressed": {record["emotion_id"]} if record.get("emotion_id") else emotions,
         "emotion": emotions,
         "speaker_role": {record["speaker_role"]} if record.get("speaker_role") else _enum_values(rules, "speaker_roles", DEFAULT_SPEAKER_ROLES),
@@ -208,8 +234,65 @@ def _contextual_allowed_values(record: dict, rules: dict) -> dict[str, set[str] 
         "personality_reasoning": {record["personality_reasoning"]} if record.get("personality_reasoning") else _enum_values(rules, "reasoning_axes", DEFAULT_REASONING_AXES),
         "previous_emotion": {record["current_emotion_id"]} if record.get("current_emotion_id") else emotions,
         "transition_type": _enum_values(rules, "transition_types", DEFAULT_TRANSITION_TYPES),
+        "action_tendency": action_tendencies,
+        "misinterpretation_type": misinterpretations,
     }
     return allowed
+
+
+def validate_task_h(payload: dict) -> list[str]:
+    violations: list[str] = []
+    if not isinstance(payload.get("name"), str) or not re.match(r"^[A-Z][a-zA-Z]+$", payload["name"]):
+        violations.append("invalid_name_format")
+    description = payload.get("description_en")
+    if not isinstance(description, str) or len(description.strip()) < 10:
+        violations.append("short_description")
+
+    for field in ("resource_modifiers", "special_zones", "special_resources", "agent_modifiers"):
+        if not isinstance(payload.get(field), list):
+            violations.append(f"missing_or_invalid_{field}")
+
+    if isinstance(payload.get("resource_modifiers"), list):
+        for modifier in payload["resource_modifiers"]:
+            if not isinstance(modifier, dict):
+                violations.append("invalid_resource_modifier")
+                continue
+            multiplier = modifier.get("multiplier", -1)
+            if isinstance(multiplier, bool) or not isinstance(multiplier, (int, float)) or not 0 <= float(multiplier) <= 5:
+                violations.append("invalid_multiplier_range")
+
+    if isinstance(payload.get("special_zones"), list):
+        for zone in payload["special_zones"]:
+            if not isinstance(zone, dict):
+                violations.append("invalid_special_zone")
+                continue
+            spawn_min = zone.get("spawn_count_min")
+            spawn_max = zone.get("spawn_count_max")
+            if isinstance(spawn_min, bool) or not isinstance(spawn_min, int):
+                violations.append("invalid_spawn_count")
+            if isinstance(spawn_max, bool) or not isinstance(spawn_max, int):
+                violations.append("invalid_spawn_count")
+            if isinstance(spawn_min, int) and isinstance(spawn_max, int) and spawn_min > spawn_max:
+                violations.append("invalid_spawn_range")
+
+    if isinstance(payload.get("special_resources"), list):
+        for resource in payload["special_resources"]:
+            if not isinstance(resource, dict):
+                violations.append("invalid_special_resource")
+                continue
+            if not isinstance(resource.get("tags", []), list):
+                violations.append("invalid_resource_tags")
+
+    if isinstance(payload.get("agent_modifiers"), list):
+        for modifier in payload["agent_modifiers"]:
+            if not isinstance(modifier, dict):
+                violations.append("invalid_agent_modifier")
+                continue
+            for field in ("system", "trigger", "effect"):
+                if not isinstance(modifier.get(field), str) or not modifier[field].strip():
+                    violations.append(f"missing_{field}")
+
+    return violations
 
 
 def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, list[str], int]:
@@ -279,6 +362,9 @@ def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, lis
     if "dominant_trait" in payload and payload["dominant_trait"] not in (allowed["dominant_trait"] or set()):
         violations.append("invalid_dominant_trait")
 
+    if "temperament_expressed" in payload and payload["temperament_expressed"] not in (allowed["temperament_expressed"] or set()):
+        violations.append("invalid_temperament_expressed")
+
     emotion_field = "emotion_expressed" if "emotion_expressed" in payload else "emotion" if "emotion" in payload else None
     if emotion_field:
         if payload[emotion_field] not in (allowed[emotion_field] or set()):
@@ -299,6 +385,21 @@ def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, lis
     if "transition_type" in payload and payload["transition_type"] not in (allowed["transition_type"] or set()):
         violations.append("invalid_transition_type")
 
+    if "action_tendency" in payload and payload["action_tendency"] not in (allowed["action_tendency"] or set()):
+        violations.append("invalid_action_tendency")
+
+    if "misinterpretation_type" in payload and payload["misinterpretation_type"] not in (allowed["misinterpretation_type"] or set()):
+        violations.append("invalid_misinterpretation")
+
+    if "temperament_bias" in payload:
+        value = payload["temperament_bias"]
+        if not isinstance(value, str) or not value.strip():
+            violations.append("missing_temperament_bias")
+
+    for field in ("temperament_influence", "temperament_tone", "temperament_factor", "temperament_amplifier"):
+        if field in payload and (not isinstance(payload[field], str) or len(payload[field].strip()) < 3):
+            violations.append(f"missing_{field}" if field not in payload or isinstance(payload[field], str) else f"invalid_{field}_type")
+
     if "mimetics" in payload:
         if not isinstance(payload["mimetics"], list) or any(not isinstance(item, str) or not item.strip() for item in payload["mimetics"]):
             violations.append("invalid_mimetics")
@@ -315,6 +416,9 @@ def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, lis
         max_action = 9 if action_options is None else len(action_options) - 1
         if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= max_action:
             violations.append("invalid_action_id")
+
+    if task == "H":
+        violations.extend(validate_task_h(payload))
 
     return _compact_json(payload), sorted(set(violations)), repair_count
 
@@ -340,10 +444,10 @@ def _resolve_validated_output_dir(repo_root: Path, settings: dict, output_dir: s
 
 
 def latest_raw_file(raw_dir: Path) -> Path:
-    candidates = sorted(raw_dir.glob("*.jsonl"))
+    candidates = list(raw_dir.glob("*.jsonl"))
     if not candidates:
         raise FileNotFoundError(f"No raw JSONL files found in {raw_dir}")
-    return candidates[-1]
+    return max(candidates, key=lambda path: (path.stat().st_mtime_ns, path.name))
 
 
 def validate_file(

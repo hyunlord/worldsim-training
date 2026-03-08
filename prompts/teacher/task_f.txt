@@ -1,5 +1,14 @@
 [과제] 아래 인물이 이 일을 겪고 어떤 감정을 느끼게 될지 JSON으로만 답하라.
 
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
+
 [이름]
 {name}
 
@@ -9,8 +18,20 @@
 [지금 느끼는 것]
 {current_emotion_name}:{current_emotion_intensity}
 
+[STRESS]
+{stress}
+
 [벌어진 일]
 {scenario_desc}
+
+[WORLD]
+{world_id}
+
+[WORLD_DESC]
+{world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
 
 [감정 선택지]
 joy, sadness, fear, anger, trust, disgust, surprise, anticipation
@@ -29,7 +50,7 @@ joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 gradual, sudden, sustained
 
 [출력 형식]
-{{"emotion": "8개중하나", "intensity": 0.0, "cause_ko": "순우리말 한 문장", "cause_en": "English 1 sentence", "previous_emotion": "이전 감정", "transition_type": "전이 방식"}}
+{{"emotion": "8개중하나", "intensity": 0.0, "cause_ko": "순우리말 한 문장", "cause_en": "English 1 sentence", "previous_emotion": "이전 감정", "transition_type": "전이 방식", "temperament_amplifier": "English snake_case phrase"}}
 
 [규칙]
 - emotion은 위 8개 중 하나를 영어로 쓴다
@@ -38,4 +59,5 @@ gradual, sudden, sustained
 - cause_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
 - previous_emotion은 [지금 느끼는 것]에 맞는 영어 감정 id로 적어라
 - transition_type은 감정이 바뀌는 흐름에 맞춰 gradual, sudden, sustained 중 하나를 고르라
+- temperament_amplifier는 이 기질이 감정 세기를 어떻게 키우거나 누르는지 영어 snake_case 한 구절로 적어라
 - JSON만 출력하고 다른 설명문은 쓰지 마라

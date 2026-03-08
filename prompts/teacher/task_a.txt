@@ -1,4 +1,13 @@
-[과제] 아래 성격의 석기시대 인물을 이중언어 JSON으로만 묘사하라.
+[과제] 아래 인물의 기질과 성격을 이중언어 JSON으로만 묘사하라.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
 
 [성격 이름]
 {personality_name}
@@ -9,23 +18,36 @@
 [성격 키워드]
 {personality_keywords}
 
+[STRESS]
+{stress}
+
+[WORLD]
+{world_id}
+
+[WORLD_DESC]
+{world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
+
 [어투]
 {register_instruction}
 
 [어투 코드]
 {register}
 
-[지배 성향 선택지]
-honesty_humility, emotionality, extraversion, agreeableness, conscientiousness, openness
+[지배 기질축 선택지]
+novelty_seeking, harm_avoidance, reward_dependence, persistence
 
 [출력 형식]
-{{"text_ko":"순우리말 1문장","text_en":"English 1 sentence","register":"{register}","dominant_trait":"HEXACO 6축 중 하나"}}
+{{"text_ko":"순우리말 1문장","text_en":"English 1 sentence","register":"{register}","dominant_trait":"TCI 4축 중 하나","temperament_expressed":"{temperament_id}"}}
 
 [규칙]
 - text_ko는 순우리말 1문장 20~40글자로 써라
 - text_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
 - register는 반드시 "{register}"로 고정하라
-- dominant_trait는 위 성격에서 가장 두드러진 HEXACO 축 하나를 영어 소문자로 고르라
+- dominant_trait는 위 기질에서 가장 두드러진 TCI 축 하나를 영어 소문자로 고르라
+- temperament_expressed는 반드시 "{temperament_id}"로 고정하라
 - JSON만 출력하라
 
 [변형번호]

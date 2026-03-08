@@ -129,11 +129,11 @@ emotions:
         encoding="utf-8",
     )
     (root / "prompts" / "teacher" / "task_a.txt").write_text(
-        '{"text_ko":"...", "text_en":"...", "register":"haera", "dominant_trait":"{dominant_trait}"}\n',
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "dominant_trait":"{dominant_trait}", "temperament_expressed":"mixed"}\n',
         encoding="utf-8",
     )
     (root / "prompts" / "teacher" / "task_b.txt").write_text(
-        '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"]}\n',
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"], "temperament_influence":"mixed_temperament_restrained_fear"}\n',
         encoding="utf-8",
     )
     (root / "prompts" / "teacher" / "task_c.txt").write_text(
@@ -159,6 +159,7 @@ def test_generate_data_loads_repo_assets_and_writes_to_raw(tmp_path: Path) -> No
                 "text_en": "Fearless and always sees things through.",
                 "register": "haera",
                 "dominant_trait": "conscientiousness",
+                "temperament_expressed": "mixed",
             }
         )
 
@@ -199,7 +200,7 @@ def test_prepare_dataset_merges_validated_samples_and_writes_manifest(tmp_path: 
     negative_path = tmp_path / "data" / "samples" / "negative_examples.jsonl"
     general_path = tmp_path / "data" / "samples" / "general_korean.jsonl"
 
-    write_jsonl(passed_path, [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"})}])
+    write_jsonl(passed_path, [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness", "temperament_expressed": "mixed"})}])
     write_jsonl(negative_path, [{"task": "NEG", "output": "이 사람은 이다. 이 사람은 이다."}])
     write_jsonl(general_path, [{"task": "GEN", "output": "바람이 강물 위를 스쳐 간다."}])
 

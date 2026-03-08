@@ -1,16 +1,37 @@
 [과제] 아래 인물이 아래 상황에서 보이는 반응을 이중언어 JSON으로만 묘사하라.
 
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
+
 [인물 성격]
 {personality_keywords}
 
 [감정]
 {emotion_name}:{emotion_intensity}
 
+[STRESS]
+{stress}
+
 [참고 의성어]
 {mimetic}
 
 [상황]
 {scenario_desc}
+
+[WORLD]
+{world_id}
+
+[WORLD_DESC]
+{world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
 
 [어투]
 {register_instruction}
@@ -22,7 +43,7 @@
 joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 
 [출력 형식]
-{{"text_ko":"순우리말 2문장","text_en":"English 2 sentences","register":"{register}","emotion_expressed":"감정 8개 중 하나","intensity":0.0,"mimetics":["쓴 의성어"]}}
+{{"text_ko":"순우리말 2문장","text_en":"English 2 sentences","register":"{register}","emotion_expressed":"감정 8개 중 하나","intensity":0.0,"mimetics":["쓴 의성어"],"temperament_influence":"English snake_case phrase"}}
 
 [규칙]
 - text_ko는 순우리말 2문장 30~60글자로 써라
@@ -31,6 +52,7 @@ joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 - emotion_expressed는 위 느낌에 맞는 영어 감정 id 하나를 고르라
 - intensity는 주어진 세기를 반영해 0.0~1.0으로 적어라
 - mimetics에는 text_ko에 실제로 쓴 의성어 또는 의태어만 배열로 넣어라
+- temperament_influence는 이 기질이 반응을 어떻게 바꿨는지 영어 snake_case 한 구절로 적어라
 - JSON만 출력하라
 
 [변형번호]
