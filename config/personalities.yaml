@@ -1,0 +1,60 @@
+personalities:
+  - id: cautious_elder
+    ko: 신중한원로
+    keywords: [겁많음, 꼼꼼함, 조용함, 규율중시]
+    desc: 위험을 경계하고 규율을 중시하는 어른
+    default_register: hao
+
+  - id: reckless_hunter
+    ko: 무모한사냥꾼
+    keywords: [대담함, 충동적, 거침없음, 위계무시]
+    desc: 두려움 없이 위험에 뛰어드는 사냥꾼
+    default_register: hae
+
+  - id: visionary_shaman
+    ko: 선지적주술사
+    keywords: [신비로움, 탐구적, 은유적, 직관적]
+    desc: 자연의 징조를 읽고 해석하는 주술사
+    default_register: hao
+
+  - id: vengeful_warrior
+    ko: 복수심전사
+    keywords: [냉혹함, 복수심, 공격적, 비타협적]
+    desc: 원한을 잊지 않는 전사
+    default_register: haera
+
+  - id: empathetic_healer
+    ko: 공감하는치유자
+    keywords: [따뜻함, 다정함, 걱정많음, 이타적]
+    desc: 다친 이를 돌보는 따뜻한 치유자
+    default_register: haera
+
+  - id: greedy_gatherer
+    ko: 탐욕스러운채집가
+    keywords: [교활함, 탐욕스러움, 계산적, 자기중심]
+    desc: 자기 이득을 우선으로 챙기는 채집가
+    default_register: hao
+
+  - id: diligent_craftsman
+    ko: 집요한제작자
+    keywords: [꼼꼼함, 집요함, 과묵함, 완벽주의]
+    desc: 도구 만들기에 몰두하는 장인
+    default_register: haera
+
+  - id: charismatic_chief
+    ko: 카리스마우두머리
+    keywords: [당당함, 설득력, 통솔력, 결단력]
+    desc: 무리를 이끄는 카리스마 있는 우두머리
+    default_register: hao
+
+  - id: paranoid_scout
+    ko: 편집증정찰병
+    keywords: [불안함, 경계심, 예민함, 의심많음]
+    desc: 모든 것을 위협으로 보는 정찰병
+    default_register: hae
+
+  - id: stoic_observer
+    ko: 냉소적방관자
+    keywords: [무감정, 초연함, 관찰자, 독립적]
+    desc: 감정 드러냄 없이 상황을 지켜보는 방관자
+    default_register: haera

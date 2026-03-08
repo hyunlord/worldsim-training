@@ -1,0 +1,17 @@
+.env
+.venv/
+.omx/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+data/raw/*
+!data/raw/.gitkeep
+data/validated/*
+!data/validated/.gitkeep
+data/final/*
+!data/final/.gitkeep
+artifacts/merged/*
+!artifacts/merged/.gitkeep
+artifacts/gguf/*
+!artifacts/gguf/.gitkeep

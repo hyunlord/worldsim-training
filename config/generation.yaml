@@ -1,0 +1,112 @@
+seed: 42
+
+provider:
+  base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  model_env: OPENROUTER_MODEL
+  default_model: anthropic/claude-sonnet-4-20250514
+  temperature: 0.8
+  max_tokens: 128
+  request_headers:
+    referer: https://github.com/hyunlord/worldsim-training
+    title: WorldSim Training Data Generation
+
+paths:
+  raw_dir: data/raw
+  validated_dir: data/validated
+  final_dir: data/final
+  manifest_dir: artifacts/manifests
+  negative_samples_file: data/samples/negative_examples.jsonl
+  general_samples_file: data/samples/general_korean.jsonl
+
+prompts:
+  teacher:
+    system: prompts/teacher/system.txt
+    tasks:
+      A: prompts/teacher/task_a.txt
+      B: prompts/teacher/task_b.txt
+      C: prompts/teacher/task_c.txt
+      D: prompts/teacher/task_d.txt
+  validation:
+    rubric: prompts/validation/rubric.md
+    negative_style_guide: prompts/validation/negative_examples.md
+
+task_variants:
+  A: 5
+  B: 3
+  C: 3
+  D: 5
+
+names:
+  - 돌이
+  - 바위
+  - 새벽
+  - 이슬
+  - 구름
+  - 달빛
+  - 불꽃
+  - 물결
+  - 바람
+  - 씨앗
+
+register_instructions:
+  haera: 해라체로 써라. 문장을 -다, -는다, -았다, -었다 로 끝내라.
+  hao: 하오체로 써라. 문장을 -오, -소, -시오 로 끝내라.
+  hae: 해체로 써라. 문장을 -해, -야, -지, -어 로 끝내라.
+
+validation:
+  forbidden_words:
+    - 식량
+    - 마을
+    - 전투
+    - 자연
+    - 건축
+    - 국가
+    - 사회
+    - 족장
+    - 구출
+    - 기상
+    - 맹수
+    - 동맹
+    - 생존
+    - 결정
+    - 공격
+    - 방어
+    - 이동
+    - 제작
+    - 수집
+    - 교환
+    - 상황
+    - 감정
+    - 성격
+    - 인물
+    - 환경
+    - 위험
+    - 동물
+    - 식물
+    - 무기
+    - 기술
+    - 문화
+  meta_patterns:
+    - AI
+    - 모델
+    - 프롬프트
+    - 학습
+    - 데이터
+    - 시뮬레이션
+    - WorldSim
+    - 인공지능
+    - 언어 모델
+  register_endings:
+    haera: ['다[.\\s]?$', '는다[.\\s]?$', '았다[.\\s]?$', '었다[.\\s]?$', '였다[.\\s]?$', '한다[.\\s]?$']
+    hao: ['오[.\\s!]?$', '소[.\\s!]?$', '시오[.\\s!]?$', '구려[.\\s!]?$']
+    hae: ['해[.\\s!]?$', '야[.\\s!]?$', '지[.\\s!]?$', '어[.\\s!]?$', '았어[.\\s!]?$']
+  task_limits:
+    A: { min_chars: 15, max_chars: 50, sentences: 1 }
+    B: { min_chars: 25, max_chars: 80, sentences: 2 }
+    C: { min_chars: 10, max_chars: 40, sentences: 1 }
+    D: { min_chars: 8, max_chars: 30, sentences: 1 }
+
+dataset_mix:
+  include_negative_samples: true
+  include_general_samples: true

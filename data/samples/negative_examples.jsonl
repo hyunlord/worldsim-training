@@ -1,0 +1,2 @@
+{"task":"NEG","label":"reject","output":"이 사람은 이다. 이 사람은 이다.","reason":"repetition_loop"}
+{"task":"NEG","label":"reject","output":"식량을 수집하고 이동을 준비했다.","reason":"forbidden_sino_korean"}

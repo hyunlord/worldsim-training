@@ -1,0 +1,40 @@
+emotions:
+  - id: joy
+    ko: 기쁨
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [방긋, 덩실덩실, 싱글벙글]
+
+  - id: sadness
+    ko: 슬픔
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [그렁그렁, 글썽글썽, 훌쩍]
+
+  - id: fear
+    ko: 두려움
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [오들오들, 덜컥덜컥, 벌벌, 후들후들]
+
+  - id: anger
+    ko: 분노
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [부들부들, 벌컥, 으드득]
+
+  - id: trust
+    ko: 믿음
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [든든히, 묵묵히]
+
+  - id: disgust
+    ko: 역겨움
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [으윽, 칙칙]
+
+  - id: surprise
+    ko: 놀람
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [깜짝, 펄쩍, 화들짝]
+
+  - id: anticipation
+    ko: 기대
+    intensities: [0.3, 0.6, 0.9]
+    mimetics: [두근두근, 설레설레]

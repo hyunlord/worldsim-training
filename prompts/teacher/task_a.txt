@@ -1,0 +1,21 @@
+[과제] 아래 성격의 석기시대 인물을 순우리말 1문장으로 묘사하라.
+
+[성격 이름]
+{personality_name}
+
+[성격 설명]
+{personality_desc}
+
+[성격 키워드]
+{personality_keywords}
+
+[어투]
+{register_instruction}
+
+[길이]
+20~40글자
+
+[변형번호]
+{variant}
+
+1문장만 출력하라.
