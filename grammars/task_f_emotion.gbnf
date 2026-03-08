@@ -1,0 +1,7 @@
+root        ::= "{" ws "\"emotion\"" ws ":" ws emotion ws "," ws "\"intensity\"" ws ":" ws intensity ws "," ws "\"cause\"" ws ":" ws cause-str ws "}"
+emotion     ::= "\"joy\"" | "\"sadness\"" | "\"fear\"" | "\"anger\"" | "\"trust\"" | "\"disgust\"" | "\"surprise\"" | "\"anticipation\""
+intensity   ::= "0" ("." [0-9] [0-9]?)? | "1" (".0" "0"?)?
+cause-str   ::= "\"" cause-chars "\""
+cause-chars ::= cause-char cause-chars | cause-char
+cause-char  ::= [가-힣] | " " | "," | "."
+ws          ::= [ \t\n]*

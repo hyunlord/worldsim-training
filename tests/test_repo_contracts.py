@@ -137,10 +137,11 @@ def test_validate_data_reads_raw_and_writes_pass_fail_files(tmp_path: Path) -> N
 
     assert result.passed_path.parent == tmp_path / "data" / "validated"
     assert result.failed_path.parent == tmp_path / "data" / "validated"
-    assert len(read_jsonl(result.passed_path)) == 1
+    passed_rows = read_jsonl(result.passed_path)
+    assert len(passed_rows) == 2
+    assert passed_rows[1]["output"] == "먹거리를 발견했다."
     failed_rows = read_jsonl(result.failed_path)
-    assert len(failed_rows) == 1
-    assert failed_rows[0]["violations"] == ["forbidden(식량)"]
+    assert len(failed_rows) == 0
 
 
 def test_prepare_dataset_merges_validated_samples_and_writes_manifest(tmp_path: Path) -> None:

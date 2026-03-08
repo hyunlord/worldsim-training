@@ -1,0 +1,7 @@
+root       ::= "{" ws "\"action_id\"" ws ":" ws action-id ws "," ws "\"confidence\"" ws ":" ws confidence ws "," ws "\"hint\"" ws ":" ws hint-str ws "}"
+action-id  ::= [0-9]
+confidence ::= "0" ("." [0-9] [0-9]?)? | "1" (".0" "0"?)?
+hint-str   ::= "\"" hint-chars "\""
+hint-chars ::= hint-char hint-chars | hint-char
+hint-char  ::= [가-힣] | " " | "," | "."
+ws         ::= [ \t\n]*

@@ -3,48 +3,58 @@ situations:
     ko: 짐승발견
     desc: 날랜 짐승이 무리 가까이에 나타났다
     typical_actions: [도망, 숨기, 맞서기, 경고]
+    action_options: [도망, 숨기, 맞서기, 경고, 얼어붙기]
 
   - id: food_found
     ko: 먹거리발견
     desc: 먹을 것을 찾았다
     typical_actions: [채집, 나누기, 숨기기, 알리기]
+    action_options: [채집, 나누기, 숨기기, 알리기, 지켜보기]
 
   - id: storm
     ko: 비바람
     desc: 거센 비바람이 몰아친다
     typical_actions: [피하기, 움막보강, 불지키기, 견디기]
+    action_options: [피하기, 움막보강, 불지키기, 견디기, 도망]
 
   - id: injury
     ko: 부상
     desc: 누군가 다쳤다
     typical_actions: [돌보기, 풀바르기, 놔두기, 걱정하기]
+    action_options: [돌보기, 풀바르기, 놔두기, 걱정하기, 도움청하기]
 
   - id: kin_death
     ko: 친족사망
     desc: 가까운 이가 숨을 거두었다
     typical_actions: [슬퍼하기, 묻어주기, 분노하기, 받아들이기]
+    action_options: [슬퍼하기, 묻어주기, 분노하기, 받아들이기, 떠나기]
 
   - id: theft
     ko: 도둑적발
     desc: 누군가 먹거리를 훔친 것이 드러났다
     typical_actions: [따지기, 용서하기, 쫓아내기, 되찾기]
+    action_options: [따지기, 용서하기, 쫓아내기, 되찾기, 모른척하기]
 
   - id: migration
     ko: 무리이동
     desc: 무리가 새로운 곳으로 옮겨가야 한다
     typical_actions: [이끌기, 따르기, 거부하기, 정찰하기]
+    action_options: [이끌기, 따르기, 거부하기, 정찰하기, 뒤처지기]
 
   - id: tool_craft
     ko: 도구제작
     desc: 새로운 도구를 만들고 있다
     typical_actions: [깎기, 다듬기, 시험하기, 가르치기]
+    action_options: [깎기, 다듬기, 시험하기, 가르치기, 포기하기]
 
   - id: fire
     ko: 불발견
     desc: 불을 발견하거나 다루고 있다
     typical_actions: [지키기, 옮기기, 두려워하기, 놀라기]
+    action_options: [지키기, 옮기기, 두려워하기, 놀라기, 가까이가기]
 
   - id: strangers
     ko: 낯선무리
     desc: 낯선 무리가 다가오고 있다
     typical_actions: [경계하기, 맞이하기, 숨기기, 위협하기]
+    action_options: [경계하기, 맞이하기, 숨기기, 위협하기, 지켜보기]

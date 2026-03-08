@@ -173,10 +173,10 @@ def test_validate_data_splits_passed_and_failed_records(tmp_path: Path) -> None:
     passed = read_jsonl(repo_root / "data/validated/passed.jsonl")
     failed = read_jsonl(repo_root / "data/validated/failed.jsonl")
 
-    assert summary["passed"] == 1
-    assert summary["failed"] == 1
-    assert len(passed) == 1
-    assert failed[0]["violations"] == ["forbidden(식량)"]
+    assert summary["passed"] == 2
+    assert summary["failed"] == 0
+    assert len(passed) == 2
+    assert failed == []
 
 
 def test_prepare_dataset_combines_validated_and_sample_streams(tmp_path: Path) -> None:

@@ -7,9 +7,18 @@ provider:
   default_model: anthropic/claude-sonnet-4-20250514
   temperature: 0.8
   max_tokens: 128
+  require_parameters: true
+  retry_attempts: 3
+  retry_backoff_seconds: 1.0
+  pricing:
+    input_per_million_tokens_usd: 3.0
+    output_per_million_tokens_usd: 15.0
   request_headers:
     referer: https://github.com/hyunlord/worldsim-training
     title: WorldSim Training Data Generation
+
+reporting:
+  progress_every: 10
 
 paths:
   raw_dir: data/raw
@@ -27,15 +36,35 @@ prompts:
       B: prompts/teacher/task_b.txt
       C: prompts/teacher/task_c.txt
       D: prompts/teacher/task_d.txt
+      E: prompts/teacher/task_e.txt
+      F: prompts/teacher/task_f.txt
+  training:
+    layer3_system: prompts/training/layer3_system.txt
+    layer4_system: prompts/training/layer4_system.txt
+    negative_system: prompts/training/negative_system.txt
+    general_system: prompts/training/general_system.txt
   validation:
     rubric: prompts/validation/rubric.md
     negative_style_guide: prompts/validation/negative_examples.md
+  grammars:
+    task_e_action: grammars/task_e_action.gbnf
+    task_f_emotion: grammars/task_f_emotion.gbnf
 
 task_variants:
   A: 5
-  B: 3
+  B: 2
   C: 3
   D: 5
+  E: 3
+  F: 1
+
+tasks:
+  A: { layer: L4, expected_format: text, description: 성격 한줄 묘사 }
+  B: { layer: L4, expected_format: text, description: 상황 반응 묘사 }
+  C: { layer: L4, expected_format: text, description: 짧은 대사 }
+  D: { layer: L4, expected_format: text, description: 알림 카피 }
+  E: { layer: L3, expected_format: json, description: 행동 선택 }
+  F: { layer: L3, expected_format: json, description: 감정 판정 }
 
 names:
   - 돌이
@@ -106,6 +135,39 @@ validation:
     B: { min_chars: 25, max_chars: 80, sentences: 2 }
     C: { min_chars: 10, max_chars: 40, sentences: 1 }
     D: { min_chars: 8, max_chars: 30, sentences: 1 }
+    E: { min_chars: 10, max_chars: 30, sentences: null }
+    F: { min_chars: 10, max_chars: 25, sentences: null }
+  auto_replacements:
+    "마을": "무리가 사는 곳"
+    "식량": "먹거리"
+    "전투": "피 흘리는 싸움"
+    "자연": "온 누리"
+    "건축": "집짓기"
+    "족장": "우두머리"
+    "구출": "빼내오기"
+    "맹수": "날랜 짐승"
+    "동맹": "손잡기"
+    "공격": "덤비기"
+    "방어": "막아서기"
+    "이동": "옮겨가기"
+    "위험": "아슬아슬한 것"
+    "동물": "짐승"
+    "무기": "날붙이"
+    "기술": "솜씨"
+  layer3_json:
+    task_e:
+      required_fields: [action_id, confidence, hint]
+      action_id_min: 0
+      action_id_max: 9
+      confidence_min: 0.0
+      confidence_max: 1.0
+      text_fields: [hint]
+    task_f:
+      required_fields: [emotion, intensity, cause]
+      valid_emotions: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+      intensity_min: 0.0
+      intensity_max: 1.0
+      text_fields: [cause]
 
 dataset_mix:
   include_negative_samples: true
