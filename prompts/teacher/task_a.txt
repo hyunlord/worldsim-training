@@ -1,4 +1,4 @@
-[과제] 아래 성격의 석기시대 인물을 순우리말 1문장으로 묘사하라.
+[과제] 아래 성격의 석기시대 인물을 이중언어 JSON으로만 묘사하라.
 
 [성격 이름]
 {personality_name}
@@ -12,10 +12,21 @@
 [어투]
 {register_instruction}
 
-[길이]
-20~40글자
+[어투 코드]
+{register}
+
+[지배 성향 선택지]
+honesty_humility, emotionality, extraversion, agreeableness, conscientiousness, openness
+
+[출력 형식]
+{{"text_ko":"순우리말 1문장","text_en":"English 1 sentence","register":"{register}","dominant_trait":"HEXACO 6축 중 하나"}}
+
+[규칙]
+- text_ko는 순우리말 1문장 20~40글자로 써라
+- text_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
+- register는 반드시 "{register}"로 고정하라
+- dominant_trait는 위 성격에서 가장 두드러진 HEXACO 축 하나를 영어 소문자로 고르라
+- JSON만 출력하라
 
 [변형번호]
 {variant}
-
-1문장만 출력하라.

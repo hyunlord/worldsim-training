@@ -1,4 +1,4 @@
-[과제] 아래 인물이 아래 상황에서 하는 말을 순우리말 1문장 대사로 써라.
+[과제] 아래 인물이 아래 상황에서 하는 말을 이중언어 JSON으로만 써라.
 
 [인물 성격]
 {personality_keywords}
@@ -12,7 +12,26 @@
 [말투]
 {register_instruction}
 
+[어투 코드]
+{register}
+
+[화자 역할 선택지]
+elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer
+
+[감정 선택지]
+joy, sadness, fear, anger, trust, disgust, surprise, anticipation
+
+[출력 형식]
+{{"speech_ko":"순우리말 대사 1문장","speech_en":"English 1 sentence","register":"{register}","emotion_expressed":"감정 8개 중 하나","speaker_role":"화자 역할 1개"}}
+
+[규칙]
+- speech_ko는 순우리말 대사 1문장 15~30글자로 써라
+- speech_en은 같은 뜻의 자연스러운 영어 대사 1문장으로 써라
+- speech_ko에는 큰따옴표를 넣지 마라
+- register는 반드시 "{register}"로 고정하라
+- emotion_expressed는 현재 느낌에 맞는 영어 감정 id 하나를 고르라
+- speaker_role은 성격 설명에 가장 잘 맞는 역할 하나를 고르라
+- JSON만 출력하라
+
 [변형번호]
 {variant}
-
-큰따옴표로 감싼 대사 1문장만 출력하라.

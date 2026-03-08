@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import random
+import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,12 +14,58 @@ from time import perf_counter, sleep
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.common import AttrDict, ensure_directory, load_text, load_yaml, resolve_path
+from scripts.common import AttrDict, ensure_directory, ensure_within_directory, load_text, load_yaml, resolve_path
 
 DEFAULT_REGISTERS = {
     "haera": "해라체로 써라. 문장을 -다, -는다, -았다, -었다 로 끝내라.",
     "hao": "하오체로 써라. 문장을 -오, -소, -시오 로 끝내라.",
     "hae": "해체로 써라. 문장을 -해, -야, -지, -어 로 끝내라.",
+}
+DEFAULT_TRAIT_AXES = [
+    "honesty_humility",
+    "emotionality",
+    "extraversion",
+    "agreeableness",
+    "conscientiousness",
+    "openness",
+]
+DEFAULT_REASONING_AXES = [f"high_{axis}" for axis in DEFAULT_TRAIT_AXES]
+DEFAULT_SPEAKER_ROLES = [
+    "elder",
+    "hunter",
+    "shaman",
+    "warrior",
+    "healer",
+    "gatherer",
+    "craftsman",
+    "chief",
+    "scout",
+    "observer",
+]
+DEFAULT_TRANSITION_TYPES = ["gradual", "sudden", "sustained"]
+DEFAULT_DOMINANT_TRAITS = {
+    "cautious_elder": "conscientiousness",
+    "reckless_hunter": "extraversion",
+    "visionary_shaman": "openness",
+    "vengeful_warrior": "emotionality",
+    "empathetic_healer": "agreeableness",
+    "greedy_gatherer": "honesty_humility",
+    "diligent_craftsman": "conscientiousness",
+    "charismatic_chief": "extraversion",
+    "paranoid_scout": "emotionality",
+    "stoic_observer": "openness",
+}
+DEFAULT_SPEAKER_ROLE_MAP = {
+    "cautious_elder": "elder",
+    "reckless_hunter": "hunter",
+    "visionary_shaman": "shaman",
+    "vengeful_warrior": "warrior",
+    "empathetic_healer": "healer",
+    "greedy_gatherer": "gatherer",
+    "diligent_craftsman": "craftsman",
+    "charismatic_chief": "chief",
+    "paranoid_scout": "scout",
+    "stoic_observer": "observer",
 }
 
 
@@ -66,6 +113,51 @@ def _register_instructions(settings: dict) -> dict:
     return {**DEFAULT_REGISTERS, **settings.get("register_instructions", {})}
 
 
+def _trait_axes(settings: dict) -> list[str]:
+    return list(settings.get("validation", {}).get("trait_axes", DEFAULT_TRAIT_AXES))
+
+
+def _reasoning_axes(settings: dict) -> list[str]:
+    return list(settings.get("validation", {}).get("reasoning_axes", DEFAULT_REASONING_AXES))
+
+
+def _speaker_roles(settings: dict) -> list[str]:
+    return list(settings.get("validation", {}).get("speaker_roles", DEFAULT_SPEAKER_ROLES))
+
+
+def _transition_types(settings: dict) -> list[str]:
+    return list(settings.get("validation", {}).get("transition_types", DEFAULT_TRANSITION_TYPES))
+
+
+def _emotion_ids(catalogs: dict) -> list[str]:
+    return [emotion["id"] for emotion in catalogs.get("emotions", [])] or ["joy", "sadness", "fear", "anger", "trust", "disgust", "surprise", "anticipation"]
+
+
+def _dominant_trait_for_personality(personality: dict, settings: dict) -> str:
+    trait = personality.get("dominant_trait") or DEFAULT_DOMINANT_TRAITS.get(personality["id"])
+    if trait:
+        return trait
+    return _trait_axes(settings)[0]
+
+
+def _speaker_role_for_personality(personality: dict, settings: dict) -> str:
+    role = personality.get("speaker_role") or DEFAULT_SPEAKER_ROLE_MAP.get(personality["id"])
+    if role:
+        return role
+    return _speaker_roles(settings)[0]
+
+
+def _personality_reasoning_for_personality(personality: dict, settings: dict) -> str:
+    reasoning = personality.get("personality_reasoning")
+    if reasoning:
+        return reasoning
+    dominant_trait = _dominant_trait_for_personality(personality, settings)
+    candidate = f"high_{dominant_trait}"
+    if candidate in _reasoning_axes(settings):
+        return candidate
+    return _reasoning_axes(settings)[0]
+
+
 def _repo_prompt_assets(repo_root: Path, settings: dict) -> dict:
     prompts = settings.get("prompts", {})
     teacher = prompts.get("teacher", {})
@@ -94,18 +186,20 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
     situations = catalogs.get("situations", [])
     personalities = catalogs.get("personalities", [])
     emotions = catalogs.get("emotions", [])
+    emotion_ids = _emotion_ids(catalogs)
     names = settings.get("names") or settings.get("generation", {}).get("task_d_names", ["돌이"])
     registers = _register_instructions(settings)
     default_register = settings.get("defaults", {}).get("register", "haera")
     jobs: list[dict] = []
 
     for personality in personalities:
+        dominant_trait = _dominant_trait_for_personality(personality, settings)
         for variant in range(_variant_count(settings, "A")):
             jobs.append(
                 {
                     "task": "A",
                     "layer": "L4",
-                    "expected_format": "text",
+                    "expected_format": "json",
                     "variant": variant,
                     "personality_id": personality["id"],
                     "personality_name": personality.get("ko", personality["id"]),
@@ -114,6 +208,7 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                     "keywords": ", ".join(personality.get("keywords", [])),
                     "register": "haera",
                     "register_instruction": registers["haera"],
+                    "dominant_trait": dominant_trait,
                     "system_prompt": system_prompt,
                 }
             )
@@ -127,7 +222,7 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                         {
                             "task": "B",
                             "layer": "L4",
-                            "expected_format": "text",
+                            "expected_format": "json",
                             "variant": variant,
                             "personality_id": personality["id"],
                             "personality_name": personality.get("ko", personality["id"]),
@@ -142,6 +237,7 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                             "emotion_intensity": intensity,
                             "intensity": intensity,
                             "mimetic": rng.choice(emotion.get("mimetics", [""])) if emotion.get("mimetics") else "",
+                            "emotion_options": emotion_ids,
                             "situation_id": situation["id"],
                             "scenario_name": situation.get("ko", situation["id"]),
                             "scenario_desc": situation.get("desc", ""),
@@ -159,7 +255,7 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                     {
                         "task": "C",
                         "layer": "L4",
-                        "expected_format": "text",
+                        "expected_format": "json",
                         "variant": variant,
                         "personality_id": personality["id"],
                         "personality_name": personality.get("ko", personality["id"]),
@@ -171,6 +267,8 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                         "emotion_id": emotion["id"],
                         "emotion_name": emotion.get("ko", emotion["id"]),
                         "emotion": emotion.get("ko", emotion["id"]),
+                        "emotion_options": emotion_ids,
+                        "speaker_role": _speaker_role_for_personality(personality, settings),
                         "situation_id": situation["id"],
                         "scenario_name": situation.get("ko", situation["id"]),
                         "scenario_desc": situation.get("desc", ""),
@@ -185,7 +283,7 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                 {
                     "task": "D",
                     "layer": "L4",
-                    "expected_format": "text",
+                    "expected_format": "json",
                     "variant": variant,
                     "name": names[variant % len(names)],
                     "register": "haera",
@@ -226,6 +324,7 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                         "intensity": intensity,
                         "register": "",
                         "register_instruction": "",
+                        "personality_reasoning": _personality_reasoning_for_personality(personality, settings),
                         "situation_id": situation["id"],
                         "scenario_name": situation.get("ko", situation["id"]),
                         "scenario_desc": situation.get("desc", ""),
@@ -262,6 +361,8 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                             "emotion_intensity": current_intensity,
                             "register": "",
                             "register_instruction": "",
+                            "transition_types": _transition_types(settings),
+                            "emotion_options": emotion_ids,
                             "situation_id": situation["id"],
                             "scenario_name": situation.get("ko", situation["id"]),
                             "scenario_desc": situation.get("desc", ""),
@@ -301,28 +402,45 @@ def build_jobs(
 
 def render_prompt(job: dict, prompt_assets: dict) -> str:
     template = prompt_assets["tasks"][job["task"]]
-    return template.format(
-        personality_name=job.get("personality_name", ""),
-        personality_desc=job.get("personality_desc", ""),
-        personality_keywords=", ".join(job.get("personality_keywords", [])),
-        keywords=job.get("keywords", ", ".join(job.get("personality_keywords", []))),
-        emotion_name=job.get("emotion_name", ""),
-        emotion=job.get("emotion", job.get("emotion_name", "")),
-        emotion_intensity=job.get("emotion_intensity", ""),
-        intensity=job.get("intensity", job.get("emotion_intensity", "")),
-        mimetic=job.get("mimetic", ""),
-        scenario_name=job.get("scenario_name", ""),
-        scenario_desc=job.get("scenario_desc", ""),
-        situation=job.get("scenario_desc") or job.get("scenario_name", ""),
-        register_instruction=job.get("register_instruction", ""),
-        register=job.get("register", ""),
-        action_options=job.get("options_line", job.get("action_options", "")),
-        options_line=job.get("options_line", ""),
-        current_emotion_name=job.get("current_emotion_name", ""),
-        current_emotion_intensity=job.get("current_emotion_intensity", ""),
-        name=job.get("name", ""),
-        variant=job.get("variant", 0),
-    )
+    replacements = {
+        "personality_name": job.get("personality_name", ""),
+        "personality_desc": job.get("personality_desc", ""),
+        "personality_keywords": ", ".join(job.get("personality_keywords", [])),
+        "keywords": job.get("keywords", ", ".join(job.get("personality_keywords", []))),
+        "emotion_name": job.get("emotion_name", ""),
+        "emotion_id": job.get("emotion_id", ""),
+        "emotion": job.get("emotion", job.get("emotion_name", "")),
+        "emotion_intensity": job.get("emotion_intensity", ""),
+        "intensity": job.get("intensity", job.get("emotion_intensity", "")),
+        "mimetic": job.get("mimetic", ""),
+        "emotion_options": ", ".join(job.get("emotion_options", [])),
+        "scenario_name": job.get("scenario_name", ""),
+        "scenario_desc": job.get("scenario_desc", ""),
+        "situation": job.get("scenario_desc") or job.get("scenario_name", ""),
+        "situation_id": job.get("situation_id", ""),
+        "register_instruction": job.get("register_instruction", ""),
+        "register": job.get("register", ""),
+        "action_options": job.get("options_line", job.get("action_options", "")),
+        "options_line": job.get("options_line", ""),
+        "current_emotion_name": job.get("current_emotion_name", ""),
+        "current_emotion_id": job.get("current_emotion_id", ""),
+        "current_emotion_intensity": job.get("current_emotion_intensity", ""),
+        "dominant_trait": job.get("dominant_trait", ""),
+        "personality_reasoning": job.get("personality_reasoning", ""),
+        "speaker_role": job.get("speaker_role", ""),
+        "transition_types": ", ".join(job.get("transition_types", DEFAULT_TRANSITION_TYPES)),
+        "name": job.get("name", ""),
+        "variant": job.get("variant", 0),
+    }
+    placeholder = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
+
+    def replace(match: re.Match[str]) -> str:
+        key = match.group(1)
+        if key not in replacements:
+            return match.group(0)
+        return str(replacements[key])
+
+    return placeholder.sub(replace, template)
 
 
 def parse_task_filter(value: str | None) -> set[str] | None:
@@ -374,10 +492,21 @@ def build_output_path(output_dir: Path) -> Path:
     return ensure_directory(output_dir) / f"generated_{timestamp}.jsonl"
 
 
+def _raw_dir(repo_root: Path, settings: dict) -> Path:
+    return ensure_directory(resolve_path(repo_root, settings.get("paths", {}).get("raw_dir", "data/raw")))
+
+
+def _resolve_cli_output_path(repo_root: Path, settings: dict, output_path: str | Path | None = None) -> Path:
+    raw_dir = _raw_dir(repo_root, settings)
+    if output_path is None:
+        return build_output_path(raw_dir)
+    candidate = resolve_path(repo_root, output_path)
+    return ensure_within_directory(raw_dir, candidate, label="raw_dir output_path")
+
+
 def default_raw_output_path(repo_root: Path, stamp: str | None = None) -> Path:
     settings = load_generation_config(repo_root / "config")
-    raw_dir = resolve_path(repo_root, settings.get("paths", {}).get("raw_dir", "data/raw"))
-    ensure_directory(raw_dir)
+    raw_dir = _raw_dir(repo_root, settings)
     if stamp is None:
         return build_output_path(raw_dir)
     return raw_dir / f"generated_{stamp}.jsonl"
@@ -423,10 +552,15 @@ def estimate_cost_usd(usage: dict[str, int], settings: dict) -> float:
 def normalize_generation_result(result: object, settings: dict, *, fallback_model: str | None = None) -> AttrDict:
     if isinstance(result, dict):
         output_text = result.get("output") or result.get("text") or ""
+        if isinstance(output_text, (dict, list)):
+            output_text = json.dumps(output_text, ensure_ascii=False, separators=(",", ":"))
         usage = extract_usage(result.get("usage"))
         model = result.get("model") or fallback_model or settings.get("provider", {}).get("default_model")
     else:
-        output_text = str(result)
+        if isinstance(result, (dict, list)):
+            output_text = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
+        else:
+            output_text = str(result)
         usage = extract_usage(None)
         model = fallback_model or settings.get("provider", {}).get("default_model")
 
@@ -489,63 +623,112 @@ def build_response_format(job: dict, settings: dict) -> tuple[dict | None, dict 
     if provider.get("require_parameters") is not None:
         extra_body = {"provider": {"require_parameters": bool(provider["require_parameters"])}}
 
-    if job.get("task") == "E":
+    valid_emotions = job.get("emotion_options") or settings.get("validation", {}).get("emotions") or _emotion_ids({"emotions": settings.get("emotions", [])})
+    trait_axes = _trait_axes(settings)
+    reasoning_axes = _reasoning_axes(settings)
+    speaker_roles = _speaker_roles(settings)
+    transition_types = _transition_types(settings)
+    task = job.get("task")
+
+    if task == "A":
+        min_chars, max_chars = _task_text_limits(settings, "A")
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["text_ko", "text_en", "register", "dominant_trait"],
+            "properties": {
+                "text_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "text_en": {"type": "string", "minLength": 3},
+                "register": {"type": "string", "enum": [job.get("register", "haera")]},
+                "dominant_trait": {"type": "string", "enum": [job.get("dominant_trait")] if job.get("dominant_trait") else trait_axes},
+            },
+        }
+    elif task == "B":
+        min_chars, max_chars = _task_text_limits(settings, "B")
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["text_ko", "text_en", "register", "emotion_expressed", "intensity", "mimetics"],
+            "properties": {
+                "text_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "text_en": {"type": "string", "minLength": 3},
+                "register": {"type": "string", "enum": [job.get("register", "haera")]},
+                "emotion_expressed": {"type": "string", "enum": list(valid_emotions)},
+                "intensity": {"type": "number", "minimum": 0, "maximum": 1},
+                "mimetics": {"type": "array", "items": {"type": "string"}, "minItems": 0},
+            },
+        }
+    elif task == "C":
+        min_chars, max_chars = _task_text_limits(settings, "C")
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["speech_ko", "speech_en", "register", "emotion_expressed", "speaker_role"],
+            "properties": {
+                "speech_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "speech_en": {"type": "string", "minLength": 3},
+                "register": {"type": "string", "enum": [job.get("register", "haera")]},
+                "emotion_expressed": {"type": "string", "enum": list(valid_emotions)},
+                "speaker_role": {"type": "string", "enum": [job.get("speaker_role")] if job.get("speaker_role") else speaker_roles},
+            },
+        }
+    elif task == "D":
+        min_chars, max_chars = _task_text_limits(settings, "D")
+        event_enum = [job.get("situation_id")] if job.get("situation_id") else None
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["text_ko", "text_en", "event_type"],
+            "properties": {
+                "text_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "text_en": {"type": "string", "minLength": 3},
+                "event_type": {"type": "string", **({"enum": event_enum} if event_enum else {})},
+            },
+        }
+    elif task == "E":
         min_chars, max_chars = _task_text_limits(settings, "E")
         action_options = job.get("action_options", [])
-        return (
-            {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "worldsim_task_e_action",
-                    "strict": True,
-                    "schema": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["action_id", "confidence", "hint"],
-                        "properties": {
-                            "action_id": {"type": "integer", "enum": list(range(len(action_options)))},
-                            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-                            "hint": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
-                        },
-                    },
-                },
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["action_id", "confidence", "hint_ko", "hint_en", "personality_reasoning"],
+            "properties": {
+                "action_id": {"type": "integer", "enum": list(range(len(action_options)))},
+                "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                "hint_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "hint_en": {"type": "string", "minLength": 3},
+                "personality_reasoning": {"type": "string", "enum": [job.get("personality_reasoning")] if job.get("personality_reasoning") else reasoning_axes},
             },
-            extra_body,
-        )
-
-    if job.get("task") == "F":
+        }
+    elif task == "F":
         min_chars, max_chars = _task_text_limits(settings, "F")
-        valid_emotions = (
-            settings.get("validation", {})
-            .get("layer3_json", {})
-            .get("task_f", {})
-            .get(
-                "valid_emotions",
-                ["joy", "sadness", "fear", "anger", "trust", "disgust", "surprise", "anticipation"],
-            )
-        )
-        return (
-            {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "worldsim_task_f_emotion",
-                    "strict": True,
-                    "schema": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["emotion", "intensity", "cause"],
-                        "properties": {
-                            "emotion": {"type": "string", "enum": list(valid_emotions)},
-                            "intensity": {"type": "number", "minimum": 0, "maximum": 1},
-                            "cause": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
-                        },
-                    },
-                },
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type"],
+            "properties": {
+                "emotion": {"type": "string", "enum": list(valid_emotions)},
+                "intensity": {"type": "number", "minimum": 0, "maximum": 1},
+                "cause_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "cause_en": {"type": "string", "minLength": 3},
+                "previous_emotion": {"type": "string", "enum": list(valid_emotions)},
+                "transition_type": {"type": "string", "enum": transition_types},
             },
-            extra_body,
-        )
+        }
+    else:
+        return None, extra_body
 
-    return None, extra_body
+    return (
+        {
+            "type": "json_schema",
+            "json_schema": {
+                "name": f"worldsim_task_{task.lower()}",
+                "strict": True,
+                "schema": schema,
+            },
+        },
+        extra_body,
+    )
 
 
 def call_teacher_api(*, job: dict, system_prompt: str, user_prompt: str, settings: dict) -> AttrDict:
@@ -598,6 +781,20 @@ def _generation_retry_settings(settings: dict) -> tuple[int, float]:
     return attempts, backoff_seconds
 
 
+def parse_and_validate(raw_text: object, job: dict, settings: dict) -> tuple[str | None, str | None]:
+    from scripts.validate_data import repair_and_validate_json_output
+
+    candidate = {key: value for key, value in job.items() if key != "system_prompt"}
+    if isinstance(raw_text, (dict, list)):
+        candidate["output"] = json.dumps(raw_text, ensure_ascii=False, separators=(",", ":"))
+    else:
+        candidate["output"] = str(raw_text)
+    repaired_output, violations, _ = repair_and_validate_json_output(candidate, settings.get("validation", {}))
+    if violations:
+        return None, ",".join(violations)
+    return repaired_output, None
+
+
 def generate_dataset(
     repo_root: Path,
     *,
@@ -612,7 +809,7 @@ def generate_dataset(
     settings = load_generation_config(repo_root / "config")
     jobs = build_jobs(repo_root, seed=seed, task_filter=task_filter)
     selected_jobs = select_jobs(jobs, limit)
-    output_path = output_path or default_raw_output_path(repo_root)
+    output_path = _resolve_cli_output_path(repo_root, settings, output_path)
     ensure_directory(output_path.parent)
     output_path.write_text("", encoding="utf-8")
     totals: dict[str, float] = {
@@ -649,9 +846,12 @@ def generate_dataset(
                 if retry_backoff_seconds > 0:
                     sleep(retry_backoff_seconds * attempt)
         normalized = normalize_generation_result(raw_result, settings, fallback_model=provider_default_model)
+        validated_output, validation_error = parse_and_validate(normalized.output, job, settings)
+        if validation_error is not None:
+            raise RuntimeError(f"generation_validation_failed:{validation_error}")
         request_elapsed = perf_counter() - request_started_at
         row = {key: value for key, value in job.items() if key != "system_prompt"}
-        row["output"] = normalized.output
+        row["output"] = validated_output
         row["model"] = normalized.model
         row["prompt_tokens"] = normalized.usage["prompt_tokens"]
         row["completion_tokens"] = normalized.usage["completion_tokens"]
@@ -712,10 +912,13 @@ def generate_records(
             user_prompt=user_prompt,
             settings=settings,
         )
+        validated_output, validation_error = parse_and_validate(normalized.output, job, settings)
+        if validation_error is not None:
+            raise RuntimeError(f"generation_validation_failed:{validation_error}")
         row = {
             **job,
             "prompt": user_prompt,
-            "output": normalized.output,
+            "output": validated_output,
             "model": normalized.model,
             "timestamp": datetime.now(UTC).isoformat(),
         }
@@ -751,9 +954,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     repo_root = resolve_path(Path.cwd(), args.repo_root)
+    settings = load_generation_config(repo_root / "config")
     task_filter = parse_task_filter(args.tasks)
     jobs = build_jobs(repo_root, seed=args.seed, task_filter=task_filter)
-    output_path = resolve_path(repo_root, args.output) if args.output else default_raw_output_path(repo_root)
+    output_path = _resolve_cli_output_path(repo_root, settings, args.output)
     print_job_summary(select_jobs(jobs, args.limit))
     if args.dry_run:
         print(f"Dry run only. Raw output would be written to {output_path}")

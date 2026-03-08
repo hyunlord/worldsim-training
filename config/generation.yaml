@@ -6,7 +6,7 @@ provider:
   model_env: OPENROUTER_MODEL
   default_model: anthropic/claude-sonnet-4-20250514
   temperature: 0.8
-  max_tokens: 128
+  max_tokens: 256
   require_parameters: true
   retry_attempts: 3
   retry_backoff_seconds: 1.0
@@ -59,12 +59,54 @@ task_variants:
   F: 1
 
 tasks:
-  A: { layer: L4, expected_format: text, description: 성격 한줄 묘사 }
-  B: { layer: L4, expected_format: text, description: 상황 반응 묘사 }
-  C: { layer: L4, expected_format: text, description: 짧은 대사 }
-  D: { layer: L4, expected_format: text, description: 알림 카피 }
-  E: { layer: L3, expected_format: json, description: 행동 선택 }
-  F: { layer: L3, expected_format: json, description: 감정 판정 }
+  A:
+    layer: L4
+    expected_format: json
+    description: 성격 한줄 묘사
+    output_fields:
+      korean_primary: text_ko
+      english_primary: text_en
+      required: [text_ko, text_en, register, dominant_trait]
+  B:
+    layer: L4
+    expected_format: json
+    description: 상황 반응 묘사
+    output_fields:
+      korean_primary: text_ko
+      english_primary: text_en
+      required: [text_ko, text_en, register, emotion_expressed, intensity, mimetics]
+  C:
+    layer: L4
+    expected_format: json
+    description: 짧은 대사
+    output_fields:
+      korean_primary: speech_ko
+      english_primary: speech_en
+      required: [speech_ko, speech_en, register, emotion_expressed, speaker_role]
+  D:
+    layer: L4
+    expected_format: json
+    description: 알림 카피
+    output_fields:
+      korean_primary: text_ko
+      english_primary: text_en
+      required: [text_ko, text_en, event_type]
+  E:
+    layer: L3
+    expected_format: json
+    description: 행동 선택
+    output_fields:
+      korean_primary: hint_ko
+      english_primary: hint_en
+      required: [action_id, confidence, hint_ko, hint_en, personality_reasoning]
+  F:
+    layer: L3
+    expected_format: json
+    description: 감정 판정
+    output_fields:
+      korean_primary: cause_ko
+      english_primary: cause_en
+      required: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type]
 
 names:
   - 돌이
@@ -84,6 +126,34 @@ register_instructions:
   hae: 해체로 써라. 문장을 -해, -야, -지, -어 로 끝내라.
 
 validation:
+  registers: [haera, hao, hae]
+  emotions: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+  trait_axes:
+    - honesty_humility
+    - emotionality
+    - extraversion
+    - agreeableness
+    - conscientiousness
+    - openness
+  reasoning_axes:
+    - high_honesty_humility
+    - high_emotionality
+    - high_extraversion
+    - high_agreeableness
+    - high_conscientiousness
+    - high_openness
+  speaker_roles:
+    - elder
+    - hunter
+    - shaman
+    - warrior
+    - healer
+    - gatherer
+    - craftsman
+    - chief
+    - scout
+    - observer
+  transition_types: [gradual, sudden, sustained]
   forbidden_words:
     - 식량
     - 마을
@@ -131,12 +201,46 @@ validation:
     hao: ['오[.\\s!]?$', '소[.\\s!]?$', '시오[.\\s!]?$', '구려[.\\s!]?$']
     hae: ['해[.\\s!]?$', '야[.\\s!]?$', '지[.\\s!]?$', '어[.\\s!]?$', '았어[.\\s!]?$']
   task_limits:
-    A: { min_chars: 15, max_chars: 50, sentences: 1 }
-    B: { min_chars: 25, max_chars: 80, sentences: 2 }
-    C: { min_chars: 10, max_chars: 40, sentences: 1 }
-    D: { min_chars: 8, max_chars: 30, sentences: 1 }
-    E: { min_chars: 10, max_chars: 30, sentences: null }
-    F: { min_chars: 10, max_chars: 25, sentences: null }
+    A: { korean_field: text_ko, min_chars: 20, max_chars: 40, sentences: 1 }
+    B: { korean_field: text_ko, min_chars: 30, max_chars: 60, sentences: 2 }
+    C: { korean_field: speech_ko, min_chars: 15, max_chars: 30, sentences: 1 }
+    D: { korean_field: text_ko, min_chars: 10, max_chars: 25, sentences: 1 }
+    E: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
+    F: { korean_field: cause_ko, min_chars: 10, max_chars: 25, sentences: 1 }
+  structured_json:
+    A:
+      required_fields: [text_ko, text_en, register, dominant_trait]
+      korean_fields: [text_ko]
+      english_fields: [text_en]
+      dominant_trait_enum: [honesty_humility, emotionality, extraversion, agreeableness, conscientiousness, openness]
+    B:
+      required_fields: [text_ko, text_en, register, emotion_expressed, intensity, mimetics]
+      korean_fields: [text_ko]
+      english_fields: [text_en]
+      emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+    C:
+      required_fields: [speech_ko, speech_en, register, emotion_expressed, speaker_role]
+      korean_fields: [speech_ko]
+      english_fields: [speech_en]
+      emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+      speaker_role_enum: [elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer]
+    D:
+      required_fields: [text_ko, text_en, event_type]
+      korean_fields: [text_ko]
+      english_fields: [text_en]
+      event_type_enum: [predator, food_found, storm, injury, kin_death, theft, migration, tool_craft, fire, strangers]
+    E:
+      required_fields: [action_id, confidence, hint_ko, hint_en, personality_reasoning]
+      korean_fields: [hint_ko]
+      english_fields: [hint_en]
+      reasoning_enum: [high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness]
+    F:
+      required_fields: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type]
+      korean_fields: [cause_ko]
+      english_fields: [cause_en]
+      emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+      previous_emotion_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+      transition_type_enum: [gradual, sudden, sustained]
   auto_replacements:
     "마을": "무리가 사는 곳"
     "식량": "먹거리"
@@ -156,18 +260,20 @@ validation:
     "기술": "솜씨"
   layer3_json:
     task_e:
-      required_fields: [action_id, confidence, hint]
+      required_fields: [action_id, confidence, hint_ko, hint_en, personality_reasoning]
       action_id_min: 0
       action_id_max: 9
       confidence_min: 0.0
       confidence_max: 1.0
-      text_fields: [hint]
+      text_fields: [hint_ko, hint_en]
+      valid_reasoning_axes: [high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness]
     task_f:
-      required_fields: [emotion, intensity, cause]
+      required_fields: [emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type]
       valid_emotions: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
       intensity_min: 0.0
       intensity_max: 1.0
-      text_fields: [cause]
+      text_fields: [cause_ko, cause_en]
+      valid_transition_types: [gradual, sudden, sustained]
 
 dataset_mix:
   include_negative_samples: true

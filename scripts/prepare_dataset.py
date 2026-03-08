@@ -11,7 +11,7 @@ from pathlib import Path
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.common import AttrDict, load_yaml, read_jsonl, resolve_path, write_jsonl, write_yaml
+from scripts.common import AttrDict, ensure_within_directory, load_yaml, read_jsonl, resolve_path, write_jsonl, write_yaml
 
 
 def _legacy_counts(validated: int, negative: int, general: int) -> dict[str, int]:
@@ -35,7 +35,7 @@ def _tag_rows(rows: list[dict], source_split: str) -> list[dict]:
 def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str, str]:
     defaults = {
         "L3": "너는 석기시대 서사 도우미다. JSON으로만 답하라.",
-        "L4": "너는 석기시대 서사 도우미다. 지시된 형식과 길이를 지켜라. 순우리말만 써라.",
+        "L4": "너는 석기시대 서사 도우미다. JSON으로만 답하라. 한국어와 영어를 함께 써라.",
         "NEG": "너는 학습 샘플 감시자다. 제시된 답안이 버릴 예시인지 retain 또는 reject 한 단어로만 답하라.",
         "GEN": "너는 한국어 문장 도우미다. 자연스러운 일반 한국어 한 문장으로 답하라.",
     }
@@ -58,15 +58,36 @@ def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str
     return defaults
 
 
+def _validate_messages_row(row: dict) -> dict:
+    messages = row.get("messages")
+    if not isinstance(messages, list) or not messages:
+        raise ValueError(f"Unsupported dataset row for task {row.get('task', 'unknown')}: invalid messages payload")
+    for message in messages:
+        if not isinstance(message, dict):
+            raise ValueError(f"Unsupported dataset row for task {row.get('task', 'unknown')}: invalid messages payload")
+        if not isinstance(message.get("role"), str) or not isinstance(message.get("content"), str):
+            raise ValueError(f"Unsupported dataset row for task {row.get('task', 'unknown')}: invalid messages payload")
+    return row
+
+
+def _assistant_content(output: object, *, task: str) -> str:
+    if isinstance(output, str):
+        return output
+    if isinstance(output, (dict, list)):
+        return json.dumps(output, ensure_ascii=False, separators=(",", ":"))
+    raise ValueError(f"Unsupported dataset row for task {task}: output must be a string or JSON value")
+
+
 def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
     if "messages" in row:
-        return row
+        return _validate_messages_row(row)
 
     task = row.get("task")
     prompt = row.get("prompt")
     output = row.get("output")
     if task in {"A", "B", "C", "D", "E", "F"} and prompt and output:
         layer = row.get("layer", "L3" if task in {"E", "F"} else "L4")
+        assistant_content = _assistant_content(output, task=task)
         return {
             "task": task,
             "layer": layer,
@@ -74,14 +95,17 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
             "messages": [
                 {"role": "system", "content": system_prompts[layer]},
                 {"role": "user", "content": prompt},
-                {"role": "assistant", "content": output},
+                {"role": "assistant", "content": assistant_content},
             ],
         }
+    if task in {"A", "B", "C", "D", "E", "F"}:
+        raise ValueError(f"Unsupported dataset row for task {task}: missing prompt/output")
     if task == "NEG" and output:
+        sample_output = _assistant_content(output, task=task)
         user_content = "[TASK] NEG"
         if row.get("reason"):
             user_content += f"\n[REASON] {row['reason']}"
-        user_content += f"\n[SAMPLE] {output}"
+        user_content += f"\n[SAMPLE] {sample_output}"
         return {
             "task": task,
             "label": row.get("label", "reject"),
@@ -93,7 +117,10 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
                 {"role": "assistant", "content": row.get("label", "reject")},
             ],
         }
+    if task == "NEG":
+        raise ValueError("Unsupported dataset row for task NEG: missing output")
     if task == "GEN" and output:
+        assistant_content = _assistant_content(output, task=task)
         return {
             "task": task,
             "label": row.get("label", "retain"),
@@ -101,10 +128,12 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
             "messages": [
                 {"role": "system", "content": system_prompts["GEN"]},
                 {"role": "user", "content": row.get("prompt", "[TASK] GEN\n[STYLE] 자연스러운 일반 한국어 한 문장을 써라.")},
-                {"role": "assistant", "content": output},
+                {"role": "assistant", "content": assistant_content},
             ],
         }
-    return row
+    if task == "GEN":
+        raise ValueError("Unsupported dataset row for task GEN: missing output")
+    raise ValueError(f"Unsupported dataset row for task {task or 'unknown'}")
 
 
 def _validate_dataset_name(dataset_name: str) -> str:
@@ -138,6 +167,16 @@ def _require_file(path: Path, *, label: str) -> None:
         raise FileNotFoundError(f"Required {label} file does not exist: {path}")
 
 
+def _resolve_dataset_outputs(repo_root: Path, settings: dict, output_file: Path, manifest_file: Path) -> tuple[Path, Path]:
+    paths = settings.get("paths", {})
+    final_dir = resolve_path(repo_root, paths.get("final_dir", "data/final"))
+    manifest_dir = resolve_path(repo_root, paths.get("manifest_dir") or paths.get("manifests_dir") or "artifacts/manifests")
+    return (
+        ensure_within_directory(final_dir, output_file, label="final_dir output_file"),
+        ensure_within_directory(manifest_dir, manifest_file, label="manifest_dir manifest_file"),
+    )
+
+
 def prepare_dataset(
     repo_root: Path | None = None,
     *,
@@ -154,7 +193,12 @@ def prepare_dataset(
         settings = load_yaml(repo_root / "config" / "generation.yaml")
         dataset_mix.update(settings.get("dataset_mix", {}))
         if any(value is None for value in (passed_file, negative_samples_file, general_samples_file, output_file, manifest_file)):
-            passed_file, negative_samples_file, general_samples_file, output_file, manifest_file = _resolve_repo_paths(repo_root, settings, dataset_name)
+            defaults = _resolve_repo_paths(repo_root, settings, dataset_name)
+            passed_file = passed_file or defaults[0]
+            negative_samples_file = negative_samples_file or defaults[1]
+            general_samples_file = general_samples_file or defaults[2]
+            output_file = output_file or defaults[3]
+            manifest_file = manifest_file or defaults[4]
     elif None in (passed_file, negative_samples_file, general_samples_file, output_file, manifest_file):
         raise ValueError("Either repo_root or all file paths must be provided")
 
@@ -163,6 +207,8 @@ def prepare_dataset(
         _require_file(negative_samples_file, label="negative samples")
     if dataset_mix["include_general_samples"]:
         _require_file(general_samples_file, label="general samples")
+    if repo_root is not None:
+        output_file, manifest_file = _resolve_dataset_outputs(repo_root, settings, output_file, manifest_file)
 
     validated_rows = _tag_rows(read_jsonl(passed_file), "validated")
     negative_rows = _tag_rows(read_jsonl(negative_samples_file), "negative") if dataset_mix["include_negative_samples"] else []

@@ -1,7 +1,10 @@
-[과제] 아래 상황이 일어났다는 알림을 순우리말 1문장으로 써라.
+[과제] 아래 상황이 일어났다는 알림을 이중언어 JSON으로만 써라.
 
 [누가]
 {name}
+
+[상황 이름]
+{scenario_name}
 
 [상황]
 {scenario_desc}
@@ -9,10 +12,27 @@
 [어투]
 {register_instruction}
 
-[길이]
-10~25글자
+[event_type 선택표]
+짐승발견=predator
+먹거리발견=food_found
+비바람=storm
+부상=injury
+친족사망=kin_death
+도둑적발=theft
+무리이동=migration
+도구제작=tool_craft
+불발견=fire
+낯선무리=strangers
+
+[출력 형식]
+{{"text_ko":"순우리말 1문장","text_en":"English 1 sentence","event_type":"상황 id"}}
+
+[규칙]
+- text_ko는 {name}을 반드시 넣은 순우리말 1문장 10~25글자로 써라
+- text_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
+- text_ko는 해라체로 써라
+- event_type은 위 상황 이름 {scenario_name}에 맞는 id로 고정하라
+- JSON만 출력하라
 
 [변형번호]
 {variant}
-
-이름을 반드시 포함한 1문장만 출력하라.

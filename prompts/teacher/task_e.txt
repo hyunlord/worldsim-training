@@ -15,14 +15,19 @@
 [선택지]
 {action_options}
 
+[판단 근거 선택지]
+high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness
+
 [출력 형식]
-{{"action_id": 번호, "confidence": 0.0~1.0, "hint": "순우리말 한 문장"}}
+{{"action_id": 번호, "confidence": 0.0, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "personality_reasoning": "판단 근거 HEXACO 축"}}
 
 [규칙]
 - action_id는 위 선택지 번호 중 하나
 - confidence는 0.0~1.0
-- hint는 순우리말 10~30글자
-- 다른 설명문은 쓰지 마라
+- hint_ko는 왜 이 행동을 골랐는지 순우리말 10~30글자로 써라
+- hint_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
+- personality_reasoning은 위 선택지 중 하나로만 적어라
+- JSON만 출력하고 다른 설명문은 쓰지 마라
 
 [변형번호]
 {variant}
