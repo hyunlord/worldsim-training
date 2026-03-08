@@ -56,6 +56,16 @@ def ensure_directory(path: Path) -> Path:
     return path
 
 
+def ensure_within_directory(root_dir: Path, path: Path, *, label: str) -> Path:
+    resolved_root = root_dir.resolve()
+    resolved_path = path.resolve()
+    try:
+        resolved_path.relative_to(resolved_root)
+    except ValueError as exc:
+        raise ValueError(f"{label} must stay within {resolved_root}") from exc
+    return resolved_path
+
+
 def resolve_path(base_dir: Path, value: str | Path) -> Path:
     path = Path(value)
     if path.is_absolute():

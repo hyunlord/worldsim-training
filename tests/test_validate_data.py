@@ -1,9 +1,10 @@
+import json
 from pathlib import Path
 
-import json
 import pytest
+import yaml
 
-from scripts.validate_data import auto_repair, load_validation_rules, validate_dataset, validate_file, validate_layer3_json
+from scripts.validate_data import _resolve_validated_output_dir, auto_repair, load_validation_rules, validate_dataset, validate_file, validate_json_output
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -13,40 +14,79 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def test_validate_file_splits_pass_fail_and_writes_report(tmp_path: Path) -> None:
+def compact_json(payload: dict) -> str:
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
+def bilingual_rules_yaml() -> str:
+    return """
+validation:
+  forbidden_words: ["마을", "식량"]
+  meta_patterns: ["WorldSim"]
+  trait_axes: ["honesty_humility", "emotionality", "extraversion", "agreeableness", "conscientiousness", "openness"]
+  reasoning_axes: ["high_honesty_humility", "high_emotionality", "high_extraversion", "high_agreeableness", "high_conscientiousness", "high_openness"]
+  speaker_roles: ["elder", "hunter", "shaman", "warrior", "healer", "gatherer", "craftsman", "chief", "scout", "observer"]
+  transition_types: ["gradual", "sudden", "sustained"]
+  register_endings:
+    haera: ['다[.\\s]?$', '는다[.\\s]?$', '았다[.\\s]?$', '었다[.\\s]?$']
+    hao: ['오[.\\s!]?$', '소[.\\s!]?$', '시오[.\\s!]?$']
+    hae: ['해[.\\s!]?$', '야[.\\s!]?$', '지[.\\s!]?$', '어[.\\s!]?$']
+  task_limits:
+    A: {min_chars: 20, max_chars: 40, sentences: 1}
+    B: {min_chars: 30, max_chars: 60, sentences: 2}
+    C: {min_chars: 15, max_chars: 30, sentences: 1}
+    D: {min_chars: 10, max_chars: 25, sentences: 1}
+    E: {min_chars: 10, max_chars: 30, sentences: 1}
+    F: {min_chars: 10, max_chars: 25, sentences: 1}
+""".strip()
+
+
+def test_validate_file_repairs_korean_json_fields_and_writes_report(tmp_path: Path) -> None:
     raw_file = tmp_path / "data" / "raw" / "sample.jsonl"
     validated_dir = tmp_path / "data" / "validated"
     config_dir = tmp_path / "config"
     config_dir.mkdir()
-    (config_dir / "generation.yaml").write_text(
-        """
-validation:
-  forbidden_words: ["식량"]
-  meta_patterns: ["WorldSim"]
-  task_limits:
-    A: {min_chars: 5, max_chars: 40, sentences: 1}
-    B: {min_chars: 5, max_chars: 60, sentences: 2}
-    C: {min_chars: 5, max_chars: 30, sentences: 1}
-    D: {min_chars: 5, max_chars: 30, sentences: 1}
-""".strip(),
-        encoding="utf-8",
-    )
+    (config_dir / "generation.yaml").write_text(bilingual_rules_yaml(), encoding="utf-8")
     write_jsonl(
         raw_file,
         [
-            {"task": "A", "register": "haera", "output": "풀숲을 살피며 조심스레 걸음을 옮겼다."},
-            {"task": "D", "register": "haera", "output": "식량을 찾았다."},
+            {
+                "task": "A",
+                "register": "haera",
+                "dominant_trait": "conscientiousness",
+                "output": compact_json(
+                    {
+                        "text_ko": "마을 곁을 살피며 먹거리를 챙겼다.",
+                        "text_en": "Watched the camp and gathered food.",
+                        "register": "haera",
+                        "dominant_trait": "conscientiousness",
+                    }
+                ),
+            },
+            {
+                "task": "D",
+                "situation_id": "food_found",
+                "output": compact_json(
+                    {
+                        "text_ko": "돌이가 식량을 찾았다.",
+                        "text_en": "Dol-i found food.",
+                        "event_type": "food_found",
+                    }
+                ),
+            },
         ],
     )
 
     rules = load_validation_rules(config_dir)
     summary = validate_file(raw_file, validated_dir=validated_dir, rules=rules)
 
-    assert summary["total"] == 2
     assert summary["passed"] == 2
-    assert summary["failed"] == 0
-    assert (validated_dir / "passed.jsonl").exists()
-    assert (validated_dir / "failed.jsonl").exists()
+    passed_rows = [json.loads(line) for line in (validated_dir / "passed.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    repaired_a = json.loads(passed_rows[0]["output"])
+    repaired_d = json.loads(passed_rows[1]["output"])
+    assert repaired_a["text_ko"] == "무리가 사는 곳 곁을 살피며 먹거리를 챙겼다."
+    assert repaired_d["text_ko"] == "돌이가 먹거리를 찾았다."
+    assert passed_rows[0]["repair_count"] == 1
     assert (validated_dir / "report.json").exists()
 
 
@@ -57,168 +97,130 @@ def test_auto_repair_replaces_forbidden_words() -> None:
     assert count == 2
 
 
-def test_validate_layer3_json_checks_task_e_shape() -> None:
-    violations = validate_layer3_json(
-        json.dumps({"action_id": 6, "confidence": 1.2, "hint": ""}, ensure_ascii=False),
-        "E",
-        action_options=["도망", "숨기", "맞서기"],
+def test_validate_json_output_checks_required_fields_and_enums() -> None:
+    violations = validate_json_output(
+        {
+            "task": "C",
+            "register": "hao",
+            "speaker_role": "chief",
+            "emotion_id": "anger",
+            "output": compact_json(
+                {
+                    "speech_ko": "당장 나서시오!",
+                    "register": "hao",
+                    "emotion_expressed": "rage",
+                    "speaker_role": "",
+                }
+            ),
+        },
+        load_validation_rules_for_inline(),
     )
 
-    assert "invalid_action_id" in violations
-    assert "invalid_confidence" in violations
-    assert "missing_hint" in violations
-
-
-def test_validate_layer3_json_checks_task_f_shape() -> None:
-    violations = validate_layer3_json(
-        json.dumps({"emotion": "calm", "intensity": -0.1, "cause": ""}, ensure_ascii=False),
-        "F",
-    )
-
+    assert "missing_speech_en" in violations
     assert "invalid_emotion" in violations
-    assert "invalid_intensity" in violations
-    assert "missing_cause" in violations
+    assert "invalid_speaker_role" in violations
 
 
-def test_validate_file_repairs_forbidden_words_and_passes_layer3_json(tmp_path: Path) -> None:
+def test_validate_json_output_rejects_registers_that_do_not_match_requested_task_register() -> None:
+    violations = validate_json_output(
+        {
+            "task": "C",
+            "register": "haera",
+            "speaker_role": "chief",
+            "emotion_id": "anger",
+            "output": compact_json(
+                {
+                    "speech_ko": "지금 바로 앞으로 나오시오",
+                    "speech_en": "Step forward right now.",
+                    "register": "hao",
+                    "emotion_expressed": "anger",
+                    "speaker_role": "chief",
+                }
+            ),
+        },
+        load_validation_rules_for_inline(),
+    )
+
+    assert "invalid_register" in violations
+    assert "register_mismatch" in violations
+
+
+def test_validate_json_output_rejects_non_object_roots_and_bad_types() -> None:
+    rules = load_validation_rules_for_inline()
+    root_violations = validate_json_output({"task": "E", "action_options": ["도망"], "output": "[]"}, rules)
+    type_violations = validate_json_output(
+        {
+            "task": "B",
+            "emotion_id": "fear",
+            "register": "haera",
+            "output": compact_json(
+                    {
+                        "text_ko": "풀숲이 거세게 흔들렸다. 온몸이 오들오들 떨리며 물러섰다.",
+                        "text_en": "The bushes shook. The whole body trembled.",
+                        "register": "haera",
+                        "emotion_expressed": "fear",
+                        "intensity": True,
+                    "mimetics": "오들오들",
+                }
+            ),
+        },
+        rules,
+    )
+
+    assert root_violations == ["json_root_not_object"]
+    assert "invalid_numeric_range" in type_violations
+    assert "invalid_mimetics" in type_violations
+
+
+def test_validate_file_marks_invalid_bilingual_rows_as_failures(tmp_path: Path) -> None:
     raw_file = tmp_path / "data" / "raw" / "sample.jsonl"
     validated_dir = tmp_path / "data" / "validated"
     config_dir = tmp_path / "config"
     config_dir.mkdir()
-    (config_dir / "generation.yaml").write_text(
-        """
-validation:
-  forbidden_words: ["마을", "식량"]
-  layer3_emotions: ["joy", "sadness", "fear", "anger", "trust", "disgust", "surprise", "anticipation"]
-  task_limits:
-    A: {min_chars: 5, max_chars: 40, sentences: 1}
-    E: {min_chars: 1, max_chars: 200, sentences: null}
-    F: {min_chars: 1, max_chars: 200, sentences: null}
-""".strip(),
-        encoding="utf-8",
-    )
+    (config_dir / "generation.yaml").write_text(bilingual_rules_yaml(), encoding="utf-8")
     write_jsonl(
         raw_file,
         [
             {
-                "task": "A",
+                "task": "B",
                 "register": "haera",
-                "output": "마을에서 식량을 지켰다.",
-            },
-            {
-                "task": "E",
-                "output": "{\"action_id\": 0, \"confidence\": 0.9, \"hint\": \"마을 곁에서 식량을 품었다\"}",
-                "action_options": ["도망", "숨기", "맞서기"],
+                "emotion_id": "fear",
+                "output": compact_json(
+                    {
+                        "text_ko": "풀숲이 거세게 흔들렸다. 온몸이 오들오들 떨리며 물러섰다.",
+                        "text_en": "",
+                        "register": "hao",
+                        "emotion_expressed": "fear",
+                        "intensity": 0.9,
+                        "mimetics": ["오들오들"],
+                    }
+                ),
             },
             {
                 "task": "F",
-                "output": "{\"emotion\": \"fear\", \"intensity\": 0.85, \"cause\": \"마을에 짐승이 들이닥쳤다\"}",
+                "current_emotion_id": "trust",
+                "output": compact_json(
+                    {
+                        "emotion": "fear",
+                        "intensity": 0.9,
+                        "cause_ko": "날랜 짐승이 바로 눈앞에 나타났다",
+                        "cause_en": "A fierce beast appeared.",
+                        "previous_emotion": "joy",
+                        "transition_type": "fast",
+                    }
+                ),
             },
         ],
     )
 
-    rules = load_validation_rules(config_dir)
-    summary = validate_file(raw_file, validated_dir=validated_dir, rules=rules)
-
-    assert summary["passed"] == 3
-    assert summary["failed"] == 0
-
-    passed_rows = [json.loads(line) for line in (validated_dir / "passed.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
-    assert passed_rows[0]["output"] == "무리가 사는 곳에서 먹거리를 지켰다."
-    assert "무리가 사는 곳" in passed_rows[1]["output"]
-    assert passed_rows[1]["repair_count"] == 2
-    assert passed_rows[2]["repair_count"] == 1
-
-
-def test_validate_layer3_json_rejects_non_object_roots_and_non_string_text_fields() -> None:
-    root_violations = validate_layer3_json("[]", "E", action_options=["도망"])
-    hint_violations = validate_layer3_json(
-        json.dumps({"action_id": 0, "confidence": 0.9, "hint": {"bad": "value"}}, ensure_ascii=False),
-        "E",
-        action_options=["도망"],
-    )
-    cause_violations = validate_layer3_json(
-        json.dumps({"emotion": "fear", "intensity": 0.7, "cause": ["bad"]}, ensure_ascii=False),
-        "F",
-    )
-
-    assert "json_root_not_object" in root_violations
-    assert "invalid_hint_type" in hint_violations
-    assert "invalid_cause_type" in cause_violations
-
-
-def test_validate_layer3_json_rejects_boolean_numeric_fields() -> None:
-    violations = validate_layer3_json(
-        json.dumps({"action_id": True, "confidence": False, "hint": "곧바로 숨었다"}, ensure_ascii=False),
-        "E",
-        action_options=["도망", "숨기"],
-    )
-
-    assert "invalid_action_id" in violations
-    assert "invalid_confidence" in violations
-
-
-def test_validate_file_marks_unexpected_layer3_payloads_as_failures_instead_of_crashing(tmp_path: Path) -> None:
-    raw_file = tmp_path / "data" / "raw" / "sample.jsonl"
-    validated_dir = tmp_path / "data" / "validated"
-    config_dir = tmp_path / "config"
-    config_dir.mkdir()
-    (config_dir / "generation.yaml").write_text(
-        """
-validation:
-  forbidden_words: ["식량"]
-  task_limits:
-    E: {min_chars: 5, max_chars: 20, sentences: null}
-    F: {min_chars: 5, max_chars: 20, sentences: null}
-""".strip(),
-        encoding="utf-8",
-    )
-    write_jsonl(
-        raw_file,
-        [
-            {"task": "E", "output": "[]", "action_options": ["도망"]},
-            {"task": "F", "output": "{\"emotion\": \"fear\", \"intensity\": 0.7, \"cause\": {\"bad\": \"value\"}}"},
-        ],
-    )
-
     summary = validate_file(raw_file, validated_dir=validated_dir, rules=load_validation_rules(config_dir))
     failed_rows = [json.loads(line) for line in (validated_dir / "failed.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
 
-    assert summary["passed"] == 0
     assert summary["failed"] == 2
-    assert failed_rows[0]["violations"] == ["json_root_not_object"]
-    assert failed_rows[1]["violations"] == ["invalid_cause_type"]
-
-
-def test_validate_file_applies_task_limits_to_layer3_text_fields(tmp_path: Path) -> None:
-    raw_file = tmp_path / "data" / "raw" / "sample.jsonl"
-    validated_dir = tmp_path / "data" / "validated"
-    config_dir = tmp_path / "config"
-    config_dir.mkdir()
-    (config_dir / "generation.yaml").write_text(
-        """
-validation:
-  task_limits:
-    E: {min_chars: 5, max_chars: 10, sentences: null}
-""".strip(),
-        encoding="utf-8",
-    )
-    write_jsonl(
-        raw_file,
-        [
-            {
-                "task": "E",
-                "output": "{\"action_id\": 0, \"confidence\": 0.9, \"hint\": \"숨을 죽이고 오래 웅크렸다\"}",
-                "action_options": ["도망", "숨기"],
-            }
-        ],
-    )
-
-    summary = validate_file(raw_file, validated_dir=validated_dir, rules=load_validation_rules(config_dir))
-    failed_rows = [json.loads(line) for line in (validated_dir / "failed.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
-
-    assert summary["failed"] == 1
-    assert failed_rows[0]["violations"] == ["too_long"]
+    assert "missing_text_en" in failed_rows[0]["violations"]
+    assert "invalid_register" in failed_rows[0]["violations"]
+    assert "invalid_previous_emotion" in failed_rows[1]["violations"]
+    assert "invalid_transition_type" in failed_rows[1]["violations"]
 
 
 def test_validate_dataset_raises_clear_error_when_raw_dir_is_empty(tmp_path: Path) -> None:
@@ -229,9 +231,9 @@ def test_validate_dataset_raises_clear_error_when_raw_dir_is_empty(tmp_path: Pat
 paths:
   raw_dir: data/raw
   validated_dir: data/validated
-validation:
-  forbidden_words: []
-""".strip(),
+"""
+        + "\n"
+        + bilingual_rules_yaml(),
         encoding="utf-8",
     )
 
@@ -243,7 +245,68 @@ def test_validate_file_raises_clear_error_when_input_file_is_missing(tmp_path: P
     validated_dir = tmp_path / "data" / "validated"
     config_dir = tmp_path / "config"
     config_dir.mkdir()
-    (config_dir / "generation.yaml").write_text("validation:\n  forbidden_words: []\n", encoding="utf-8")
+    (config_dir / "generation.yaml").write_text(bilingual_rules_yaml(), encoding="utf-8")
 
     with pytest.raises(FileNotFoundError, match="Validation input file does not exist"):
         validate_file(tmp_path / "data" / "raw" / "missing.jsonl", validated_dir=validated_dir, rules=load_validation_rules(config_dir))
+
+
+def test_resolve_validated_output_dir_rejects_paths_outside_validated_dir(tmp_path: Path) -> None:
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    (config_dir / "generation.yaml").write_text(
+        """
+paths:
+  validated_dir: data/validated
+"""
+        + "\n"
+        + bilingual_rules_yaml(),
+        encoding="utf-8",
+    )
+    settings = load_validation_rules(config_dir)
+    full_settings = {"paths": {"validated_dir": "data/validated"}, "validation": settings}
+
+    with pytest.raises(ValueError, match="validated_dir"):
+        _resolve_validated_output_dir(tmp_path, full_settings, tmp_path / "escape")
+
+
+def test_validate_file_rejects_validated_dir_outside_repo_when_repo_root_is_provided(tmp_path: Path) -> None:
+    config_dir = tmp_path / "config"
+    raw_dir = tmp_path / "data" / "raw"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    (config_dir / "generation.yaml").write_text(
+        """
+paths:
+  raw_dir: data/raw
+  validated_dir: data/validated
+"""
+        + "\n"
+        + bilingual_rules_yaml(),
+        encoding="utf-8",
+    )
+    write_jsonl(
+        raw_dir / "sample.jsonl",
+        [
+            {
+                "task": "A",
+                "register": "haera",
+                "dominant_trait": "conscientiousness",
+                "output": compact_json(
+                    {
+                        "text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.",
+                        "text_en": "Fearless and always sees things through.",
+                        "register": "haera",
+                        "dominant_trait": "conscientiousness",
+                    }
+                ),
+            }
+        ],
+    )
+
+    with pytest.raises(ValueError, match="validated_dir"):
+        validate_file(input_path=raw_dir / "sample.jsonl", validated_dir=tmp_path / "escape", repo_root=tmp_path)
+
+
+def load_validation_rules_for_inline() -> dict:
+    return yaml.safe_load(bilingual_rules_yaml())["validation"]

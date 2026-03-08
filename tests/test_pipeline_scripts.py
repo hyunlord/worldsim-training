@@ -7,6 +7,7 @@ from pathlib import Path
 
 import yaml
 
+
 def load_module(module_name: str, file_path: Path):
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     module = importlib.util.module_from_spec(spec)
@@ -27,11 +28,16 @@ def read_jsonl(path: Path) -> list[dict]:
         return [json.loads(line) for line in handle if line.strip()]
 
 
+def compact_json(payload: dict) -> str:
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
 def bootstrap_repo(tmp_path: Path) -> Path:
     for rel in [
         "config",
         "prompts/teacher",
         "prompts/validation",
+        "prompts/training",
         "data/raw",
         "data/validated",
         "data/final",
@@ -46,9 +52,11 @@ situations:
   - id: predator
     ko: 짐승발견
     desc: 날랜 짐승이 나타났다
+    action_options: [도망, 숨기, 맞서기, 경고, 얼어붙기]
   - id: storm
     ko: 비바람
     desc: 거센 비바람이 몰아친다
+    action_options: [피하기, 움막보강, 불지키기, 견디기, 도망]
 """.strip()
         + "\n",
         encoding="utf-8",
@@ -61,6 +69,8 @@ personalities:
     keywords: [겁많음, 꼼꼼함]
     desc: 위험을 경계하는 어른
     default_register: hao
+    dominant_trait: conscientiousness
+    speaker_role: elder
 """.strip()
         + "\n",
         encoding="utf-8",
@@ -87,56 +97,80 @@ paths:
   validated_dir: data/validated
   final_dir: data/final
   manifest_dir: artifacts/manifests
-  negative_samples: data/samples/negative_examples.jsonl
-  general_samples: data/samples/general_korean.jsonl
+  negative_samples_file: data/samples/negative_examples.jsonl
+  general_samples_file: data/samples/general_korean.jsonl
 prompts:
-  teacher_system: prompts/teacher/system.txt
-  task_a: prompts/teacher/task_a.txt
-  task_b: prompts/teacher/task_b.txt
-  task_c: prompts/teacher/task_c.txt
-  task_d: prompts/teacher/task_d.txt
-generation:
-  variants:
-    task_a: 2
-    task_b: 1
-    task_c: 1
-    task_d: 1
+  teacher:
+    system: prompts/teacher/system.txt
+    tasks:
+      A: prompts/teacher/task_a.txt
+      B: prompts/teacher/task_b.txt
+      C: prompts/teacher/task_c.txt
+      D: prompts/teacher/task_d.txt
+      E: prompts/teacher/task_e.txt
+      F: prompts/teacher/task_f.txt
+  training:
+    layer3_system: prompts/training/layer3_system.txt
+    layer4_system: prompts/training/layer4_system.txt
+task_variants:
+  A: 2
+  B: 1
+  C: 1
+  D: 1
+  E: 1
+  F: 1
 validation:
   forbidden_words: [식량, 전투]
   meta_patterns: [WorldSim]
+  trait_axes: [honesty_humility, emotionality, extraversion, agreeableness, conscientiousness, openness]
+  reasoning_axes: [high_honesty_humility, high_emotionality, high_extraversion, high_agreeableness, high_conscientiousness, high_openness]
+  speaker_roles: [elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer]
+  transition_types: [gradual, sudden, sustained]
   register_endings:
-    haera: ['다$', '는다$']
-    hao: ['오$', '소$']
-    hae: ['해$', '야$']
+    haera: ['다[.\\s]?$', '는다[.\\s]?$']
+    hao: ['오[.\\s!?]?$', '소[.\\s!?]?$']
+    hae: ['해[.\\s!?]?$', '야[.\\s!?]?$']
   task_limits:
-    A: {min_chars: 5, max_chars: 50, sentences: 1}
-    B: {min_chars: 5, max_chars: 80, sentences: 2}
-    C: {min_chars: 5, max_chars: 40, sentences: 1}
-    D: {min_chars: 5, max_chars: 30, sentences: 1}
+    A: {min_chars: 20, max_chars: 40, sentences: 1}
+    B: {min_chars: 30, max_chars: 60, sentences: 2}
+    C: {min_chars: 15, max_chars: 30, sentences: 1}
+    D: {min_chars: 10, max_chars: 25, sentences: 1}
+    E: {min_chars: 10, max_chars: 30, sentences: 1}
+    F: {min_chars: 10, max_chars: 25, sentences: 1}
 """.strip()
         + "\n",
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/system.txt").write_text(
-        "순우리말만 쓰고 지정된 형식만 출력하라.\n",
+        "JSON only bilingual output.\n",
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_a.txt").write_text(
-        "[TASK] A\n[PERS] {keywords}\n[LEN] 1문장\n",
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "dominant_trait":"{dominant_trait}"}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_b.txt").write_text(
-        "[TASK] B\n[PERS] {keywords}\n[EMOT] {emotion}:{intensity}\n[SITU] {situation}\n[LEN] 2문장\n",
+        '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"]}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_c.txt").write_text(
-        "[TASK] C\n[PERS] {keywords}\n[EMOT] {emotion}\n[SITU] {situation}\n[REG] {register}\n",
+        '{"speech_ko":"...", "speech_en":"...", "register":"{register}", "emotion_expressed":"{emotion_id}", "speaker_role":"{speaker_role}"}\n',
         encoding="utf-8",
     )
     (tmp_path / "prompts/teacher/task_d.txt").write_text(
-        "[TASK] D\n[NAME] {name}\n[SITU] {situation}\n",
+        '{"text_ko":"...", "text_en":"...", "event_type":"{situation_id}"}\n',
         encoding="utf-8",
     )
+    (tmp_path / "prompts/teacher/task_e.txt").write_text(
+        '{"action_id":0, "confidence":0.9, "hint_ko":"...", "hint_en":"...", "personality_reasoning":"{personality_reasoning}"}\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "prompts/teacher/task_f.txt").write_text(
+        '{"emotion":"fear", "intensity":0.9, "cause_ko":"...", "cause_en":"...", "previous_emotion":"{current_emotion_id}", "transition_type":"sudden"}\n',
+        encoding="utf-8",
+    )
+    (tmp_path / "prompts/training/layer3_system.txt").write_text("JSON only bilingual output.", encoding="utf-8")
+    (tmp_path / "prompts/training/layer4_system.txt").write_text("JSON only bilingual output.", encoding="utf-8")
     write_jsonl(tmp_path / "data/samples/negative_examples.jsonl", [{"task": "NEG", "output": "이 사람은 이다."}])
     write_jsonl(tmp_path / "data/samples/general_korean.jsonl", [{"task": "GEN", "output": "강가에 안개가 내렸다."}])
     return tmp_path
@@ -151,9 +185,9 @@ def test_generate_data_builds_jobs_from_config_and_prompts(tmp_path: Path) -> No
     for job in jobs:
         counts[job["task"]] = counts.get(job["task"], 0) + 1
 
-    assert counts == {"A": 2, "B": 4, "C": 2, "D": 2}
-    assert jobs[0]["system_prompt"] == "순우리말만 쓰고 지정된 형식만 출력하라."
-    assert module.default_raw_output_path(repo_root, "20260308-152500").parent == repo_root / "data/raw"
+    assert counts == {"A": 2, "B": 4, "C": 2, "D": 2, "E": 2, "F": 4}
+    assert jobs[0]["system_prompt"] == "JSON only bilingual output."
+    assert jobs[0]["expected_format"] == "json"
 
 
 def test_validate_data_splits_passed_and_failed_records(tmp_path: Path) -> None:
@@ -162,8 +196,17 @@ def test_validate_data_splits_passed_and_failed_records(tmp_path: Path) -> None:
     write_jsonl(
         raw_path,
         [
-            {"task": "A", "register": "haera", "output": "풀숲을 살피며 숨을 골랐다"},
-            {"task": "D", "register": "haera", "output": "식량을 찾았다"},
+            {
+                "task": "A",
+                "register": "haera",
+                "dominant_trait": "conscientiousness",
+                "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"}),
+            },
+            {
+                "task": "D",
+                "situation_id": "predator",
+                "output": compact_json({"text_ko": "돌이가 먹거리를 찾았다.", "text_en": "Dol-i found food.", "event_type": "predator"}),
+            },
         ],
     )
 
@@ -175,7 +218,7 @@ def test_validate_data_splits_passed_and_failed_records(tmp_path: Path) -> None:
 
     assert summary["passed"] == 2
     assert summary["failed"] == 0
-    assert len(passed) == 2
+    assert json.loads(passed[0]["output"])["text_en"] == "Fearless and always sees things through."
     assert failed == []
 
 
@@ -183,7 +226,7 @@ def test_prepare_dataset_combines_validated_and_sample_streams(tmp_path: Path) -
     repo_root = bootstrap_repo(tmp_path)
     write_jsonl(
         repo_root / "data/validated/passed.jsonl",
-        [{"task": "A", "output": "돌이는 앞을 살폈다."}],
+        [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"})}],
     )
 
     module = load_module("prepare_dataset", Path.cwd() / "scripts/prepare_dataset.py")
@@ -193,6 +236,7 @@ def test_prepare_dataset_combines_validated_and_sample_streams(tmp_path: Path) -
     manifest = yaml.safe_load(result["manifest_path"].read_text(encoding="utf-8"))
 
     assert len(dataset_rows) == 3
+    assert json.loads(dataset_rows[0]["messages"][2]["content"])["dominant_trait"] == "conscientiousness"
     assert result["dataset_path"].parent == repo_root / "data/final"
     assert result["manifest_path"].parent == repo_root / "artifacts/manifests"
     assert manifest["dataset_name"] == "worldsim-v0"
@@ -210,7 +254,7 @@ def test_prepare_dataset_respects_dataset_mix_flags(tmp_path: Path) -> None:
     config_path.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False), encoding="utf-8")
     write_jsonl(
         repo_root / "data/validated/passed.jsonl",
-        [{"task": "A", "output": "돌이는 앞을 살폈다."}],
+        [{"task": "A", "layer": "L4", "prompt": "[TASK] A", "output": compact_json({"text_ko": "곧은 마음에 겁 없고 한번 마음먹으면 끝을 본다.", "text_en": "Fearless and always sees things through.", "register": "haera", "dominant_trait": "conscientiousness"})}],
     )
 
     module = load_module("prepare_dataset", Path.cwd() / "scripts/prepare_dataset.py")
