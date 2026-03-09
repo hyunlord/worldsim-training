@@ -164,6 +164,84 @@ def test_classify_record_applies_canonical_task_policies(tmp_path: Path) -> None
     assert result_c_recoverable.normalized_output["emotion_expressed"] == "anger"
 
 
+def test_classify_record_supports_structured_game_and_oracle_tasks(tmp_path: Path) -> None:
+    repo_root = bootstrap_postprocess_repo(tmp_path)
+
+    from scripts.lib.postprocess import classify_record, load_postprocess_policy
+
+    policy = load_postprocess_policy(repo_root / "config")
+
+    task_e = {
+        "task": "E",
+        "action_options": ["도망", "숨기", "맞서기"],
+        "personality_reasoning": "high_conscientiousness",
+        "output": compact_json(
+            {
+                "action_id": 1,
+                "confidence": 0.81,
+                "hint_ko": "겁이 앞서 재빨리 몸을 숨겼다",
+                "hint_en": "Fear took over, so they hid quickly.",
+                "personality_reasoning": "high_conscientiousness",
+                "temperament_factor": "harm_avoidance_dominant",
+            }
+        ),
+    }
+    task_f = {
+        "task": "F",
+        "situation_id": "predator",
+        "current_emotion_id": "trust",
+        "output": compact_json(
+            {
+                "emotion": "fear",
+                "intensity": 0.88,
+                "cause_ko": "날랜 짐승이 앞을 막아 겁이 솟았다",
+                "cause_en": "A swift beast blocked the path and fear surged.",
+                "previous_emotion": "trust",
+                "transition_type": "sudden",
+                "temperament_amplifier": "high_HA_intensifies_fear",
+            }
+        ),
+    }
+    task_g = {
+        "task": "G",
+        "output": compact_json(
+            {
+                "interpretation_ko": "신이 길을 여셨으니 곧 무리를 움직이겠소.",
+                "interpretation_en": "The gods opened the way, so I will move the tribe soon.",
+                "action_tendency": "mobilize",
+                "confidence": 0.91,
+                "register": "하오체",
+                "misinterpretation_type": "overconfident_literal",
+                "temperament_bias": "action_oriented certainty",
+            }
+        ),
+    }
+    task_h = {
+        "task": "H",
+        "output": compact_json(
+            {
+                "name": "DungeonEconomy",
+                "description_en": "A cursed world where dungeon routes control survival.",
+                "resource_modifiers": [{"target": "dungeon_loot", "multiplier": 3.0}],
+                "special_zones": [{"kind": "dungeon_node", "spawn_count_min": 3, "spawn_count_max": 7}],
+                "special_resources": [{"name": "magic_stone", "tags": ["currency", "tradeable"]}],
+                "agent_modifiers": [{"system": "temperament", "trigger": "essence_equip", "effect": "shift_random_axis"}],
+            }
+        ),
+    }
+
+    result_e = classify_record(task_e, policy)
+    result_f = classify_record(task_f, policy)
+    result_g = classify_record(task_g, policy)
+    result_h = classify_record(task_h, policy)
+
+    assert result_e.disposition == "passed"
+    assert result_f.disposition == "passed"
+    assert result_g.disposition == "recoverable"
+    assert result_g.normalized_output["register"] == "hao"
+    assert result_h.disposition == "passed"
+
+
 def test_create_snapshot_copies_inputs_and_writes_metadata(tmp_path: Path) -> None:
     repo_root = bootstrap_postprocess_repo(tmp_path / "repo")
     source_dir = tmp_path / "source"
@@ -266,6 +344,10 @@ def test_sample_for_review_writes_diverse_review_files(tmp_path: Path) -> None:
             {"task": "B", "personality_id": "p1", "world_id": "default", "situation_id": "predator", "postprocess": {"disposition": "passed"}, "output": compact_json({"text_ko": "오들오들 떨며 물러섰다. 곧 숨을 죽이고 둘레를 훑었다.", "text_en": "They trembled and stepped back. Then they watched quietly.", "register": "haera", "emotion_expressed": "fear", "intensity": 0.7, "mimetics": ["오들오들"], "temperament_influence": "fear_sharpens_watchfulness"})},
             {"task": "B", "personality_id": "p2", "world_id": "winter", "situation_id": "storm", "postprocess": {"disposition": "review"}, "output": compact_json({"text_ko": "눈보라 속에서 이를 악물었다. 한걸음도 물러서지 않았다.", "text_en": "They clenched their teeth in the blizzard. They refused to step back.", "register": "haera", "emotion_expressed": "anger", "intensity": 0.6, "mimetics": [], "temperament_influence": "anger_overrides_fatigue"})},
             {"task": "C", "personality_id": "p3", "world_id": "default", "speaker_role": "chief", "postprocess": {"disposition": "passed"}, "output": compact_json({"speech_ko": "다들 앞으로 나서라.", "speech_en": "Everyone, step forward.", "register": "haera", "emotion_expressed": "anger", "speaker_role": "chief", "temperament_tone": "direct_command"})},
+            {"task": "E", "personality_id": "p5", "world_id": "default", "situation_id": "predator", "postprocess": {"disposition": "passed"}, "output": compact_json({"action_id": 0, "confidence": 0.8, "hint_ko": "겁이 앞서 곧장 달아났다", "hint_en": "Fear took over, so they fled.", "personality_reasoning": "high_conscientiousness", "temperament_factor": "harm_avoidance_dominant"})},
+            {"task": "F", "personality_id": "p6", "world_id": "default", "situation_id": "predator", "postprocess": {"disposition": "passed"}, "output": compact_json({"emotion": "fear", "intensity": 0.9, "cause_ko": "날랜 짐승이 앞을 막아 겁이 솟았다", "cause_en": "A swift beast blocked the path and fear surged.", "previous_emotion": "trust", "transition_type": "sudden", "temperament_amplifier": "high_HA_intensifies_fear"})},
+            {"task": "G", "personality_id": "p7", "oracle_id": "oracle_01", "temperament_id": "choleric", "postprocess": {"disposition": "recoverable"}, "output": compact_json({"interpretation_ko": "신이 길을 여셨으니 곧 무리를 움직이겠소.", "interpretation_en": "The gods opened the way, so I will move the tribe soon.", "register": "hao", "action_tendency": "mobilize", "confidence": 0.9, "misinterpretation_type": "overconfident_literal", "temperament_bias": "action_oriented certainty"})},
+            {"task": "H", "worldbuilding_id": "wb_01", "expected_world_type": "dungeon", "postprocess": {"disposition": "passed"}, "output": compact_json({"name": "DungeonEconomy", "description_en": "A dungeon world with scarce surface food.", "resource_modifiers": [{"target": "dungeon_loot", "multiplier": 3.0}], "special_zones": [{"kind": "dungeon_node", "spawn_count_min": 3, "spawn_count_max": 7}], "special_resources": [{"name": "magic_stone", "tags": ["currency", "tradeable"]}], "agent_modifiers": [{"system": "temperament", "trigger": "essence_equip", "effect": "shift_random_axis"}]})},
         ],
     )
     write_jsonl(
@@ -285,13 +367,21 @@ def test_sample_for_review_writes_diverse_review_files(tmp_path: Path) -> None:
         target_a=2,
         target_b=2,
         target_c=1,
+        target_e=1,
+        target_f=1,
+        target_g=1,
+        target_h=1,
         target_recovered=1,
     )
 
     task_b_rows = read_jsonl(result["review_task_b"])
+    task_e_rows = read_jsonl(result["review_task_e"])
+    task_g_rows = read_jsonl(result["review_task_g"])
     recovered_rows = read_jsonl(result["review_recovered"])
 
     assert len(task_b_rows) == 2
+    assert len(task_e_rows) == 1
+    assert len(task_g_rows) == 1
     assert len(recovered_rows) == 1
     assert all("sample_reason" in row for row in task_b_rows)
     assert all("sample_reason" in row for row in recovered_rows)

@@ -18,6 +18,10 @@ DEFAULT_TARGETS = {
     "A": 20,
     "B": 50,
     "C": 30,
+    "E": 30,
+    "F": 30,
+    "G": 50,
+    "H": 20,
     "RECOVERED": 30,
 }
 
@@ -25,6 +29,10 @@ DIVERSITY_FIELDS = {
     "A": ("personality_id", "world_id", "dominant_trait", "temperament_expressed", "length_bucket", "disposition"),
     "B": ("personality_id", "world_id", "situation_id", "emotion_expressed", "length_bucket", "disposition"),
     "C": ("personality_id", "world_id", "speaker_role", "emotion_expressed", "register", "disposition"),
+    "E": ("personality_id", "world_id", "situation_id", "personality_reasoning", "action_id", "disposition"),
+    "F": ("personality_id", "world_id", "situation_id", "emotion", "previous_emotion", "disposition"),
+    "G": ("personality_id", "oracle_id", "temperament_id", "action_tendency", "register", "disposition"),
+    "H": ("worldbuilding_id", "expected_world_type", "name", "length_bucket", "disposition"),
     "RECOVERED": ("task", "personality_id", "world_id", "situation_id", "emotion_expressed", "register", "disposition"),
 }
 
@@ -74,7 +82,7 @@ def _lookup_output_field(parsed_output: dict | list | None, field: str) -> str |
 
 
 def _primary_text(parsed_output: dict | list | None) -> str:
-    for field in ("text_ko", "speech_ko", "hint_ko", "cause_ko", "interpretation_ko", "name"):
+    for field in ("text_ko", "speech_ko", "hint_ko", "cause_ko", "interpretation_ko", "description_en", "name"):
         value = _lookup_output_field(parsed_output, field)
         if value:
             return value
@@ -202,6 +210,10 @@ def sample_for_review(
     target_a: int = DEFAULT_TARGETS["A"],
     target_b: int = DEFAULT_TARGETS["B"],
     target_c: int = DEFAULT_TARGETS["C"],
+    target_e: int = DEFAULT_TARGETS["E"],
+    target_f: int = DEFAULT_TARGETS["F"],
+    target_g: int = DEFAULT_TARGETS["G"],
+    target_h: int = DEFAULT_TARGETS["H"],
     target_recovered: int = DEFAULT_TARGETS["RECOVERED"],
     seed: int = 42,
 ):
@@ -236,36 +248,45 @@ def sample_for_review(
         *_read_optional_jsonl(needs_review_path),
     ]
 
-    review_task_a = _select_diverse_rows([row for row in postprocess_rows if row.get("task") == "A"], bucket="A", target=target_a, seed=seed)
-    review_task_b = _select_diverse_rows([row for row in postprocess_rows if row.get("task") == "B"], bucket="B", target=target_b, seed=seed)
-    review_task_c = _select_diverse_rows([row for row in postprocess_rows if row.get("task") == "C"], bucket="C", target=target_c, seed=seed)
+    task_targets = {
+        "A": target_a,
+        "B": target_b,
+        "C": target_c,
+        "E": target_e,
+        "F": target_f,
+        "G": target_g,
+        "H": target_h,
+    }
+    review_rows_by_task: dict[str, list[dict]] = {}
+    for task, target in task_targets.items():
+        review_rows_by_task[task] = _select_diverse_rows(
+            [row for row in postprocess_rows if row.get("task") == task],
+            bucket=task,
+            target=target,
+            seed=seed,
+        )
     review_recovered = _select_diverse_rows(recovered_rows, bucket="RECOVERED", target=target_recovered, seed=seed)
 
     ensure_directory(output_dir)
-    task_a_path = output_dir / "review_task_a.jsonl"
-    task_b_path = output_dir / "review_task_b.jsonl"
-    task_c_path = output_dir / "review_task_c.jsonl"
+    output_paths: dict[str, Path] = {}
+    for task in task_targets:
+        output_paths[task] = output_dir / f"review_task_{task.lower()}.jsonl"
     recovered_output_path = output_dir / "review_recovered.jsonl"
     manifest_path = output_dir / "review_manifest.json"
 
-    write_jsonl(task_a_path, review_task_a)
-    write_jsonl(task_b_path, review_task_b)
-    write_jsonl(task_c_path, review_task_c)
+    for task, rows in review_rows_by_task.items():
+        write_jsonl(output_paths[task], rows)
     write_jsonl(recovered_output_path, review_recovered)
 
     manifest_payload = {
         "generated_at": datetime.now(UTC).isoformat(),
         "seed": seed,
         "targets": {
-            "A": target_a,
-            "B": target_b,
-            "C": target_c,
+            **task_targets,
             "recovered": target_recovered,
         },
         "selected_counts": {
-            "A": len(review_task_a),
-            "B": len(review_task_b),
-            "C": len(review_task_c),
+            **{task: len(rows) for task, rows in review_rows_by_task.items()},
             "recovered": len(review_recovered),
         },
         "source_files": {
@@ -276,22 +297,21 @@ def sample_for_review(
             "needs_review_file": str(needs_review_path),
         },
         "output_files": {
-            "review_task_a": str(task_a_path),
-            "review_task_b": str(task_b_path),
-            "review_task_c": str(task_c_path),
+            **{f"review_task_{task.lower()}": str(path) for task, path in output_paths.items()},
             "review_recovered": str(recovered_output_path),
         },
     }
     manifest_path.write_text(json.dumps(manifest_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    return AttrDict(
-        review_task_a=task_a_path,
-        review_task_b=task_b_path,
-        review_task_c=task_c_path,
+    result = AttrDict(
         review_recovered=recovered_output_path,
         manifest_path=manifest_path,
         counts=manifest_payload["selected_counts"],
+        review_paths={task: output_paths[task] for task in task_targets},
     )
+    for task, path in output_paths.items():
+        result[f"review_task_{task.lower()}"] = path
+    return result
 
 
 def parse_args() -> argparse.Namespace:
@@ -303,6 +323,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--target-a", type=int, default=DEFAULT_TARGETS["A"])
     parser.add_argument("--target-b", type=int, default=DEFAULT_TARGETS["B"])
     parser.add_argument("--target-c", type=int, default=DEFAULT_TARGETS["C"])
+    parser.add_argument("--target-e", type=int, default=DEFAULT_TARGETS["E"])
+    parser.add_argument("--target-f", type=int, default=DEFAULT_TARGETS["F"])
+    parser.add_argument("--target-g", type=int, default=DEFAULT_TARGETS["G"])
+    parser.add_argument("--target-h", type=int, default=DEFAULT_TARGETS["H"])
     parser.add_argument("--target-recovered", type=int, default=DEFAULT_TARGETS["RECOVERED"])
     parser.add_argument("--seed", type=int, default=42)
     return parser.parse_args()
@@ -323,6 +347,10 @@ def main() -> None:
             target_a=args.target_a,
             target_b=args.target_b,
             target_c=args.target_c,
+            target_e=args.target_e,
+            target_f=args.target_f,
+            target_g=args.target_g,
+            target_h=args.target_h,
             target_recovered=args.target_recovered,
             seed=args.seed,
         )
@@ -332,9 +360,7 @@ def main() -> None:
     print(
         json.dumps(
             {
-                "review_task_a": str(result.review_task_a),
-                "review_task_b": str(result.review_task_b),
-                "review_task_c": str(result.review_task_c),
+                **{f"review_task_{task.lower()}": str(path) for task, path in result.review_paths.items()},
                 "review_recovered": str(result.review_recovered),
                 "manifest_path": str(result.manifest_path),
                 "counts": result.counts,

@@ -1,0 +1,20 @@
+{
+  "counts_by_disposition": {
+    "passed": 1163,
+    "recoverable": 0,
+    "review": 0,
+    "failed": 44
+  },
+  "counts_by_task": {
+    "G": 591,
+    "H": 80,
+    "E": 150,
+    "F": 250,
+    "C": 136
+  },
+  "counts_by_reason": {
+    "low_information_ir": 44
+  },
+  "normalization_version": "worldsim-postprocess-normalize-v2",
+  "validator_version": "worldsim-postprocess-validator-v2"
+}
