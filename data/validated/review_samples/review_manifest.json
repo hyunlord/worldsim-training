@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-03-09T06:05:09.605715+00:00",
+  "seed": 42,
+  "targets": {
+    "A": 20,
+    "B": 50,
+    "C": 30,
+    "recovered": 30
+  },
+  "selected_counts": {
+    "A": 20,
+    "B": 50,
+    "C": 30,
+    "recovered": 30
+  },
+  "source_files": {
+    "postprocess_passed_file": "/Users/rexxa/github/worldsim-training/data/validated/postprocess/passed.jsonl",
+    "postprocess_recoverable_file": "/Users/rexxa/github/worldsim-training/data/validated/postprocess/recoverable.jsonl",
+    "postprocess_review_file": "/Users/rexxa/github/worldsim-training/data/validated/postprocess/review.jsonl",
+    "recovered_file": "/Users/rexxa/github/worldsim-training/data/validated/recovery/recovered.jsonl",
+    "needs_review_file": "/Users/rexxa/github/worldsim-training/data/validated/recovery/needs_review.jsonl"
+  },
+  "output_files": {
+    "review_task_a": "/Users/rexxa/github/worldsim-training/data/validated/review_samples/review_task_a.jsonl",
+    "review_task_b": "/Users/rexxa/github/worldsim-training/data/validated/review_samples/review_task_b.jsonl",
+    "review_task_c": "/Users/rexxa/github/worldsim-training/data/validated/review_samples/review_task_c.jsonl",
+    "review_recovered": "/Users/rexxa/github/worldsim-training/data/validated/review_samples/review_recovered.jsonl"
+  }
+}
