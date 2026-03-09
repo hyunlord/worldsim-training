@@ -1,9 +1,11 @@
 .env
 .venv/
+.venv-train/
 .omx/
 .pytest_cache/
 __pycache__/
 *.pyc
+outputs/
 
 data/raw/*
 !data/raw/.gitkeep
