@@ -1,0 +1,24 @@
+{
+  "dataset_id": "worldsim-v31-mix-v1",
+  "included_tasks": {
+    "A": 100,
+    "B": 896,
+    "C": 429,
+    "E": 150,
+    "F": 250,
+    "G": 591,
+    "H": 36
+  },
+  "excluded_reasons": {
+    "task_cap": 477
+  },
+  "b_cap": {
+    "train": 800,
+    "dev": 96
+  },
+  "duplicate_filtering": {
+    "exact_duplicates": 0,
+    "near_duplicates": 0,
+    "excluded_total": 0
+  }
+}
