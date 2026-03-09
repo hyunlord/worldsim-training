@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-03-09T08:44:26.521867+00:00",
+  "seed": 42,
+  "targets": {
+    "A": 0,
+    "B": 0,
+    "C": 30,
+    "E": 30,
+    "F": 30,
+    "G": 50,
+    "H": 20,
+    "recovered": 30
+  },
+  "selected_counts": {
+    "A": 0,
+    "B": 0,
+    "C": 30,
+    "E": 30,
+    "F": 30,
+    "G": 50,
+    "H": 20,
+    "recovered": 23
+  },
+  "source_files": {
+    "postprocess_passed_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/passed.jsonl",
+    "postprocess_recoverable_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/recoverable.jsonl",
+    "postprocess_review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/review.jsonl",
+    "recovered_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/recovered.jsonl",
+    "needs_review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/needs_review.jsonl"
+  },
+  "output_files": {
+    "review_task_a": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_a.jsonl",
+    "review_task_b": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_b.jsonl",
+    "review_task_c": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_c.jsonl",
+    "review_task_e": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_e.jsonl",
+    "review_task_f": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_f.jsonl",
+    "review_task_g": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_g.jsonl",
+    "review_task_h": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_task_h.jsonl",
+    "review_recovered": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/review_recovered.jsonl"
+  }
+}

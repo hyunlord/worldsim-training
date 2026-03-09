@@ -1,4 +1,5 @@
 import json
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -746,3 +747,122 @@ def test_build_output_path_is_unique_within_same_second(tmp_path: Path) -> None:
     second = build_output_path(tmp_path / "data" / "raw")
 
     assert first != second
+
+
+def test_generate_dataset_batch_plan_writes_batch_scoped_artifacts_and_exact_task_counts(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+    batch_plan = {
+        "batch_id": "batch_test",
+        "task_counts": {"G": 2, "H": 1, "E": 1, "F": 1},
+        "reporting": {"progress_every": 2},
+        "output": {
+            "raw_dir": "data/raw/batch_test",
+            "generated_file": "generated.jsonl",
+            "skipped_file": "skipped.jsonl",
+            "progress_file": "progress.json",
+            "summary_file": "summary.json",
+        },
+    }
+
+    def fake_generator(job: dict, system_prompt: str) -> dict:
+        if job["task"] == "E":
+            payload = {
+                "action_id": 0,
+                "confidence": 0.9,
+                "hint_ko": "겁이 치밀어 곧바로 달아났다",
+                "hint_en": "Fear surged, so they fled at once.",
+                "personality_reasoning": job["personality_reasoning"],
+                "temperament_factor": "mixed_temperament_balanced_choice",
+            }
+        elif job["task"] == "F":
+            payload = {
+                "emotion": "fear",
+                "intensity": 0.8,
+                "cause_ko": "날랜 짐승이 앞을 막아 겁이 솟았다",
+                "cause_en": "A fierce beast blocked the way and fear rose.",
+                "previous_emotion": job["current_emotion_id"],
+                "transition_type": "sudden",
+                "temperament_amplifier": "mixed_temperament_balanced_fear",
+            }
+        elif job["task"] == "G":
+            payload = {
+                "interpretation_ko": "신이 길을 열었으니 곧 무리를 이끌겠소.",
+                "interpretation_en": "The gods opened the way, so I will lead the tribe soon.",
+                "action_tendency": "mobilize",
+                "confidence": 0.8,
+                "register": job["register"],
+                "misinterpretation_type": "overconfident_literal",
+                "temperament_bias": "action_oriented certainty",
+            }
+        else:
+            payload = {
+                "name": "DungeonEconomy",
+                "description_en": "A dungeon-focused world with scarce surface resources.",
+                "resource_modifiers": [{"target": "surface_foraging", "multiplier": 0.5}],
+                "special_zones": [{"kind": "dungeon_node", "spawn_count_min": 3, "spawn_count_max": 7}],
+                "special_resources": [{"name": "magic_stone", "tags": ["currency", "tradeable"]}],
+                "agent_modifiers": [{"system": "temperament", "trigger": "essence_equip", "effect": "shift_random_axis"}],
+            }
+        return {
+            "output": compact_json(payload),
+            "usage": {"prompt_tokens": 2, "completion_tokens": 1, "total_tokens": 3},
+            "model": "test-model",
+        }
+
+    result = generate_dataset(tmp_path, generator=fake_generator, batch_plan=batch_plan, verbose=False)
+
+    rows = [json.loads(line) for line in result.output_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    summary = json.loads(result.summary_path.read_text(encoding="utf-8"))
+    progress = json.loads(result.progress_path.read_text(encoding="utf-8"))
+
+    assert result.output_path == (tmp_path / "data" / "raw" / "batch_test" / "generated.jsonl").resolve()
+    assert result.skipped_path == (tmp_path / "data" / "raw" / "batch_test" / "skipped.jsonl").resolve()
+    assert result.progress_path == (tmp_path / "data" / "raw" / "batch_test" / "progress.json").resolve()
+    assert result.summary_path == (tmp_path / "data" / "raw" / "batch_test" / "summary.json").resolve()
+    assert Counter(row["task"] for row in rows) == Counter({"G": 2, "H": 1, "E": 1, "F": 1})
+    assert summary["counts_by_task"]["planned"] == {"G": 2, "H": 1, "E": 1, "F": 1}
+    assert summary["counts_by_task"]["successful"] == {"G": 2, "H": 1, "E": 1, "F": 1}
+    assert progress["successful_rows"] == 5
+    assert progress["skipped_rows"] == 0
+
+
+def test_generate_dataset_batch_plan_supports_variant_overrides_for_high_h_counts(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+    settings = load_generation_config(tmp_path / "config")
+    settings["worldbuilding_texts"] = [
+        {
+            "id": f"wb_{index:02d}",
+            "text": f"세계 {index}은 얼음과 불씨가 엇갈리는 곳이다.",
+            "expected_world_type": "winter",
+        }
+        for index in range(10)
+    ]
+    write_yaml(tmp_path / "config" / "generation.yaml", settings)
+    batch_plan = {
+        "batch_id": "batch_test_h",
+        "task_counts": {"H": 80},
+        "task_variant_overrides": {"H": 8},
+        "output": {"raw_dir": "data/raw/batch_test_h"},
+    }
+
+    def fake_generator(job: dict, system_prompt: str) -> dict:
+        return {
+            "output": compact_json(
+                {
+                    "name": "WinterWorld",
+                    "description_en": "A frozen world where fire remains precious.",
+                    "resource_modifiers": [{"target": "surface_foraging", "multiplier": 0.2}],
+                    "special_zones": [{"kind": "frozen_cave", "spawn_count_min": 1, "spawn_count_max": 4}],
+                    "special_resources": [{"name": "ember_seed", "tags": ["fuel"]}],
+                    "agent_modifiers": [{"system": "temperament", "trigger": "cold_snap", "effect": "raise_caution"}],
+                }
+            ),
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+            "model": "test-model",
+        }
+
+    result = generate_dataset(tmp_path, generator=fake_generator, batch_plan=batch_plan, verbose=False)
+    rows = [json.loads(line) for line in result.output_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    assert result.count == 80
+    assert all(row["task"] == "H" for row in rows)

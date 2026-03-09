@@ -1,0 +1,162 @@
+{
+  "batch_id": "batch_v31_02_gefhc",
+  "updated_at": "2026-03-09T08:28:34.824785+00:00",
+  "paths": {
+    "generated_file": "/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/generated.jsonl",
+    "skipped_file": "/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/skipped.jsonl",
+    "progress_file": "/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/progress.json",
+    "summary_file": "/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/summary.json"
+  },
+  "total_planned_rows": 1230,
+  "processed_rows": 1230,
+  "successful_rows": 1207,
+  "skipped_rows": 23,
+  "success_rate": 0.981301,
+  "current_task": null,
+  "counts_by_task": {
+    "planned": {
+      "G": 600,
+      "H": 80,
+      "E": 150,
+      "F": 250,
+      "C": 150
+    },
+    "successful": {
+      "G": 591,
+      "H": 80,
+      "E": 150,
+      "F": 250,
+      "C": 136
+    },
+    "skipped": {
+      "G": 9,
+      "H": 0,
+      "E": 0,
+      "F": 0,
+      "C": 14
+    }
+  },
+  "failure_reasons_by_task": {
+    "G": {
+      "generation_validation_failed:register_mismatch": 9
+    },
+    "C": {
+      "generation_validation_failed:register_mismatch": 9,
+      "generation_validation_failed:invalid_emotion": 3,
+      "generation_validation_failed:invalid_emotion,register_mismatch": 2
+    }
+  },
+  "recent_failures": [
+    {
+      "task": "C",
+      "variant": 0,
+      "reason": "generation_validation_failed:invalid_emotion,register_mismatch",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "kin_death",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_07",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_09",
+        "temperament_id": "choleric"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_09",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_09",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "paranoid_scout",
+        "oracle_id": "oracle_09",
+        "temperament_id": "choleric"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "paranoid_scout",
+        "oracle_id": "oracle_09",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_10",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_15",
+        "temperament_id": "choleric"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:register_mismatch",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "oracle_id": "oracle_15",
+        "temperament_id": "sanguine"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1465796,
+    "completion_tokens": 119761,
+    "total_tokens": 1585557,
+    "estimated_cost_usd": 6.193803
+  },
+  "throughput": {
+    "rows_per_second": 0.389925,
+    "tokens_per_second": 502.641492
+  },
+  "eta_seconds": 0.0
+}

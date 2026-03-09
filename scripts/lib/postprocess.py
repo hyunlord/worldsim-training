@@ -16,9 +16,9 @@ from scripts.common import AttrDict, ensure_directory, load_yaml, read_jsonl, wr
 from scripts.lib.normalize import CANONICAL_EMOTIONS, CANONICAL_REGISTERS, normalize_emotion, normalize_register, normalize_text, strip_outer_quotes
 from scripts.validate_data import AUTO_REPLACEMENTS, auto_repair
 
-NORMALIZATION_VERSION = "abc-postprocess-normalize-v1"
-VALIDATOR_VERSION = "abc-postprocess-validator-v1"
-CANONICAL_TASKS = ("A", "B", "C")
+NORMALIZATION_VERSION = "worldsim-postprocess-normalize-v2"
+VALIDATOR_VERSION = "worldsim-postprocess-validator-v2"
+CANONICAL_TASKS = ("A", "B", "C", "E", "F", "G", "H")
 CANONICAL_TCI_TRAITS = ("novelty_seeking", "harm_avoidance", "reward_dependence", "persistence")
 LEGACY_HEXACO_TRAITS = (
     "honesty_humility",
@@ -34,12 +34,41 @@ DEFAULT_REQUIRED_FIELDS = {
     "A": ("text_ko", "text_en", "register", "dominant_trait", "temperament_expressed"),
     "B": ("text_ko", "text_en", "register", "emotion_expressed", "intensity", "mimetics", "temperament_influence"),
     "C": ("speech_ko", "speech_en", "register", "emotion_expressed", "speaker_role", "temperament_tone"),
+    "E": ("action_id", "confidence", "hint_ko", "hint_en", "personality_reasoning", "temperament_factor"),
+    "F": ("emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type", "temperament_amplifier"),
+    "G": ("interpretation_ko", "interpretation_en", "action_tendency", "confidence", "register", "misinterpretation_type", "temperament_bias"),
+    "H": ("name", "description_en", "resource_modifiers", "special_zones", "special_resources", "agent_modifiers"),
 }
 DEFAULT_TASK_LIMITS = {
     "A": {"min_chars": 20, "max_chars": 40, "sentences": 1},
     "B": {"min_chars": 30, "max_chars": 60, "sentences": 2},
     "C": {"min_chars": 15, "max_chars": 30, "sentences": 1},
+    "E": {"min_chars": 10, "max_chars": 30, "sentences": 1},
+    "F": {"min_chars": 10, "max_chars": 25, "sentences": 1},
+    "G": {"min_chars": 15, "max_chars": 40, "sentences": 1},
+    "H": {},
 }
+DEFAULT_REASONING_AXES = (
+    "high_honesty_humility",
+    "high_emotionality",
+    "high_extraversion",
+    "high_agreeableness",
+    "high_conscientiousness",
+    "high_openness",
+    "high_novelty_seeking",
+    "high_harm_avoidance",
+    "high_reward_dependence",
+    "high_persistence",
+)
+DEFAULT_TRANSITION_TYPES = ("gradual", "sudden", "sustained")
+DEFAULT_ORACLE_ACTION_TENDENCIES = ("mobilize", "defend", "wait", "retreat", "celebrate", "mourn")
+DEFAULT_ORACLE_MISINTERPRETATIONS = (
+    "overconfident_literal",
+    "cautious_reversal",
+    "optimistic_expansion",
+    "passive_deferral",
+    "symbolic_abstraction",
+)
 DEFAULT_REGISTER_PATTERNS = {
     "haera": [r"다[.\s!?]?$", r"는다[.\s!?]?$", r"했다[.\s!?]?$", r"쳤다[.\s!?]?$", r"라[.\s!?]?$"],
     "hao": [r"오[.\s!?]?$", r"소[.\s!?]?$", r"시오[.\s!?]?$"],
@@ -61,6 +90,14 @@ CONTRADICTION_CUES = {
     "trust": ("겁", "두려", "노려", "trembl", "terror"),
 }
 LOW_INFORMATION_MARKERS = {"...", "lorem ipsum", "todo", "tbd"}
+PRIMARY_TEXT_FIELDS = {
+    "A": "text_ko",
+    "B": "text_ko",
+    "C": "speech_ko",
+    "E": "hint_ko",
+    "F": "cause_ko",
+    "G": "interpretation_ko",
+}
 TIC_TRAIT_ALIASES = {
     "ns": "novelty_seeking",
     "novelty_seeking": "novelty_seeking",
@@ -88,6 +125,10 @@ class PostprocessPolicy:
     speaker_roles: tuple[str, ...]
     canonical_emotions: tuple[str, ...]
     canonical_registers: tuple[str, ...]
+    reasoning_axes: tuple[str, ...]
+    transition_types: tuple[str, ...]
+    oracle_action_tendencies: tuple[str, ...]
+    oracle_misinterpretations: tuple[str, ...]
     auto_replacements: dict[str, str]
 
 
@@ -109,7 +150,10 @@ def load_postprocess_policy(config_dir: Path) -> PostprocessPolicy:
         task: tuple(tasks.get(task, {}).get("output_fields", {}).get("required", DEFAULT_REQUIRED_FIELDS[task]))
         for task in CANONICAL_TASKS
     }
-    task_limits = {task: {**DEFAULT_TASK_LIMITS[task], **validation.get("task_limits", {}).get(task, {})} for task in CANONICAL_TASKS}
+    task_limits = {
+        task: {**DEFAULT_TASK_LIMITS.get(task, {}), **validation.get("task_limits", {}).get(task, {})}
+        for task in CANONICAL_TASKS
+    }
     configured_patterns = validation.get("register_endings", {})
     register_patterns = {}
     for register in CANONICAL_REGISTERS:
@@ -131,6 +175,10 @@ def load_postprocess_policy(config_dir: Path) -> PostprocessPolicy:
         speaker_roles=tuple(speaker_roles),
         canonical_emotions=CANONICAL_EMOTIONS,
         canonical_registers=CANONICAL_REGISTERS,
+        reasoning_axes=tuple(validation.get("reasoning_axes", DEFAULT_REASONING_AXES)),
+        transition_types=tuple(validation.get("transition_types", DEFAULT_TRANSITION_TYPES)),
+        oracle_action_tendencies=tuple(validation.get("oracle_action_tendencies", DEFAULT_ORACLE_ACTION_TENDENCIES)),
+        oracle_misinterpretations=tuple(validation.get("oracle_misinterpretations", DEFAULT_ORACLE_MISINTERPRETATIONS)),
         auto_replacements=dict(AUTO_REPLACEMENTS),
     )
 
@@ -262,7 +310,7 @@ def _normalize_output(task: str, payload: dict[str, Any], policy: PostprocessPol
             actions.append("normalized_mimetics")
         normalized["mimetics"] = seen
 
-    for field in ("text_ko", "speech_ko"):
+    for field in ("text_ko", "speech_ko", "hint_ko", "cause_ko", "interpretation_ko"):
         if field in normalized and isinstance(normalized[field], str):
             repaired, repair_count = auto_repair(normalized[field], policy.auto_replacements)
             normalized[field] = repaired
@@ -332,8 +380,85 @@ def _check_task_c_structural(payload: dict[str, Any], policy: PostprocessPolicy)
     return issues
 
 
+def _check_task_e_structural(record: dict[str, Any], payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues: list[str] = []
+    action_id = payload.get("action_id")
+    if isinstance(action_id, bool) or not isinstance(action_id, int):
+        issues.append("invalid_action_id")
+    else:
+        action_options = record.get("action_options")
+        if isinstance(action_options, list) and action_options:
+            if action_id < 0 or action_id >= len(action_options):
+                issues.append("invalid_action_id")
+        elif action_id < 0 or action_id > 9:
+            issues.append("invalid_action_id")
+    confidence = payload.get("confidence")
+    if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) or not 0 <= float(confidence) <= 1:
+        issues.append("invalid_confidence")
+    reasoning = payload.get("personality_reasoning")
+    if not isinstance(reasoning, str) or not reasoning.strip():
+        issues.append("invalid_personality_reasoning")
+    elif reasoning not in policy.reasoning_axes and record.get("personality_reasoning") and reasoning != record.get("personality_reasoning"):
+        issues.append("reasoning_context_mismatch")
+    return issues
+
+
+def _check_task_f_structural(record: dict[str, Any], payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues: list[str] = []
+    if payload.get("emotion") not in policy.canonical_emotions:
+        issues.append("invalid_emotion")
+    intensity = payload.get("intensity")
+    if isinstance(intensity, bool) or not isinstance(intensity, (int, float)) or not 0 <= float(intensity) <= 1:
+        issues.append("invalid_intensity")
+    previous_emotion = payload.get("previous_emotion")
+    if previous_emotion not in policy.canonical_emotions:
+        issues.append("invalid_previous_emotion")
+    elif record.get("current_emotion_id") and previous_emotion != record.get("current_emotion_id"):
+        issues.append("previous_emotion_mismatch")
+    if payload.get("transition_type") not in policy.transition_types:
+        issues.append("invalid_transition_type")
+    return issues
+
+
+def _check_task_g_structural(payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues: list[str] = []
+    if payload.get("register") not in policy.canonical_registers:
+        issues.append("invalid_register")
+    if payload.get("action_tendency") not in policy.oracle_action_tendencies:
+        issues.append("invalid_action_tendency")
+    confidence = payload.get("confidence")
+    if isinstance(confidence, bool) or not isinstance(confidence, (int, float)) or not 0 <= float(confidence) <= 1:
+        issues.append("invalid_confidence")
+    if payload.get("misinterpretation_type") not in policy.oracle_misinterpretations:
+        issues.append("invalid_misinterpretation_type")
+    return issues
+
+
+def _check_task_h_structural(payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues: list[str] = []
+    name = payload.get("name")
+    if not isinstance(name, str) or not re.match(r"^[A-Z][a-zA-Z]+$", name):
+        issues.append("invalid_name_format")
+    description = payload.get("description_en")
+    if not isinstance(description, str) or len(description.strip()) < 10:
+        issues.append("short_description")
+    for field in ("resource_modifiers", "special_zones", "special_resources", "agent_modifiers"):
+        if not isinstance(payload.get(field), list):
+            issues.append(f"missing_or_invalid_{field}")
+    if isinstance(payload.get("resource_modifiers"), list):
+        for modifier in payload["resource_modifiers"]:
+            if not isinstance(modifier, dict):
+                issues.append("invalid_resource_modifier")
+                continue
+            multiplier = modifier.get("multiplier", -1)
+            if isinstance(multiplier, bool) or not isinstance(multiplier, (int, float)) or not 0 <= float(multiplier) <= 5:
+                issues.append("invalid_multiplier_range")
+                break
+    return issues
+
+
 def _check_text_limits(task: str, payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
-    field = {"A": "text_ko", "B": "text_ko", "C": "speech_ko"}[task]
+    field = PRIMARY_TEXT_FIELDS[task]
     value = payload.get(field)
     if not isinstance(value, str):
         return [f"invalid_{field}_type"]
@@ -355,7 +480,7 @@ def _contains_forbidden(value: str, policy: PostprocessPolicy) -> bool:
 
 
 def _semantic_common(task: str, payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
-    field = {"A": "text_ko", "B": "text_ko", "C": "speech_ko"}[task]
+    field = PRIMARY_TEXT_FIELDS[task]
     text = str(payload.get(field, "")).strip()
     lowered = text.lower()
     issues: list[str] = []
@@ -426,6 +551,57 @@ def _semantic_task_c(payload: dict[str, Any], policy: PostprocessPolicy) -> list
     return issues
 
 
+def _semantic_task_e(record: dict[str, Any], payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues = _semantic_common("E", payload, policy)
+    hint_ko = str(payload.get("hint_ko", ""))
+    if len(hint_ko.split()) <= 1 and len(hint_ko) < 8:
+        issues.append("low_information_output")
+    return issues
+
+
+def _semantic_task_f(record: dict[str, Any], payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues = _semantic_common("F", payload, policy)
+    cause_ko = str(payload.get("cause_ko", ""))
+    cause_en = str(payload.get("cause_en", ""))
+    combined = f"{cause_ko} {cause_en}".lower()
+    emotion = payload.get("emotion")
+    situation_id = str(record.get("situation_id", ""))
+    scores = _collect_emotion_cues(combined)
+
+    if emotion in CONTRADICTION_CUES:
+        contradictions = sum(1 for cue in CONTRADICTION_CUES[emotion] if cue in combined)
+        if contradictions >= 2:
+            issues.append("emotion_text_contradiction")
+
+    if situation_id in NEGATIVE_SITUATIONS and emotion in {"joy", "trust"} and scores.get("fear", 0) > 0:
+        issues.append("emotion_text_contradiction")
+    return issues
+
+
+def _semantic_task_g(payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues = _semantic_common("G", payload, policy)
+    interpretation_ko = str(payload.get("interpretation_ko", ""))
+    register = payload.get("register")
+    if isinstance(register, str) and register in policy.canonical_registers and not _matches_register(interpretation_ko, register, policy.register_patterns):
+        issues.append("register_style_mismatch")
+    if len(interpretation_ko.split()) <= 1 and len(interpretation_ko) < 12:
+        issues.append("low_information_output")
+    return issues
+
+
+def _semantic_task_h(payload: dict[str, Any], policy: PostprocessPolicy) -> list[str]:
+    issues: list[str] = []
+    description = str(payload.get("description_en", "")).strip().lower()
+    if not description:
+        issues.append("low_information_output")
+    if any(marker in description for marker in LOW_INFORMATION_MARKERS):
+        issues.append("low_information_output")
+    arrays = [payload.get("resource_modifiers", []), payload.get("special_zones", []), payload.get("special_resources", []), payload.get("agent_modifiers", [])]
+    if all(isinstance(value, list) and not value for value in arrays):
+        issues.append("low_information_ir")
+    return issues
+
+
 def classify_record(record: dict[str, Any], policy: PostprocessPolicy) -> PostprocessResult:
     task = str(record.get("task", ""))
     if task not in CANONICAL_TASKS:
@@ -437,23 +613,50 @@ def classify_record(record: dict[str, Any], policy: PostprocessPolicy) -> Postpr
 
     normalized, actions, notes = _normalize_output(task, payload, policy)
     structural_issues = _check_required_fields(task, normalized, policy)
-    structural_issues.extend(_check_text_limits(task, normalized, policy))
     if task == "A":
+        structural_issues.extend(_check_text_limits(task, normalized, policy))
         structural_issues.extend(_check_task_a_structural(normalized, policy))
         semantic_issues = _semantic_task_a(normalized, policy)
     elif task == "B":
+        structural_issues.extend(_check_text_limits(task, normalized, policy))
         structural_issues.extend(_check_task_b_structural(normalized, policy))
         semantic_issues = _semantic_task_b(record, normalized, policy)
-    else:
+    elif task == "C":
+        structural_issues.extend(_check_text_limits(task, normalized, policy))
         structural_issues.extend(_check_task_c_structural(normalized, policy))
         semantic_issues = _semantic_task_c(normalized, policy)
+    elif task == "E":
+        structural_issues.extend(_check_text_limits(task, normalized, policy))
+        structural_issues.extend(_check_task_e_structural(record, normalized, policy))
+        semantic_issues = _semantic_task_e(record, normalized, policy)
+    elif task == "F":
+        structural_issues.extend(_check_text_limits(task, normalized, policy))
+        structural_issues.extend(_check_task_f_structural(record, normalized, policy))
+        semantic_issues = _semantic_task_f(record, normalized, policy)
+    elif task == "G":
+        structural_issues.extend(_check_text_limits(task, normalized, policy))
+        structural_issues.extend(_check_task_g_structural(normalized, policy))
+        semantic_issues = _semantic_task_g(normalized, policy)
+    else:
+        structural_issues.extend(_check_task_h_structural(normalized, policy))
+        semantic_issues = _semantic_task_h(normalized, policy)
 
     structural_issues = sorted(set(issue for issue in structural_issues if issue))
     semantic_issues = sorted(set(issue for issue in semantic_issues + notes if issue))
 
     if structural_issues:
         disposition = "failed"
-    elif any(issue in {"emotion_text_contradiction", "low_information_output", "forbidden_word_remaining", "missing_literal_mimetic"} for issue in semantic_issues):
+    elif any(
+        issue
+        in {
+            "emotion_text_contradiction",
+            "low_information_output",
+            "forbidden_word_remaining",
+            "missing_literal_mimetic",
+            "low_information_ir",
+        }
+        for issue in semantic_issues
+    ):
         disposition = "failed"
     elif semantic_issues:
         disposition = "review"

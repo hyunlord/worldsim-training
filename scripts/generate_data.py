@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import random
 import re
 import sys
+from collections import Counter, deque
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter, sleep
@@ -705,10 +707,11 @@ def build_jobs(
     settings: dict | None = None,
     seed: int | None = None,
     task_filter: set[str] | None = None,
+    settings_override: dict | None = None,
 ) -> list[dict]:
     if isinstance(catalogs_or_repo_root, Path):
         repo_root = catalogs_or_repo_root
-        repo_settings = load_generation_config(repo_root / "config")
+        repo_settings = settings_override or load_generation_config(repo_root / "config")
         catalogs = load_catalogs(repo_root / "config")
         prompt_assets = _repo_prompt_assets(repo_root, repo_settings)
         jobs = _build_jobs_from_catalogs(catalogs, repo_settings, system_prompt=prompt_assets["system"], seed=seed)
@@ -838,6 +841,95 @@ def select_jobs(jobs: list[dict], limit: int | None) -> list[dict]:
     return selected
 
 
+def select_jobs_by_task_counts(jobs: list[dict], task_counts: dict[str, int]) -> list[dict]:
+    requested = {task.strip().upper(): int(count) for task, count in task_counts.items() if int(count) > 0}
+    if not requested:
+        return []
+
+    task_order = list(requested)
+    buckets: dict[str, list[dict]] = {task: [] for task in task_order}
+    for job in jobs:
+        if job["task"] in buckets:
+            buckets[job["task"]].append(job)
+
+    shortages = {task: requested[task] - len(buckets[task]) for task in task_order if len(buckets[task]) < requested[task]}
+    if shortages:
+        details = ", ".join(
+            f"{task} requested={requested[task]} available={len(buckets[task])}" for task in task_order if task in shortages
+        )
+        raise ValueError(f"Not enough jobs available for requested task counts: {details}")
+
+    selected: list[dict] = []
+    offsets = {task: 0 for task in task_order}
+    remaining = requested.copy()
+    while any(remaining.values()):
+        progressed = False
+        for task in task_order:
+            if remaining[task] <= 0:
+                continue
+            selected.append(buckets[task][offsets[task]])
+            offsets[task] += 1
+            remaining[task] -= 1
+            progressed = True
+        if not progressed:
+            break
+    return selected
+
+
+def select_requested_jobs(
+    jobs: list[dict],
+    *,
+    limit: int | None = None,
+    task_counts: dict[str, int] | None = None,
+) -> list[dict]:
+    if task_counts:
+        return select_jobs_by_task_counts(jobs, task_counts)
+    return select_jobs(jobs, limit)
+
+
+def load_batch_plan(
+    repo_root: Path,
+    *,
+    batch_config: str | Path | None = None,
+    batch_id: str | None = None,
+) -> dict | None:
+    if batch_config is None and batch_id is None:
+        return None
+    if batch_config is not None and batch_id is not None:
+        raise ValueError("Use either --batch-config or --batch-id, not both")
+
+    if batch_config is not None:
+        plan_path = resolve_path(repo_root, batch_config)
+    else:
+        plan_path = repo_root / "config" / "batches" / f"{batch_id}.yaml"
+    batch_plan = load_yaml(plan_path)
+    batch_plan["_path"] = str(plan_path)
+    return batch_plan
+
+
+def apply_batch_plan_to_settings(settings: dict, batch_plan: dict | None) -> dict:
+    if not batch_plan:
+        return settings
+    merged = copy.deepcopy(settings)
+    variant_overrides = batch_plan.get("task_variant_overrides", {})
+    if variant_overrides:
+        merged.setdefault("task_variants", {})
+        for task, count in variant_overrides.items():
+            merged["task_variants"][str(task).upper()] = int(count)
+    reporting_overrides = batch_plan.get("reporting", {})
+    if reporting_overrides:
+        merged.setdefault("reporting", {}).update(reporting_overrides)
+    return merged
+
+
+def batch_task_counts(batch_plan: dict | None) -> dict[str, int] | None:
+    if not batch_plan:
+        return None
+    raw_counts = batch_plan.get("task_counts", {})
+    counts = {str(task).upper(): int(count) for task, count in raw_counts.items() if int(count) > 0}
+    return counts or None
+
+
 def build_output_path(output_dir: Path) -> Path:
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
     return ensure_directory(output_dir) / f"generated_{timestamp}.jsonl"
@@ -847,9 +939,52 @@ def _raw_dir(repo_root: Path, settings: dict) -> Path:
     return ensure_directory(resolve_path(repo_root, settings.get("paths", {}).get("raw_dir", "data/raw")))
 
 
-def _resolve_cli_output_path(repo_root: Path, settings: dict, output_path: str | Path | None = None) -> Path:
+def _batch_output_dir(repo_root: Path, settings: dict, batch_plan: dict) -> Path:
+    raw_dir = _raw_dir(repo_root, settings)
+    output_settings = batch_plan.get("output", {})
+    batch_id = batch_plan.get("batch_id")
+    target = output_settings.get("raw_dir")
+    if target:
+        candidate = resolve_path(repo_root, target)
+    elif batch_id:
+        candidate = raw_dir / batch_id
+    else:
+        candidate = raw_dir
+    return ensure_directory(ensure_within_directory(raw_dir, candidate, label="raw_dir batch_output_dir"))
+
+
+def _batch_named_output_path(
+    repo_root: Path,
+    settings: dict,
+    batch_plan: dict | None,
+    *,
+    key: str,
+    default_name: str,
+) -> Path | None:
+    if not batch_plan:
+        return None
+    filename = batch_plan.get("output", {}).get(key, default_name)
+    return _batch_output_dir(repo_root, settings, batch_plan) / filename
+
+
+def _resolve_cli_output_path(
+    repo_root: Path,
+    settings: dict,
+    output_path: str | Path | None = None,
+    *,
+    batch_plan: dict | None = None,
+) -> Path:
     raw_dir = _raw_dir(repo_root, settings)
     if output_path is None:
+        batch_generated_path = _batch_named_output_path(
+            repo_root,
+            settings,
+            batch_plan,
+            key="generated_file",
+            default_name="generated.jsonl",
+        )
+        if batch_generated_path is not None:
+            return batch_generated_path
         return build_output_path(raw_dir)
     candidate = resolve_path(repo_root, output_path)
     return ensure_within_directory(raw_dir, candidate, label="raw_dir output_path")
@@ -927,19 +1062,113 @@ def reporting_settings(settings: dict) -> dict:
     return settings.get("reporting", {})
 
 
+def _format_compact_counts(counts: dict[str, int], task_order: list[str]) -> str:
+    parts = [f"{task}:{counts.get(task, 0)}" for task in task_order if counts.get(task, 0)]
+    return ", ".join(parts) if parts else "-"
+
+
+def build_progress_payload(
+    *,
+    batch_id: str | None,
+    output_path: Path,
+    skipped_path: Path,
+    progress_path: Path | None,
+    summary_path: Path | None,
+    planned_by_task: dict[str, int],
+    success_by_task: Counter,
+    skipped_by_task: Counter,
+    failure_reasons_by_task: dict[str, Counter],
+    recent_failures: deque[dict],
+    processed_rows: int,
+    total_rows: int,
+    completed_rows: int,
+    skipped_rows: int,
+    current_task: str | None,
+    elapsed_seconds: float,
+    totals: dict[str, float],
+) -> dict:
+    rows_per_second = processed_rows / elapsed_seconds if elapsed_seconds > 0 else 0.0
+    tokens_per_second = totals["total_tokens"] / elapsed_seconds if elapsed_seconds > 0 else 0.0
+    remaining = max(total_rows - processed_rows, 0)
+    eta_seconds = (remaining / rows_per_second) if rows_per_second > 0 else None
+    task_order = list(planned_by_task)
+    return {
+        "batch_id": batch_id,
+        "updated_at": datetime.now(UTC).isoformat(),
+        "paths": {
+            "generated_file": str(output_path),
+            "skipped_file": str(skipped_path),
+            "progress_file": str(progress_path) if progress_path is not None else None,
+            "summary_file": str(summary_path) if summary_path is not None else None,
+        },
+        "total_planned_rows": total_rows,
+        "processed_rows": processed_rows,
+        "successful_rows": completed_rows,
+        "skipped_rows": skipped_rows,
+        "success_rate": round((completed_rows / processed_rows), 6) if processed_rows else 0.0,
+        "current_task": current_task,
+        "counts_by_task": {
+            "planned": {task: planned_by_task.get(task, 0) for task in task_order},
+            "successful": {task: success_by_task.get(task, 0) for task in task_order},
+            "skipped": {task: skipped_by_task.get(task, 0) for task in task_order},
+        },
+        "failure_reasons_by_task": {
+            task: dict(counter.most_common(5)) for task, counter in failure_reasons_by_task.items() if counter
+        },
+        "recent_failures": list(recent_failures),
+        "usage": {
+            "prompt_tokens": int(totals["prompt_tokens"]),
+            "completion_tokens": int(totals["completion_tokens"]),
+            "total_tokens": int(totals["total_tokens"]),
+            "estimated_cost_usd": round(totals["estimated_cost_usd"], 8),
+        },
+        "throughput": {
+            "rows_per_second": round(rows_per_second, 6),
+            "tokens_per_second": round(tokens_per_second, 6),
+        },
+        "eta_seconds": round(eta_seconds, 2) if eta_seconds is not None else None,
+    }
+
+
+def write_progress_payload(path: Path | None, payload: dict) -> None:
+    if path is None:
+        return
+    ensure_directory(path.parent)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def print_progress(
     *,
     index: int,
     total: int,
+    current_task: str | None,
+    completed_rows: int,
+    skipped_rows: int,
+    planned_by_task: dict[str, int],
+    success_by_task: Counter,
+    skipped_by_task: Counter,
+    failure_reasons_by_task: dict[str, Counter],
     elapsed_seconds: float,
     totals: dict[str, float],
     last_request_seconds: float,
 ) -> None:
     rows_per_second = index / elapsed_seconds if elapsed_seconds > 0 else 0.0
     tokens_per_second = totals["total_tokens"] / elapsed_seconds if elapsed_seconds > 0 else 0.0
+    success_rate = (completed_rows / index) if index > 0 else 0.0
+    eta_seconds = ((total - index) / rows_per_second) if rows_per_second > 0 else None
+    eta_display = f"{eta_seconds:.2f}" if eta_seconds is not None else "n/a"
+    task_order = list(planned_by_task)
+    top_failures = []
+    for task in task_order:
+        reasons = failure_reasons_by_task.get(task)
+        if not reasons:
+            continue
+        reason, count = reasons.most_common(1)[0]
+        top_failures.append(f"{task}:{reason}({count})")
     print(
-        f"[{index}/{total}] elapsed={elapsed_seconds:.2f}s "
-        f"last={last_request_seconds:.2f}s rows_per_second={rows_per_second:.2f} "
+        f"[{index}/{total}] task={current_task or '-'} success={completed_rows} skipped={skipped_rows} "
+        f"success_rate={success_rate:.1%} elapsed={elapsed_seconds:.2f}s last={last_request_seconds:.2f}s "
+        f"rows_per_second={rows_per_second:.2f} eta_seconds={eta_display} "
         f"tokens={int(totals['total_tokens'])} estimated_cost_usd=${totals['estimated_cost_usd']:.6f}",
         flush=True,
     )
@@ -948,12 +1177,25 @@ def print_progress(
         f"tokens_per_second={tokens_per_second:.2f}",
         flush=True,
     )
+    print(
+        f"  by_task_success={_format_compact_counts(success_by_task, task_order)} "
+        f"by_task_skipped={_format_compact_counts(skipped_by_task, task_order)}",
+        flush=True,
+    )
+    if top_failures:
+        print(f"  dominant_failures={'; '.join(top_failures)}", flush=True)
 
 
 def print_final_summary(*, result: AttrDict) -> None:
     print("Generation summary", flush=True)
+    if result.get("batch_id"):
+        print(f"  batch_id={result.batch_id}", flush=True)
     print(f"  output_path={result.output_path}", flush=True)
     print(f"  skipped_path={result.skipped_path}", flush=True)
+    if result.get("progress_path"):
+        print(f"  progress_path={result.progress_path}", flush=True)
+    if result.get("summary_path"):
+        print(f"  summary_path={result.summary_path}", flush=True)
     print(f"  rows={result.count}", flush=True)
     print(f"  skipped={result.skipped_count}", flush=True)
     print(f"  elapsed_seconds={result.elapsed_seconds:.2f}", flush=True)
@@ -963,6 +1205,15 @@ def print_final_summary(*, result: AttrDict) -> None:
     print(f"  estimated_cost_usd=${result.estimated_cost_usd:.6f}", flush=True)
     print(f"  rows_per_second={result.rows_per_second:.2f}", flush=True)
     print(f"  tokens_per_second={result.tokens_per_second:.2f}", flush=True)
+    if result.get("task_counts"):
+        print(f"  task_counts={json.dumps(result.task_counts, ensure_ascii=False, sort_keys=True)}", flush=True)
+    if result.get("skipped_task_counts"):
+        print(f"  skipped_task_counts={json.dumps(result.skipped_task_counts, ensure_ascii=False, sort_keys=True)}", flush=True)
+    if result.get("failure_reasons_by_task"):
+        print(
+            f"  failure_reasons_by_task={json.dumps(result.failure_reasons_by_task, ensure_ascii=False, sort_keys=True)}",
+            flush=True,
+        )
 
 
 def _task_text_limits(settings: dict, task: str) -> tuple[int, int]:
@@ -1237,8 +1488,35 @@ def _append_jsonl(path: Path, row: dict) -> None:
         handle.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def _skip_output_path(output_path: Path) -> Path:
+def _skip_output_path(
+    repo_root: Path,
+    settings: dict,
+    output_path: Path,
+    *,
+    batch_plan: dict | None = None,
+) -> Path:
+    batch_skipped_path = _batch_named_output_path(
+        repo_root,
+        settings,
+        batch_plan,
+        key="skipped_file",
+        default_name="skipped.jsonl",
+    )
+    if batch_skipped_path is not None:
+        return batch_skipped_path
     return output_path.parent / "skipped.jsonl"
+
+
+def _progress_output_path(repo_root: Path, settings: dict, *, batch_plan: dict | None = None) -> Path | None:
+    return _batch_named_output_path(repo_root, settings, batch_plan, key="progress_file", default_name="progress.json")
+
+
+def _summary_output_path(repo_root: Path, settings: dict, *, batch_plan: dict | None = None) -> Path | None:
+    return _batch_named_output_path(repo_root, settings, batch_plan, key="summary_file", default_name="summary.json")
+
+
+def _log_output_path(repo_root: Path, settings: dict, *, batch_plan: dict | None = None) -> Path | None:
+    return _batch_named_output_path(repo_root, settings, batch_plan, key="log_file", default_name="generate.log")
 
 
 def _generation_retry_settings(settings: dict) -> tuple[int, float]:
@@ -1317,14 +1595,24 @@ def generate_dataset(
     output_path: Path | None = None,
     task_filter: set[str] | None = None,
     verbose: bool = True,
+    batch_plan: dict | None = None,
+    settings_override: dict | None = None,
 ):
     load_local_env(repo_root)
-    settings = load_generation_config(repo_root / "config")
-    jobs = build_jobs(repo_root, seed=seed, task_filter=task_filter)
-    selected_jobs = select_jobs(jobs, limit)
-    output_path = _resolve_cli_output_path(repo_root, settings, output_path)
-    skipped_path = _skip_output_path(output_path)
+    base_settings = settings_override or load_generation_config(repo_root / "config")
+    settings = apply_batch_plan_to_settings(base_settings, batch_plan)
+    requested_task_counts = batch_task_counts(batch_plan)
+    jobs = build_jobs(repo_root, seed=seed, task_filter=task_filter, settings_override=settings)
+    selected_jobs = select_requested_jobs(jobs, limit=limit, task_counts=requested_task_counts)
+    output_path = _resolve_cli_output_path(repo_root, settings, output_path, batch_plan=batch_plan)
+    skipped_path = _skip_output_path(repo_root, settings, output_path, batch_plan=batch_plan)
+    progress_path = _progress_output_path(repo_root, settings, batch_plan=batch_plan)
+    summary_path = _summary_output_path(repo_root, settings, batch_plan=batch_plan)
+    log_path = _log_output_path(repo_root, settings, batch_plan=batch_plan)
     ensure_directory(output_path.parent)
+    for path in (output_path, skipped_path, progress_path, summary_path):
+        if path is not None and path.exists() and path.stat().st_size > 0:
+            raise FileExistsError(f"Refusing to overwrite existing generation artifact: {path}")
     output_path.write_text("", encoding="utf-8")
     skipped_path.write_text("", encoding="utf-8")
     totals: dict[str, float] = {
@@ -1338,6 +1626,11 @@ def generate_dataset(
     retry_attempts, retry_backoff_seconds = _generation_retry_settings(settings)
     completed_rows = 0
     skipped_rows = 0
+    planned_by_task = dict(Counter(job["task"] for job in selected_jobs))
+    successful_by_task: Counter = Counter()
+    skipped_by_task: Counter = Counter()
+    failure_reasons_by_task: dict[str, Counter] = {task: Counter() for task in planned_by_task}
+    recent_failures: deque[dict] = deque(maxlen=10)
 
     for index, job in enumerate(selected_jobs, start=1):
         request_started_at = perf_counter()
@@ -1347,6 +1640,12 @@ def generate_dataset(
         validated_output = None
         validation_error = None
         last_error = None
+        per_job_usage = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "estimated_cost_usd": 0.0,
+        }
         for attempt in range(1, retry_attempts + 1):
             try:
                 raw_result = (
@@ -1355,6 +1654,10 @@ def generate_dataset(
                     else call_teacher_api(job=job, system_prompt=job["system_prompt"], user_prompt=prompt, settings=settings)
                 )
                 normalized = normalize_generation_result(raw_result, settings, fallback_model=fallback_model)
+                per_job_usage["prompt_tokens"] += normalized.usage["prompt_tokens"]
+                per_job_usage["completion_tokens"] += normalized.usage["completion_tokens"]
+                per_job_usage["total_tokens"] += normalized.usage["total_tokens"]
+                per_job_usage["estimated_cost_usd"] += normalized.estimated_cost_usd
                 validated_output, validation_error = parse_and_validate(normalized.output, job, settings)
                 if validation_error is None:
                     break
@@ -1378,7 +1681,12 @@ def generate_dataset(
                     )
                 if retry_backoff_seconds > 0:
                     sleep(retry_backoff_seconds * attempt)
-        if normalized is None or validated_output is None:
+        totals["prompt_tokens"] += per_job_usage["prompt_tokens"]
+        totals["completion_tokens"] += per_job_usage["completion_tokens"]
+        totals["total_tokens"] += per_job_usage["total_tokens"]
+        totals["estimated_cost_usd"] += per_job_usage["estimated_cost_usd"]
+        did_skip = normalized is None or validated_output is None
+        if did_skip:
             skipped_row = {key: value for key, value in job.items() if key != "system_prompt"}
             skipped_row["prompt"] = prompt
             skipped_row["skip_reason"] = last_error or "generation_failed_without_result"
@@ -1392,41 +1700,105 @@ def generate_dataset(
                 skipped_row["estimated_cost_usd"] = normalized.estimated_cost_usd
             _append_jsonl(skipped_path, skipped_row)
             skipped_rows += 1
+            skipped_by_task[job["task"]] += 1
+            failure_reasons_by_task.setdefault(job["task"], Counter())[skipped_row["skip_reason"]] += 1
+            recent_failures.append(
+                {
+                    "task": job["task"],
+                    "variant": job.get("variant", 0),
+                    "reason": skipped_row["skip_reason"],
+                    "record_hint": {
+                        key: skipped_row.get(key)
+                        for key in ("personality_id", "situation_id", "worldbuilding_id", "oracle_id", "temperament_id")
+                        if skipped_row.get(key)
+                    },
+                }
+            )
             if verbose:
                 print(
                     f"[skip] task={job['task']} variant={job.get('variant', 0)} reason={skipped_row['skip_reason']}",
                     flush=True,
                 )
-            continue
+        else:
+            row = {key: value for key, value in job.items() if key != "system_prompt"}
+            row["output"] = validated_output
+            row["model"] = normalized.model
+            row["prompt_tokens"] = normalized.usage["prompt_tokens"]
+            row["completion_tokens"] = normalized.usage["completion_tokens"]
+            row["total_tokens"] = normalized.usage["total_tokens"]
+            row["estimated_cost_usd"] = normalized.estimated_cost_usd
+            _append_jsonl(output_path, row)
+            completed_rows += 1
+            successful_by_task[job["task"]] += 1
+
         request_elapsed = perf_counter() - request_started_at
-        row = {key: value for key, value in job.items() if key != "system_prompt"}
-        row["output"] = validated_output
-        row["model"] = normalized.model
-        row["prompt_tokens"] = normalized.usage["prompt_tokens"]
-        row["completion_tokens"] = normalized.usage["completion_tokens"]
-        row["total_tokens"] = normalized.usage["total_tokens"]
-        row["estimated_cost_usd"] = normalized.estimated_cost_usd
-        _append_jsonl(output_path, row)
-        completed_rows += 1
-
-        totals["prompt_tokens"] += normalized.usage["prompt_tokens"]
-        totals["completion_tokens"] += normalized.usage["completion_tokens"]
-        totals["total_tokens"] += normalized.usage["total_tokens"]
-        totals["estimated_cost_usd"] += normalized.estimated_cost_usd
-
+        elapsed_seconds = perf_counter() - started_at
+        progress_payload = build_progress_payload(
+            batch_id=batch_plan.get("batch_id") if batch_plan else None,
+            output_path=output_path,
+            skipped_path=skipped_path,
+            progress_path=progress_path,
+            summary_path=summary_path,
+            planned_by_task=planned_by_task,
+            success_by_task=successful_by_task,
+            skipped_by_task=skipped_by_task,
+            failure_reasons_by_task=failure_reasons_by_task,
+            recent_failures=recent_failures,
+            processed_rows=index,
+            total_rows=len(selected_jobs),
+            completed_rows=completed_rows,
+            skipped_rows=skipped_rows,
+            current_task=job["task"],
+            elapsed_seconds=elapsed_seconds,
+            totals=totals,
+        )
+        if progress_path is not None and (index % progress_every == 0 or did_skip or index == len(selected_jobs)):
+            write_progress_payload(progress_path, progress_payload)
         if verbose and progress_every > 0 and (index % progress_every == 0 or index == len(selected_jobs)):
             print_progress(
                 index=index,
                 total=len(selected_jobs),
-                elapsed_seconds=perf_counter() - started_at,
+                current_task=job["task"],
+                completed_rows=completed_rows,
+                skipped_rows=skipped_rows,
+                planned_by_task=planned_by_task,
+                success_by_task=successful_by_task,
+                skipped_by_task=skipped_by_task,
+                failure_reasons_by_task=failure_reasons_by_task,
+                elapsed_seconds=elapsed_seconds,
                 totals=totals,
                 last_request_seconds=request_elapsed,
             )
 
     elapsed_seconds = perf_counter() - started_at
-    result = AttrDict(
+    summary_payload = build_progress_payload(
+        batch_id=batch_plan.get("batch_id") if batch_plan else None,
         output_path=output_path,
         skipped_path=skipped_path,
+        progress_path=progress_path,
+        summary_path=summary_path,
+        planned_by_task=planned_by_task,
+        success_by_task=successful_by_task,
+        skipped_by_task=skipped_by_task,
+        failure_reasons_by_task=failure_reasons_by_task,
+        recent_failures=recent_failures,
+        processed_rows=len(selected_jobs),
+        total_rows=len(selected_jobs),
+        completed_rows=completed_rows,
+        skipped_rows=skipped_rows,
+        current_task=None,
+        elapsed_seconds=elapsed_seconds,
+        totals=totals,
+    )
+    write_progress_payload(progress_path, summary_payload)
+    write_progress_payload(summary_path, summary_payload)
+    result = AttrDict(
+        batch_id=batch_plan.get("batch_id") if batch_plan else None,
+        output_path=output_path,
+        skipped_path=skipped_path,
+        progress_path=progress_path,
+        summary_path=summary_path,
+        log_path=log_path,
         count=completed_rows,
         record_count=completed_rows,
         jobs_count=len(selected_jobs),
@@ -1436,8 +1808,12 @@ def generate_dataset(
         total_tokens=int(totals["total_tokens"]),
         estimated_cost_usd=round(totals["estimated_cost_usd"], 8),
         elapsed_seconds=elapsed_seconds,
-        rows_per_second=(completed_rows / elapsed_seconds) if elapsed_seconds > 0 else 0.0,
+        rows_per_second=(len(selected_jobs) / elapsed_seconds) if elapsed_seconds > 0 else 0.0,
         tokens_per_second=(totals["total_tokens"] / elapsed_seconds) if elapsed_seconds > 0 else 0.0,
+        task_counts=dict(successful_by_task),
+        planned_task_counts=planned_by_task,
+        skipped_task_counts=dict(skipped_by_task),
+        failure_reasons_by_task={task: dict(counter.most_common(5)) for task, counter in failure_reasons_by_task.items() if counter},
     )
     if verbose:
         print_final_summary(result=result)
@@ -1498,6 +1874,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--tasks", default=None, help="Comma-separated task ids, e.g. E,F")
+    parser.add_argument("--batch-config", default=None, help="Path to a batch config YAML file.")
+    parser.add_argument("--batch-id", default=None, help="Batch id resolved as config/batches/<batch-id>.yaml")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -1505,16 +1883,42 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     repo_root = resolve_path(Path.cwd(), args.repo_root)
-    settings = load_generation_config(repo_root / "config")
+    batch_plan = load_batch_plan(repo_root, batch_config=args.batch_config, batch_id=args.batch_id)
+    settings = apply_batch_plan_to_settings(load_generation_config(repo_root / "config"), batch_plan)
+    batch_counts = batch_task_counts(batch_plan)
+    batch_task_filter = set(batch_counts) if batch_counts else None
     task_filter = parse_task_filter(args.tasks)
-    jobs = build_jobs(repo_root, seed=args.seed, task_filter=task_filter)
-    output_path = _resolve_cli_output_path(repo_root, settings, args.output)
-    print_job_summary(select_jobs(jobs, args.limit))
+    if task_filter is not None and batch_task_filter is not None and task_filter != batch_task_filter:
+        raise ValueError("When --tasks and --batch-config are both provided, their task sets must match exactly")
+    task_filter = task_filter or batch_task_filter
+    jobs = build_jobs(repo_root, seed=args.seed, task_filter=task_filter, settings_override=settings)
+    selected_jobs = select_requested_jobs(jobs, limit=args.limit, task_counts=batch_counts)
+    output_path = _resolve_cli_output_path(repo_root, settings, args.output, batch_plan=batch_plan)
+    print_job_summary(selected_jobs)
+    if batch_plan:
+        batch_label = batch_plan.get("batch_id") or Path(batch_plan["_path"]).stem
+        print(f"Batch id: {batch_label}")
+        print(f"Batch config: {batch_plan['_path']}")
+        print(f"Raw output: {output_path}")
+        progress_path = _progress_output_path(repo_root, settings, batch_plan=batch_plan)
+        summary_path = _summary_output_path(repo_root, settings, batch_plan=batch_plan)
+        if progress_path is not None:
+            print(f"Progress snapshot: {progress_path}")
+        if summary_path is not None:
+            print(f"Summary file: {summary_path}")
     if args.dry_run:
         print(f"Dry run only. Raw output would be written to {output_path}")
         return
 
-    result = generate_dataset(repo_root, limit=args.limit, seed=args.seed, output_path=output_path, task_filter=task_filter)
+    result = generate_dataset(
+        repo_root,
+        limit=args.limit,
+        seed=args.seed,
+        output_path=output_path,
+        task_filter=task_filter,
+        batch_plan=batch_plan,
+        settings_override=settings,
+    )
     print(f"Wrote {result.count} rows to {result.output_path}")
     if result.skipped_count:
         print(f"Skipped {result.skipped_count} rows to {result.skipped_path}")

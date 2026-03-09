@@ -1,0 +1,58 @@
+{
+  "dataset_name": "worldsim-v31-02-gefhc-final",
+  "generated_at": "2026-03-09T08:45:32.258454+00:00",
+  "seed": 42,
+  "dev_fraction": 0.1,
+  "output_files": {
+    "train": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/train.jsonl",
+    "dev": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/dev.jsonl",
+    "excluded": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/excluded.jsonl"
+  },
+  "source_files": {
+    "passed_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/passed.jsonl",
+    "approved_review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/approved.jsonl",
+    "recovered_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/recovered.jsonl",
+    "review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/review.jsonl",
+    "failed_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/failed.jsonl",
+    "needs_review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/needs_review.jsonl",
+    "unrecoverable_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/unrecoverable.jsonl"
+  },
+  "counts": {
+    "train": 1053,
+    "dev": 117,
+    "included_total": 1170,
+    "excluded_total": 60
+  },
+  "input_counts": {
+    "passed": 1163,
+    "approved_review": 0,
+    "recovered": 7,
+    "review": 0,
+    "failed": 44,
+    "needs_review": 16,
+    "unrecoverable": 0
+  },
+  "included_counts_by_source": {
+    "passed": 1163,
+    "recovered": 7
+  },
+  "excluded_counts_by_reason": {
+    "failed_source": 44,
+    "needs_review_not_approved": 16
+  },
+  "included_task_counts": {
+    "C": 143,
+    "E": 150,
+    "F": 250,
+    "G": 591,
+    "H": 36
+  },
+  "excluded_task_counts": {
+    "C": 7,
+    "G": 9,
+    "H": 44
+  },
+  "included_recovered_rows": 7,
+  "normalization_version": "worldsim-postprocess-normalize-v2",
+  "validator_version": "worldsim-postprocess-validator-v2"
+}

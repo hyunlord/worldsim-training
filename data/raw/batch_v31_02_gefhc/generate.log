@@ -1,0 +1,651 @@
+Total jobs: 1230
+  Task C: 150
+  Task E: 150
+  Task F: 250
+  Task G: 600
+  Task H: 80
+Batch id: batch_v31_02_gefhc
+Batch config: /Users/rexxa/github/worldsim-training/config/batches/batch_v31_02_gefhc.yaml
+Raw output: /Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/generated.jsonl
+Progress snapshot: /Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/progress.json
+Summary file: /Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/summary.json
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[10/1230] task=C success=8 skipped=2 success_rate=80.0% elapsed=35.49s last=8.06s rows_per_second=0.28 eta_seconds=4329.54 tokens=16271 estimated_cost_usd=$0.063657
+  prompt_tokens=15034 completion_tokens=1237 tokens_per_second=458.49
+  by_task_success=G:2, H:2, E:2, F:2 by_task_skipped=C:2
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[20/1230] task=C success=18 skipped=2 success_rate=90.0% elapsed=58.54s last=2.60s rows_per_second=0.34 eta_seconds=3541.83 tokens=27703 estimated_cost_usd=$0.109089
+  prompt_tokens=25538 completion_tokens=2165 tokens_per_second=473.21
+  by_task_success=G:4, H:4, E:4, F:4, C:2 by_task_skipped=C:2
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[30/1230] task=C success=28 skipped=2 success_rate=93.3% elapsed=78.99s last=2.23s rows_per_second=0.38 eta_seconds=3159.46 tokens=39127 estimated_cost_usd=$0.154173
+  prompt_tokens=36061 completion_tokens=3066 tokens_per_second=495.36
+  by_task_success=G:6, H:6, E:6, F:6, C:4 by_task_skipped=C:2
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[40/1230] task=C success=38 skipped=2 success_rate=95.0% elapsed=104.78s last=2.39s rows_per_second=0.38 eta_seconds=3117.09 tokens=50530 estimated_cost_usd=$0.199302
+  prompt_tokens=46554 completion_tokens=3976 tokens_per_second=482.27
+  by_task_success=G:8, H:8, E:8, F:8, C:6 by_task_skipped=C:2
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[50/1230] task=C success=47 skipped=3 success_rate=94.0% elapsed=133.17s last=1.95s rows_per_second=0.38 eta_seconds=3142.74 tokens=64211 estimated_cost_usd=$0.251865
+  prompt_tokens=59275 completion_tokens=4936 tokens_per_second=482.18
+  by_task_success=G:10, H:10, E:10, F:10, C:7 by_task_skipped=C:3
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[60/1230] task=C success=57 skipped=3 success_rate=95.0% elapsed=158.74s last=6.71s rows_per_second=0.38 eta_seconds=3095.45 tokens=77949 estimated_cost_usd=$0.304719
+  prompt_tokens=72043 completion_tokens=5906 tokens_per_second=491.05
+  by_task_success=G:12, H:12, E:12, F:12, C:9 by_task_skipped=C:3
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[70/1230] task=C success=67 skipped=3 success_rate=95.7% elapsed=179.51s last=2.05s rows_per_second=0.39 eta_seconds=2974.67 tokens=89236 estimated_cost_usd=$0.348036
+  prompt_tokens=82542 completion_tokens=6694 tokens_per_second=497.12
+  by_task_success=G:14, H:14, E:14, F:14, C:11 by_task_skipped=C:3
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[80/1230] task=C success=77 skipped=3 success_rate=96.2% elapsed=200.06s last=2.31s rows_per_second=0.40 eta_seconds=2875.84 tokens=100542 estimated_cost_usd=$0.391554
+  prompt_tokens=93048 completion_tokens=7494 tokens_per_second=502.56
+  by_task_success=G:16, H:16, E:16, F:16, C:13 by_task_skipped=C:3
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[90/1230] task=C success=87 skipped=3 success_rate=96.7% elapsed=221.19s last=2.87s rows_per_second=0.41 eta_seconds=2801.74 tokens=111862 estimated_cost_usd=$0.435474
+  prompt_tokens=103538 completion_tokens=8324 tokens_per_second=505.73
+  by_task_success=G:18, H:18, E:18, F:18, C:15 by_task_skipped=C:3
+  dominant_failures=C:generation_validation_failed:invalid_emotion,register_mismatch(1)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[100/1230] task=C success=96 skipped=4 success_rate=96.0% elapsed=248.98s last=2.37s rows_per_second=0.40 eta_seconds=2813.52 tokens=125610 estimated_cost_usd=$0.488922
+  prompt_tokens=116269 completion_tokens=9341 tokens_per_second=504.49
+  by_task_success=G:20, H:20, E:20, F:20, C:16 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[110/1230] task=C success=106 skipped=4 success_rate=96.4% elapsed=269.23s last=1.60s rows_per_second=0.41 eta_seconds=2741.24 tokens=136929 estimated_cost_usd=$0.532923
+  prompt_tokens=126751 completion_tokens=10178 tokens_per_second=508.60
+  by_task_success=G:22, H:22, E:22, F:22, C:18 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[120/1230] task=C success=116 skipped=4 success_rate=96.7% elapsed=288.95s last=2.25s rows_per_second=0.42 eta_seconds=2672.79 tokens=148220 estimated_cost_usd=$0.576684
+  prompt_tokens=137218 completion_tokens=11002 tokens_per_second=512.96
+  by_task_success=G:24, H:24, E:24, F:24, C:20 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[130/1230] task=C success=126 skipped=4 success_rate=96.9% elapsed=312.97s last=2.28s rows_per_second=0.42 eta_seconds=2648.17 tokens=159628 estimated_cost_usd=$0.622032
+  prompt_tokens=147699 completion_tokens=11929 tokens_per_second=510.05
+  by_task_success=G:26, H:26, E:26, F:26, C:22 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[140/1230] task=C success=136 skipped=4 success_rate=97.1% elapsed=334.58s last=2.31s rows_per_second=0.42 eta_seconds=2604.98 tokens=170986 estimated_cost_usd=$0.666810
+  prompt_tokens=158165 completion_tokens=12821 tokens_per_second=511.04
+  by_task_success=G:28, H:28, E:28, F:28, C:24 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[150/1230] task=C success=146 skipped=4 success_rate=97.3% elapsed=355.30s last=1.86s rows_per_second=0.42 eta_seconds=2558.17 tokens=182370 estimated_cost_usd=$0.711882
+  prompt_tokens=168639 completion_tokens=13731 tokens_per_second=513.28
+  by_task_success=G:30, H:30, E:30, F:30, C:26 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[160/1230] task=C success=156 skipped=4 success_rate=97.5% elapsed=379.72s last=2.85s rows_per_second=0.42 eta_seconds=2539.35 tokens=193748 estimated_cost_usd=$0.756840
+  prompt_tokens=179115 completion_tokens=14633 tokens_per_second=510.24
+  by_task_success=G:32, H:32, E:32, F:32, C:28 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[170/1230] task=C success=166 skipped=4 success_rate=97.6% elapsed=405.47s last=2.29s rows_per_second=0.42 eta_seconds=2528.19 tokens=207475 estimated_cost_usd=$0.809541
+  prompt_tokens=191882 completion_tokens=15593 tokens_per_second=511.70
+  by_task_success=G:34, H:34, E:34, F:34, C:30 by_task_skipped=C:4
+  dominant_failures=C:generation_validation_failed:register_mismatch(2)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[180/1230] task=C success=175 skipped=5 success_rate=97.2% elapsed=430.11s last=6.02s rows_per_second=0.42 eta_seconds=2508.99 tokens=221168 estimated_cost_usd=$0.861972
+  prompt_tokens=204629 completion_tokens=16539 tokens_per_second=514.21
+  by_task_success=G:36, H:36, E:36, F:36, C:31 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[190/1230] task=C success=185 skipped=5 success_rate=97.4% elapsed=450.05s last=2.29s rows_per_second=0.42 eta_seconds=2463.45 tokens=232425 estimated_cost_usd=$0.905151
+  prompt_tokens=215102 completion_tokens=17323 tokens_per_second=516.44
+  by_task_success=G:38, H:38, E:38, F:38, C:33 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[200/1230] task=C success=195 skipped=5 success_rate=97.5% elapsed=474.19s last=2.37s rows_per_second=0.42 eta_seconds=2442.09 tokens=244870 estimated_cost_usd=$0.952818
+  prompt_tokens=226686 completion_tokens=18184 tokens_per_second=516.39
+  by_task_success=G:40, H:40, E:40, F:40, C:35 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[210/1230] task=C success=205 skipped=5 success_rate=97.6% elapsed=497.53s last=1.99s rows_per_second=0.42 eta_seconds=2416.56 tokens=256291 estimated_cost_usd=$0.998001
+  prompt_tokens=237197 completion_tokens=19094 tokens_per_second=515.13
+  by_task_success=G:42, H:42, E:42, F:42, C:37 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[220/1230] task=C success=215 skipped=5 success_rate=97.7% elapsed=518.64s last=2.26s rows_per_second=0.42 eta_seconds=2381.03 tokens=267715 estimated_cost_usd=$1.043301
+  prompt_tokens=247702 completion_tokens=20013 tokens_per_second=516.19
+  by_task_success=G:44, H:44, E:44, F:44, C:39 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[230/1230] task=C success=225 skipped=5 success_rate=97.8% elapsed=549.03s last=2.37s rows_per_second=0.42 eta_seconds=2387.10 tokens=282860 estimated_cost_usd=$1.103244
+  prompt_tokens=261638 completion_tokens=21222 tokens_per_second=515.20
+  by_task_success=G:46, H:46, E:46, F:46, C:41 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[240/1230] task=C success=235 skipped=5 success_rate=97.9% elapsed=574.27s last=1.82s rows_per_second=0.42 eta_seconds=2368.88 tokens=295529 estimated_cost_usd=$1.153599
+  prompt_tokens=273278 completion_tokens=22251 tokens_per_second=514.61
+  by_task_success=G:48, H:48, E:48, F:48, C:43 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[250/1230] task=C success=245 skipped=5 success_rate=98.0% elapsed=594.52s last=2.18s rows_per_second=0.42 eta_seconds=2330.51 tokens=306814 estimated_cost_usd=$1.196958
+  prompt_tokens=283771 completion_tokens=23043 tokens_per_second=516.07
+  by_task_success=G:50, H:50, E:50, F:50, C:45 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[260/1230] task=C success=255 skipped=5 success_rate=98.1% elapsed=621.81s last=2.19s rows_per_second=0.42 eta_seconds=2319.83 tokens=320543 estimated_cost_usd=$1.249533
+  prompt_tokens=296551 completion_tokens=23992 tokens_per_second=515.50
+  by_task_success=G:52, H:52, E:52, F:52, C:47 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[270/1230] task=C success=265 skipped=5 success_rate=98.1% elapsed=641.07s last=1.72s rows_per_second=0.42 eta_seconds=2279.34 tokens=331830 estimated_cost_usd=$1.292826
+  prompt_tokens=307052 completion_tokens=24778 tokens_per_second=517.62
+  by_task_success=G:54, H:54, E:54, F:54, C:49 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[280/1230] task=C success=275 skipped=5 success_rate=98.2% elapsed=660.86s last=2.39s rows_per_second=0.42 eta_seconds=2242.20 tokens=343108 estimated_cost_usd=$1.336080
+  prompt_tokens=317545 completion_tokens=25563 tokens_per_second=519.19
+  by_task_success=G:56, H:56, E:56, F:56, C:51 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[290/1230] task=C success=285 skipped=5 success_rate=98.3% elapsed=681.46s last=1.85s rows_per_second=0.43 eta_seconds=2208.86 tokens=354346 estimated_cost_usd=$1.378890
+  prompt_tokens=328025 completion_tokens=26321 tokens_per_second=519.98
+  by_task_success=G:58, H:58, E:58, F:58, C:53 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[300/1230] task=C success=295 skipped=5 success_rate=98.3% elapsed=702.01s last=1.89s rows_per_second=0.43 eta_seconds=2176.22 tokens=365612 estimated_cost_usd=$1.422120
+  prompt_tokens=338505 completion_tokens=27107 tokens_per_second=520.81
+  by_task_success=G:60, H:60, E:60, F:60, C:55 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[310/1230] task=C success=305 skipped=5 success_rate=98.4% elapsed=735.49s last=1.93s rows_per_second=0.42 eta_seconds=2182.76 tokens=378101 estimated_cost_usd=$1.469811
+  prompt_tokens=350142 completion_tokens=27959 tokens_per_second=514.08
+  by_task_success=G:62, H:62, E:62, F:62, C:57 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[320/1230] task=C success=315 skipped=5 success_rate=98.4% elapsed=757.14s last=2.65s rows_per_second=0.42 eta_seconds=2153.13 tokens=389389 estimated_cost_usd=$1.513239
+  prompt_tokens=360633 completion_tokens=28756 tokens_per_second=514.29
+  by_task_success=G:64, H:64, E:64, F:64, C:59 by_task_skipped=C:5
+  dominant_failures=C:generation_validation_failed:register_mismatch(3)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[330/1230] task=C success=324 skipped=6 success_rate=98.2% elapsed=782.94s last=6.65s rows_per_second=0.42 eta_seconds=2135.28 tokens=403151 estimated_cost_usd=$1.566285
+  prompt_tokens=373415 completion_tokens=29736 tokens_per_second=514.92
+  by_task_success=G:66, H:66, E:66, F:66, C:60 by_task_skipped=C:6
+  dominant_failures=C:generation_validation_failed:register_mismatch(4)
+[340/1230] task=C success=334 skipped=6 success_rate=98.2% elapsed=802.79s last=1.89s rows_per_second=0.42 eta_seconds=2101.43 tokens=414498 estimated_cost_usd=$1.610454
+  prompt_tokens=383918 completion_tokens=30580 tokens_per_second=516.32
+  by_task_success=G:68, H:68, E:68, F:68, C:62 by_task_skipped=C:6
+  dominant_failures=C:generation_validation_failed:register_mismatch(4)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[350/1230] task=C success=343 skipped=7 success_rate=98.0% elapsed=828.07s last=6.99s rows_per_second=0.42 eta_seconds=2082.01 tokens=428200 estimated_cost_usd=$1.662972
+  prompt_tokens=396669 completion_tokens=31531 tokens_per_second=517.11
+  by_task_success=G:70, H:70, E:70, F:70, C:63 by_task_skipped=C:7
+  dominant_failures=C:generation_validation_failed:register_mismatch(5)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[360/1230] task=C success=352 skipped=8 success_rate=97.8% elapsed=854.39s last=7.17s rows_per_second=0.42 eta_seconds=2064.77 tokens=441937 estimated_cost_usd=$1.716099
+  prompt_tokens=409413 completion_tokens=32524 tokens_per_second=517.26
+  by_task_success=G:72, H:72, E:72, F:72, C:64 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[370/1230] task=C success=362 skipped=8 success_rate=97.8% elapsed=881.15s last=2.29s rows_per_second=0.42 eta_seconds=2048.08 tokens=455616 estimated_cost_usd=$1.768668
+  prompt_tokens=422131 completion_tokens=33485 tokens_per_second=517.07
+  by_task_success=G:74, H:74, E:74, F:74, C:66 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[380/1230] task=C success=372 skipped=8 success_rate=97.9% elapsed=900.90s last=2.29s rows_per_second=0.42 eta_seconds=2015.18 tokens=466878 estimated_cost_usd=$1.811886
+  prompt_tokens=432607 completion_tokens=34271 tokens_per_second=518.23
+  by_task_success=G:76, H:76, E:76, F:76, C:68 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[390/1230] task=C success=382 skipped=8 success_rate=97.9% elapsed=924.79s last=3.14s rows_per_second=0.42 eta_seconds=1991.86 tokens=478121 estimated_cost_usd=$1.854963
+  prompt_tokens=443071 completion_tokens=35050 tokens_per_second=517.00
+  by_task_success=G:78, H:78, E:78, F:78, C:70 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[400/1230] task=C success=392 skipped=8 success_rate=98.0% elapsed=945.48s last=2.18s rows_per_second=0.42 eta_seconds=1961.87 tokens=489363 estimated_cost_usd=$1.897989
+  prompt_tokens=453538 completion_tokens=35825 tokens_per_second=517.58
+  by_task_success=G:80, H:80, E:80, F:80, C:72 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[410/1230] task=E success=402 skipped=8 success_rate=98.0% elapsed=972.26s last=2.61s rows_per_second=0.42 eta_seconds=1944.52 tokens=501120 estimated_cost_usd=$1.943976
+  prompt_tokens=464402 completion_tokens=36718 tokens_per_second=515.42
+  by_task_success=G:83, H:80, E:83, F:82, C:74 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[420/1230] task=C success=412 skipped=8 success_rate=98.1% elapsed=996.18s last=2.38s rows_per_second=0.42 eta_seconds=1921.20 tokens=512938 estimated_cost_usd=$1.989414
+  prompt_tokens=475388 completion_tokens=37550 tokens_per_second=514.91
+  by_task_success=G:85, H:80, E:85, F:85, C:77 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[430/1230] task=E success=422 skipped=8 success_rate=98.1% elapsed=1020.68s last=1.85s rows_per_second=0.42 eta_seconds=1898.94 tokens=525901 estimated_cost_usd=$2.040255
+  prompt_tokens=487355 completion_tokens=38546 tokens_per_second=515.25
+  by_task_success=G:88, H:80, E:88, F:87, C:79 by_task_skipped=C:8
+  dominant_failures=C:generation_validation_failed:register_mismatch(6)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[440/1230] task=C success=431 skipped=9 success_rate=98.0% elapsed=1049.75s last=6.96s rows_per_second=0.42 eta_seconds=1884.79 tokens=540153 estimated_cost_usd=$2.095239
+  prompt_tokens=500588 completion_tokens=39565 tokens_per_second=514.55
+  by_task_success=G:90, H:80, E:90, F:90, C:81 by_task_skipped=C:9
+  dominant_failures=C:generation_validation_failed:register_mismatch(7)
+[450/1230] task=E success=441 skipped=9 success_rate=98.0% elapsed=1075.57s last=2.10s rows_per_second=0.42 eta_seconds=1864.32 tokens=551858 estimated_cost_usd=$2.140578
+  prompt_tokens=511441 completion_tokens=40417 tokens_per_second=513.09
+  by_task_success=G:93, H:80, E:93, F:92, C:83 by_task_skipped=C:9
+  dominant_failures=C:generation_validation_failed:register_mismatch(7)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[460/1230] task=C success=451 skipped=9 success_rate=98.0% elapsed=1101.42s last=2.06s rows_per_second=0.42 eta_seconds=1843.67 tokens=564917 estimated_cost_usd=$2.191059
+  prompt_tokens=523558 completion_tokens=41359 tokens_per_second=512.90
+  by_task_success=G:95, H:80, E:95, F:95, C:86 by_task_skipped=C:9
+  dominant_failures=C:generation_validation_failed:register_mismatch(7)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[470/1230] task=E success=461 skipped=9 success_rate=98.1% elapsed=1126.46s last=2.32s rows_per_second=0.42 eta_seconds=1821.52 tokens=577851 estimated_cost_usd=$2.241501
+  prompt_tokens=535522 completion_tokens=42329 tokens_per_second=512.98
+  by_task_success=G:98, H:80, E:98, F:97, C:88 by_task_skipped=C:9
+  dominant_failures=C:generation_validation_failed:register_mismatch(7)
+[480/1230] task=C success=471 skipped=9 success_rate=98.1% elapsed=1149.03s last=2.16s rows_per_second=0.42 eta_seconds=1795.36 tokens=589630 estimated_cost_usd=$2.286822
+  prompt_tokens=546469 completion_tokens=43161 tokens_per_second=513.16
+  by_task_success=G:100, H:80, E:100, F:100, C:91 by_task_skipped=C:9
+  dominant_failures=C:generation_validation_failed:register_mismatch(7)
+[490/1230] task=E success=481 skipped=9 success_rate=98.2% elapsed=1173.23s last=2.83s rows_per_second=0.42 eta_seconds=1771.82 tokens=601323 estimated_cost_usd=$2.332401
+  prompt_tokens=557287 completion_tokens=44036 tokens_per_second=512.54
+  by_task_success=G:103, H:80, E:103, F:102, C:93 by_task_skipped=C:9
+  dominant_failures=C:generation_validation_failed:register_mismatch(7)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[500/1230] task=C success=490 skipped=10 success_rate=98.0% elapsed=1200.94s last=5.64s rows_per_second=0.42 eta_seconds=1753.37 tokens=616719 estimated_cost_usd=$2.391285
+  prompt_tokens=571625 completion_tokens=45094 tokens_per_second=513.53
+  by_task_success=G:105, H:80, E:105, F:105, C:95 by_task_skipped=C:10
+  dominant_failures=C:generation_validation_failed:register_mismatch(8)
+[510/1230] task=E success=500 skipped=10 success_rate=98.0% elapsed=1230.62s last=2.42s rows_per_second=0.41 eta_seconds=1737.35 tokens=628474 estimated_cost_usd=$2.437110
+  prompt_tokens=582500 completion_tokens=45974 tokens_per_second=510.70
+  by_task_success=G:108, H:80, E:108, F:107, C:97 by_task_skipped=C:10
+  dominant_failures=C:generation_validation_failed:register_mismatch(8)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[520/1230] task=C success=510 skipped=10 success_rate=98.1% elapsed=1259.30s last=4.10s rows_per_second=0.41 eta_seconds=1719.43 tokens=642720 estimated_cost_usd=$2.491956
+  prompt_tokens=595737 completion_tokens=46983 tokens_per_second=510.38
+  by_task_success=G:110, H:80, E:110, F:110, C:100 by_task_skipped=C:10
+  dominant_failures=C:generation_validation_failed:register_mismatch(8)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[530/1230] task=E success=520 skipped=10 success_rate=98.1% elapsed=1289.04s last=1.91s rows_per_second=0.41 eta_seconds=1702.50 tokens=658087 estimated_cost_usd=$2.551869
+  prompt_tokens=609953 completion_tokens=48134 tokens_per_second=510.53
+  by_task_success=G:113, H:80, E:113, F:112, C:102 by_task_skipped=C:10
+  dominant_failures=C:generation_validation_failed:register_mismatch(8)
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[540/1230] task=C success=528 skipped=12 success_rate=97.8% elapsed=1321.70s last=6.33s rows_per_second=0.41 eta_seconds=1688.84 tokens=675841 estimated_cost_usd=$2.619567
+  prompt_tokens=626504 completion_tokens=49337 tokens_per_second=511.34
+  by_task_success=G:115, H:80, E:115, F:115, C:103 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[550/1230] task=E success=538 skipped=12 success_rate=97.8% elapsed=1348.61s last=2.15s rows_per_second=0.41 eta_seconds=1667.37 tokens=688703 estimated_cost_usd=$2.669397
+  prompt_tokens=638429 completion_tokens=50274 tokens_per_second=510.68
+  by_task_success=G:118, H:80, E:118, F:117, C:105 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[560/1230] task=C success=548 skipped=12 success_rate=97.9% elapsed=1375.91s last=6.51s rows_per_second=0.41 eta_seconds=1646.18 tokens=702831 estimated_cost_usd=$2.723469
+  prompt_tokens=651583 completion_tokens=51248 tokens_per_second=510.81
+  by_task_success=G:120, H:80, E:120, F:120, C:108 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[570/1230] task=E success=558 skipped=12 success_rate=97.9% elapsed=1397.41s last=1.97s rows_per_second=0.41 eta_seconds=1618.06 tokens=714535 estimated_cost_usd=$2.768865
+  prompt_tokens=662430 completion_tokens=52105 tokens_per_second=511.33
+  by_task_success=G:123, H:80, E:123, F:122, C:110 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[580/1230] task=C success=568 skipped=12 success_rate=97.9% elapsed=1424.81s last=2.09s rows_per_second=0.41 eta_seconds=1596.77 tokens=728806 estimated_cost_usd=$2.823906
+  prompt_tokens=675682 completion_tokens=53124 tokens_per_second=511.51
+  by_task_success=G:125, H:80, E:125, F:125, C:113 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[590/1230] task=E success=578 skipped=12 success_rate=98.0% elapsed=1453.02s last=2.11s rows_per_second=0.41 eta_seconds=1576.15 tokens=742962 estimated_cost_usd=$2.878806
+  prompt_tokens=688802 completion_tokens=54160 tokens_per_second=511.32
+  by_task_success=G:128, H:80, E:128, F:127, C:115 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[600/1230] task=C success=588 skipped=12 success_rate=98.0% elapsed=1475.43s last=2.63s rows_per_second=0.41 eta_seconds=1549.20 tokens=755952 estimated_cost_usd=$2.928624
+  prompt_tokens=700888 completion_tokens=55064 tokens_per_second=512.36
+  by_task_success=G:130, H:80, E:130, F:130, C:118 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[610/1230] task=E success=598 skipped=12 success_rate=98.0% elapsed=1501.15s last=1.82s rows_per_second=0.41 eta_seconds=1525.76 tokens=768865 estimated_cost_usd=$2.978607
+  prompt_tokens=712864 completion_tokens=56001 tokens_per_second=512.18
+  by_task_success=G:133, H:80, E:133, F:132, C:120 by_task_skipped=C:12
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[620/1230] task=C success=607 skipped=13 success_rate=97.9% elapsed=1528.69s last=6.72s rows_per_second=0.41 eta_seconds=1504.04 tokens=783135 estimated_cost_usd=$3.033357
+  prompt_tokens=726139 completion_tokens=56996 tokens_per_second=512.29
+  by_task_success=G:135, H:80, E:135, F:135, C:122 by_task_skipped=C:13
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[630/1230] task=E success=617 skipped=13 success_rate=97.9% elapsed=1550.77s last=2.31s rows_per_second=0.41 eta_seconds=1476.92 tokens=794800 estimated_cost_usd=$3.078240
+  prompt_tokens=736980 completion_tokens=57820 tokens_per_second=512.52
+  by_task_success=G:138, H:80, E:138, F:137, C:124 by_task_skipped=C:13
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[640/1230] task=C success=627 skipped=13 success_rate=98.0% elapsed=1571.91s last=2.69s rows_per_second=0.41 eta_seconds=1449.10 tokens=806605 estimated_cost_usd=$3.123543
+  prompt_tokens=747961 completion_tokens=58644 tokens_per_second=513.14
+  by_task_success=G:140, H:80, E:140, F:140, C:127 by_task_skipped=C:13
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[650/1230] task=E success=636 skipped=14 success_rate=97.8% elapsed=1598.99s last=2.27s rows_per_second=0.41 eta_seconds=1426.80 tokens=820736 estimated_cost_usd=$3.177996
+  prompt_tokens=761087 completion_tokens=59649 tokens_per_second=513.28
+  by_task_success=G:143, H:80, E:143, F:142, C:128 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[660/1230] task=C success=646 skipped=14 success_rate=97.9% elapsed=1621.32s last=2.29s rows_per_second=0.41 eta_seconds=1400.23 tokens=832526 estimated_cost_usd=$3.223326
+  prompt_tokens=772047 completion_tokens=60479 tokens_per_second=513.49
+  by_task_success=G:145, H:80, E:145, F:145, C:131 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[670/1230] task=E success=656 skipped=14 success_rate=97.9% elapsed=1650.11s last=2.33s rows_per_second=0.41 eta_seconds=1379.20 tokens=846657 estimated_cost_usd=$3.278055
+  prompt_tokens=785150 completion_tokens=61507 tokens_per_second=513.09
+  by_task_success=G:148, H:80, E:148, F:147, C:133 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[680/1230] task=C success=666 skipped=14 success_rate=97.9% elapsed=1673.36s last=4.24s rows_per_second=0.41 eta_seconds=1353.45 tokens=859638 estimated_cost_usd=$3.327810
+  prompt_tokens=797230 completion_tokens=62408 tokens_per_second=513.72
+  by_task_success=G:150, H:80, E:150, F:150, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[690/1230] task=F success=676 skipped=14 success_rate=98.0% elapsed=1700.96s last=1.81s rows_per_second=0.41 eta_seconds=1331.18 tokens=873029 estimated_cost_usd=$3.380403
+  prompt_tokens=809586 completion_tokens=63443 tokens_per_second=513.26
+  by_task_success=G:155, H:80, E:150, F:155, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[700/1230] task=F success=686 skipped=14 success_rate=98.0% elapsed=1724.45s last=1.96s rows_per_second=0.41 eta_seconds=1305.66 tokens=885107 estimated_cost_usd=$3.427029
+  prompt_tokens=820798 completion_tokens=64309 tokens_per_second=513.27
+  by_task_success=G:160, H:80, E:150, F:160, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[710/1230] task=F success=696 skipped=14 success_rate=98.0% elapsed=1752.52s last=2.50s rows_per_second=0.41 eta_seconds=1283.53 tokens=898609 estimated_cost_usd=$3.480147
+  prompt_tokens=833249 completion_tokens=65360 tokens_per_second=512.75
+  by_task_success=G:165, H:80, E:150, F:165, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[720/1230] task=F success=706 skipped=14 success_rate=98.1% elapsed=1776.60s last=2.50s rows_per_second=0.41 eta_seconds=1258.43 tokens=910871 estimated_cost_usd=$3.528237
+  prompt_tokens=844569 completion_tokens=66302 tokens_per_second=512.70
+  by_task_success=G:170, H:80, E:150, F:170, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[730/1230] task=F success=716 skipped=14 success_rate=98.1% elapsed=1799.84s last=2.25s rows_per_second=0.41 eta_seconds=1232.77 tokens=923111 estimated_cost_usd=$3.576021
+  prompt_tokens=855887 completion_tokens=67224 tokens_per_second=512.88
+  by_task_success=G:175, H:80, E:150, F:175, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[740/1230] task=F success=726 skipped=14 success_rate=98.1% elapsed=1824.46s last=2.52s rows_per_second=0.41 eta_seconds=1208.09 tokens=935429 estimated_cost_usd=$3.624891
+  prompt_tokens=867212 completion_tokens=68217 tokens_per_second=512.71
+  by_task_success=G:180, H:80, E:150, F:180, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[750/1230] task=F success=736 skipped=14 success_rate=98.1% elapsed=1851.35s last=2.40s rows_per_second=0.41 eta_seconds=1184.87 tokens=947667 estimated_cost_usd=$3.672945
+  prompt_tokens=878505 completion_tokens=69162 tokens_per_second=511.88
+  by_task_success=G:185, H:80, E:150, F:185, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[760/1230] task=F success=746 skipped=14 success_rate=98.2% elapsed=1879.47s last=2.48s rows_per_second=0.40 eta_seconds=1162.30 tokens=959915 estimated_cost_usd=$3.720885
+  prompt_tokens=889820 completion_tokens=70095 tokens_per_second=510.74
+  by_task_success=G:190, H:80, E:150, F:190, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[770/1230] task=F success=756 skipped=14 success_rate=98.2% elapsed=1903.56s last=2.09s rows_per_second=0.40 eta_seconds=1137.19 tokens=972113 estimated_cost_usd=$3.768651
+  prompt_tokens=901087 completion_tokens=71026 tokens_per_second=510.68
+  by_task_success=G:195, H:80, E:150, F:195, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[780/1230] task=F success=766 skipped=14 success_rate=98.2% elapsed=1927.05s last=2.67s rows_per_second=0.40 eta_seconds=1111.76 tokens=984269 estimated_cost_usd=$3.815907
+  prompt_tokens=912344 completion_tokens=71925 tokens_per_second=510.76
+  by_task_success=G:200, H:80, E:150, F:200, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[790/1230] task=F success=776 skipped=14 success_rate=98.2% elapsed=1953.01s last=2.43s rows_per_second=0.40 eta_seconds=1087.75 tokens=996447 estimated_cost_usd=$3.863229
+  prompt_tokens=923623 completion_tokens=72824 tokens_per_second=510.21
+  by_task_success=G:205, H:80, E:150, F:205, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[800/1230] task=F success=786 skipped=14 success_rate=98.2% elapsed=1976.04s last=2.06s rows_per_second=0.40 eta_seconds=1062.12 tokens=1008672 estimated_cost_usd=$3.911112
+  prompt_tokens=934914 completion_tokens=73758 tokens_per_second=510.45
+  by_task_success=G:210, H:80, E:150, F:210, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[810/1230] task=F success=796 skipped=14 success_rate=98.3% elapsed=1998.76s last=2.14s rows_per_second=0.41 eta_seconds=1036.39 tokens=1020909 estimated_cost_usd=$3.959091
+  prompt_tokens=946212 completion_tokens=74697 tokens_per_second=510.77
+  by_task_success=G:215, H:80, E:150, F:215, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[820/1230] task=F success=806 skipped=14 success_rate=98.3% elapsed=2021.31s last=2.11s rows_per_second=0.41 eta_seconds=1010.66 tokens=1033116 estimated_cost_usd=$4.006632
+  prompt_tokens=957509 completion_tokens=75607 tokens_per_second=511.11
+  by_task_success=G:220, H:80, E:150, F:220, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[830/1230] task=F success=816 skipped=14 success_rate=98.3% elapsed=2045.77s last=2.14s rows_per_second=0.41 eta_seconds=985.91 tokens=1045302 estimated_cost_usd=$4.054254
+  prompt_tokens=968773 completion_tokens=76529 tokens_per_second=510.96
+  by_task_success=G:225, H:80, E:150, F:225, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[840/1230] task=F success=826 skipped=14 success_rate=98.3% elapsed=2070.14s last=2.52s rows_per_second=0.41 eta_seconds=961.14 tokens=1057518 estimated_cost_usd=$4.102014
+  prompt_tokens=980063 completion_tokens=77455 tokens_per_second=510.84
+  by_task_success=G:230, H:80, E:150, F:230, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[850/1230] task=F success=836 skipped=14 success_rate=98.4% elapsed=2094.90s last=2.06s rows_per_second=0.41 eta_seconds=936.54 tokens=1069677 estimated_cost_usd=$4.149531
+  prompt_tokens=991302 completion_tokens=78375 tokens_per_second=510.61
+  by_task_success=G:235, H:80, E:150, F:235, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[860/1230] task=F success=846 skipped=14 success_rate=98.4% elapsed=2120.01s last=2.13s rows_per_second=0.41 eta_seconds=912.10 tokens=1081822 estimated_cost_usd=$4.196982
+  prompt_tokens=1002529 completion_tokens=79293 tokens_per_second=510.29
+  by_task_success=G:240, H:80, E:150, F:240, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[870/1230] task=F success=856 skipped=14 success_rate=98.4% elapsed=2143.67s last=1.94s rows_per_second=0.41 eta_seconds=887.03 tokens=1095252 estimated_cost_usd=$4.249296
+  prompt_tokens=1014957 completion_tokens=80295 tokens_per_second=510.92
+  by_task_success=G:245, H:80, E:150, F:245, C:136 by_task_skipped=C:14
+  dominant_failures=C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[880/1230] task=F success=865 skipped=15 success_rate=98.3% elapsed=2173.91s last=2.16s rows_per_second=0.40 eta_seconds=864.62 tokens=1111165 estimated_cost_usd=$4.311543
+  prompt_tokens=1029661 completion_tokens=81504 tokens_per_second=511.14
+  by_task_success=G:249, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[890/1230] task=G success=875 skipped=15 success_rate=98.3% elapsed=2201.27s last=3.06s rows_per_second=0.40 eta_seconds=840.93 tokens=1123499 estimated_cost_usd=$4.360605
+  prompt_tokens=1040990 completion_tokens=82509 tokens_per_second=510.39
+  by_task_success=G:259, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[900/1230] task=G success=885 skipped=15 success_rate=98.3% elapsed=2228.34s last=3.37s rows_per_second=0.40 eta_seconds=817.06 tokens=1135816 estimated_cost_usd=$4.409700
+  prompt_tokens=1052295 completion_tokens=83521 tokens_per_second=509.71
+  by_task_success=G:269, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[910/1230] task=G success=895 skipped=15 success_rate=98.4% elapsed=2257.23s last=2.56s rows_per_second=0.40 eta_seconds=793.75 tokens=1150535 estimated_cost_usd=$4.467525
+  prompt_tokens=1065875 completion_tokens=84660 tokens_per_second=509.71
+  by_task_success=G:279, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[920/1230] task=G success=905 skipped=15 success_rate=98.4% elapsed=2282.51s last=3.02s rows_per_second=0.40 eta_seconds=769.11 tokens=1162897 estimated_cost_usd=$4.516911
+  prompt_tokens=1077212 completion_tokens=85685 tokens_per_second=509.48
+  by_task_success=G:289, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[930/1230] task=G success=915 skipped=15 success_rate=98.4% elapsed=2310.28s last=2.92s rows_per_second=0.40 eta_seconds=745.25 tokens=1176543 estimated_cost_usd=$4.571745
+  prompt_tokens=1089700 completion_tokens=86843 tokens_per_second=509.26
+  by_task_success=G:299, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[940/1230] task=G success=925 skipped=15 success_rate=98.4% elapsed=2336.22s last=2.77s rows_per_second=0.40 eta_seconds=720.75 tokens=1188904 estimated_cost_usd=$4.621140
+  prompt_tokens=1101035 completion_tokens=87869 tokens_per_second=508.90
+  by_task_success=G:309, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[950/1230] task=G success=935 skipped=15 success_rate=98.4% elapsed=2366.88s last=2.57s rows_per_second=0.40 eta_seconds=697.61 tokens=1204976 estimated_cost_usd=$4.685184
+  prompt_tokens=1115788 completion_tokens=89188 tokens_per_second=509.10
+  by_task_success=G:319, H:80, E:150, F:250, C:136 by_task_skipped=G:1, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(1); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[960/1230] task=G success=942 skipped=18 success_rate=98.1% elapsed=2410.48s last=3.20s rows_per_second=0.40 eta_seconds=677.95 tokens=1225977 estimated_cost_usd=$4.768251
+  prompt_tokens=1135117 completion_tokens=90860 tokens_per_second=508.60
+  by_task_success=G:326, H:80, E:150, F:250, C:136 by_task_skipped=G:4, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(4); C:generation_validation_failed:register_mismatch(9)
+[970/1230] task=G success=952 skipped=18 success_rate=98.1% elapsed=2434.66s last=2.02s rows_per_second=0.40 eta_seconds=652.59 tokens=1238314 estimated_cost_usd=$4.816758
+  prompt_tokens=1146496 completion_tokens=91818 tokens_per_second=508.62
+  by_task_success=G:336, H:80, E:150, F:250, C:136 by_task_skipped=G:4, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(4); C:generation_validation_failed:register_mismatch(9)
+[980/1230] task=G success=962 skipped=18 success_rate=98.2% elapsed=2459.29s last=2.76s rows_per_second=0.40 eta_seconds=627.37 tokens=1250651 estimated_cost_usd=$4.865553
+  prompt_tokens=1157851 completion_tokens=92800 tokens_per_second=508.54
+  by_task_success=G:346, H:80, E:150, F:250, C:136 by_task_skipped=G:4, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(4); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[990/1230] task=G success=970 skipped=20 success_rate=98.0% elapsed=2492.05s last=2.93s rows_per_second=0.40 eta_seconds=604.13 tokens=1267957 estimated_cost_usd=$4.934163
+  prompt_tokens=1173766 completion_tokens=94191 tokens_per_second=508.80
+  by_task_success=G:354, H:80, E:150, F:250, C:136 by_task_skipped=G:6, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(6); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[1000/1230] task=G success=979 skipped=21 success_rate=97.9% elapsed=2530.32s last=3.08s rows_per_second=0.40 eta_seconds=581.97 tokens=1285199 estimated_cost_usd=$5.002365
+  prompt_tokens=1189635 completion_tokens=95564 tokens_per_second=507.92
+  by_task_success=G:363, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1010/1230] task=G success=989 skipped=21 success_rate=97.9% elapsed=2555.85s last=1.97s rows_per_second=0.40 eta_seconds=556.72 tokens=1297516 estimated_cost_usd=$5.050932
+  prompt_tokens=1200984 completion_tokens=96532 tokens_per_second=507.67
+  by_task_success=G:373, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1020/1230] task=G success=999 skipped=21 success_rate=97.9% elapsed=2582.93s last=2.54s rows_per_second=0.39 eta_seconds=531.78 tokens=1309836 estimated_cost_usd=$5.099832
+  prompt_tokens=1212309 completion_tokens=97527 tokens_per_second=507.11
+  by_task_success=G:383, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[1030/1230] task=G success=1009 skipped=21 success_rate=98.0% elapsed=2613.17s last=2.23s rows_per_second=0.39 eta_seconds=507.41 tokens=1324629 estimated_cost_usd=$5.158455
+  prompt_tokens=1225915 completion_tokens=98714 tokens_per_second=506.91
+  by_task_success=G:393, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[1040/1230] task=G success=1019 skipped=21 success_rate=98.0% elapsed=2642.33s last=2.71s rows_per_second=0.39 eta_seconds=482.73 tokens=1339410 estimated_cost_usd=$5.217126
+  prompt_tokens=1239502 completion_tokens=99908 tokens_per_second=506.90
+  by_task_success=G:403, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1050/1230] task=G success=1029 skipped=21 success_rate=98.0% elapsed=2669.66s last=2.41s rows_per_second=0.39 eta_seconds=457.66 tokens=1351732 estimated_cost_usd=$5.265888
+  prompt_tokens=1250841 completion_tokens=100891 tokens_per_second=506.33
+  by_task_success=G:413, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1060/1230] task=G success=1039 skipped=21 success_rate=98.0% elapsed=2697.32s last=2.96s rows_per_second=0.39 eta_seconds=432.59 tokens=1364049 estimated_cost_usd=$5.314863
+  prompt_tokens=1262156 completion_tokens=101893 tokens_per_second=505.71
+  by_task_success=G:423, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1070/1230] task=G success=1049 skipped=21 success_rate=98.0% elapsed=2723.74s last=2.22s rows_per_second=0.39 eta_seconds=407.29 tokens=1376349 estimated_cost_usd=$5.363463
+  prompt_tokens=1273481 completion_tokens=102868 tokens_per_second=505.32
+  by_task_success=G:433, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1080/1230] task=G success=1059 skipped=21 success_rate=98.1% elapsed=2749.38s last=2.77s rows_per_second=0.39 eta_seconds=381.86 tokens=1388652 estimated_cost_usd=$5.412564
+  prompt_tokens=1284768 completion_tokens=103884 tokens_per_second=505.08
+  by_task_success=G:443, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1090/1230] task=G success=1069 skipped=21 success_rate=98.1% elapsed=2775.12s last=4.08s rows_per_second=0.39 eta_seconds=356.44 tokens=1400931 estimated_cost_usd=$5.461041
+  prompt_tokens=1296077 completion_tokens=104854 tokens_per_second=504.82
+  by_task_success=G:453, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[1100/1230] task=G success=1079 skipped=21 success_rate=98.1% elapsed=2802.51s last=2.52s rows_per_second=0.39 eta_seconds=331.21 tokens=1414444 estimated_cost_usd=$5.514804
+  prompt_tokens=1308488 completion_tokens=105956 tokens_per_second=504.71
+  by_task_success=G:463, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1110/1230] task=G success=1089 skipped=21 success_rate=98.1% elapsed=2827.86s last=2.20s rows_per_second=0.39 eta_seconds=305.71 tokens=1426707 estimated_cost_usd=$5.563209
+  prompt_tokens=1319783 completion_tokens=106924 tokens_per_second=504.52
+  by_task_success=G:473, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[1120/1230] task=G success=1099 skipped=21 success_rate=98.1% elapsed=2854.02s last=3.04s rows_per_second=0.39 eta_seconds=280.31 tokens=1440184 estimated_cost_usd=$5.616396
+  prompt_tokens=1332197 completion_tokens=107987 tokens_per_second=504.62
+  by_task_success=G:483, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1130/1230] task=G success=1109 skipped=21 success_rate=98.1% elapsed=2881.45s last=2.68s rows_per_second=0.39 eta_seconds=255.00 tokens=1452493 estimated_cost_usd=$5.665323
+  prompt_tokens=1343506 completion_tokens=108987 tokens_per_second=504.08
+  by_task_success=G:493, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1140/1230] task=G success=1119 skipped=21 success_rate=98.2% elapsed=2907.67s last=2.15s rows_per_second=0.39 eta_seconds=229.55 tokens=1464784 estimated_cost_usd=$5.714268
+  prompt_tokens=1354791 completion_tokens=109993 tokens_per_second=503.77
+  by_task_success=G:503, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[1150/1230] task=G success=1129 skipped=21 success_rate=98.2% elapsed=2936.08s last=2.18s rows_per_second=0.39 eta_seconds=204.25 tokens=1479545 estimated_cost_usd=$5.773023
+  prompt_tokens=1368346 completion_tokens=111199 tokens_per_second=503.92
+  by_task_success=G:513, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1160/1230] task=G success=1139 skipped=21 success_rate=98.2% elapsed=2960.54s last=3.20s rows_per_second=0.39 eta_seconds=178.65 tokens=1491852 estimated_cost_usd=$5.821944
+  prompt_tokens=1379653 completion_tokens=112199 tokens_per_second=503.91
+  by_task_success=G:523, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1170/1230] task=G success=1149 skipped=21 success_rate=98.2% elapsed=2988.59s last=2.71s rows_per_second=0.39 eta_seconds=153.26 tokens=1504190 estimated_cost_usd=$5.871066
+  prompt_tokens=1390982 completion_tokens=113208 tokens_per_second=503.31
+  by_task_success=G:533, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1180/1230] task=G success=1159 skipped=21 success_rate=98.2% elapsed=3012.31s last=2.52s rows_per_second=0.39 eta_seconds=127.64 tokens=1516509 estimated_cost_usd=$5.920191
+  prompt_tokens=1402287 completion_tokens=114222 tokens_per_second=503.44
+  by_task_success=G:543, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[1190/1230] task=G success=1169 skipped=21 success_rate=98.2% elapsed=3037.87s last=2.50s rows_per_second=0.39 eta_seconds=102.11 tokens=1528859 estimated_cost_usd=$5.969661
+  prompt_tokens=1413602 completion_tokens=115257 tokens_per_second=503.27
+  by_task_success=G:553, H:80, E:150, F:250, C:136 by_task_skipped=G:7, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(7); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[skip] task=G variant=0 reason=generation_validation_failed:register_mismatch
+[1200/1230] task=G success=1177 skipped=23 success_rate=98.1% elapsed=3073.57s last=2.66s rows_per_second=0.39 eta_seconds=76.84 tokens=1546077 estimated_cost_usd=$6.037335
+  prompt_tokens=1429485 completion_tokens=116592 tokens_per_second=503.02
+  by_task_success=G:561, H:80, E:150, F:250, C:136 by_task_skipped=G:9, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(9); C:generation_validation_failed:register_mismatch(9)
+[1210/1230] task=G success=1187 skipped=23 success_rate=98.1% elapsed=3099.11s last=2.69s rows_per_second=0.39 eta_seconds=51.22 tokens=1558433 estimated_cost_usd=$6.086367
+  prompt_tokens=1440844 completion_tokens=117589 tokens_per_second=502.87
+  by_task_success=G:571, H:80, E:150, F:250, C:136 by_task_skipped=G:9, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(9); C:generation_validation_failed:register_mismatch(9)
+[1220/1230] task=G success=1197 skipped=23 success_rate=98.1% elapsed=3124.88s last=2.67s rows_per_second=0.39 eta_seconds=25.61 tokens=1570749 estimated_cost_usd=$6.135087
+  prompt_tokens=1452179 completion_tokens=118570 tokens_per_second=502.66
+  by_task_success=G:581, H:80, E:150, F:250, C:136 by_task_skipped=G:9, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(9); C:generation_validation_failed:register_mismatch(9)
+[retry 1/2] task=G variant=0 validation=register_mismatch
+[retry 2/2] task=G variant=0 validation=register_mismatch
+[1230/1230] task=G success=1207 skipped=23 success_rate=98.1% elapsed=3154.45s last=1.83s rows_per_second=0.39 eta_seconds=0.00 tokens=1585557 estimated_cost_usd=$6.193803
+  prompt_tokens=1465796 completion_tokens=119761 tokens_per_second=502.64
+  by_task_success=G:591, H:80, E:150, F:250, C:136 by_task_skipped=G:9, C:14
+  dominant_failures=G:generation_validation_failed:register_mismatch(9); C:generation_validation_failed:register_mismatch(9)
+Generation summary
+  batch_id=batch_v31_02_gefhc
+  output_path=/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/generated.jsonl
+  skipped_path=/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/skipped.jsonl
+  progress_path=/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/progress.json
+  summary_path=/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/summary.json
+  rows=1207
+  skipped=23
+  elapsed_seconds=3154.45
+  prompt_tokens=1465796
+  completion_tokens=119761
+  total_tokens=1585557
+  estimated_cost_usd=$6.193803
+  rows_per_second=0.39
+  tokens_per_second=502.64
+  task_counts={"C": 136, "E": 150, "F": 250, "G": 591, "H": 80}
+  skipped_task_counts={"C": 14, "G": 9}
+  failure_reasons_by_task={"C": {"generation_validation_failed:invalid_emotion": 3, "generation_validation_failed:invalid_emotion,register_mismatch": 2, "generation_validation_failed:register_mismatch": 9}, "G": {"generation_validation_failed:register_mismatch": 9}}
+Wrote 1207 rows to /Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/generated.jsonl
+Skipped 23 rows to /Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/skipped.jsonl

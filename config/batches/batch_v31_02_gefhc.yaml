@@ -1,0 +1,25 @@
+batch_id: batch_v31_02_gefhc
+description: >
+  WorldSim v3.1 follow-up batch focused on G/H/E/F/C coverage with
+  batch-scoped raw outputs and machine-readable progress tracking.
+
+task_counts:
+  G: 600
+  H: 80
+  E: 150
+  F: 250
+  C: 150
+
+task_variant_overrides:
+  H: 8
+
+reporting:
+  progress_every: 10
+
+output:
+  raw_dir: data/raw/batch_v31_02_gefhc
+  generated_file: generated.jsonl
+  skipped_file: skipped.jsonl
+  progress_file: progress.json
+  summary_file: summary.json
+  log_file: generate.log
