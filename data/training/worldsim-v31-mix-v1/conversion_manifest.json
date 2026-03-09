@@ -1,0 +1,281 @@
+{
+  "dataset_id": "worldsim-v31-mix-v1",
+  "generated_at": "2026-03-09T13:22:08.153530+00:00",
+  "detected_training_format": "messages",
+  "training_contract_source": "/Users/rexxa/github/worldsim-training/scripts/prepare_dataset.py",
+  "source_files": {
+    "input_train": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-mix-v1/train.jsonl",
+    "input_dev": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-mix-v1/dev.jsonl",
+    "source_manifest": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-mix-v1/merge_manifest.json"
+  },
+  "output_files": {
+    "train_converted": "/Users/rexxa/github/worldsim-training/data/training/worldsim-v31-mix-v1/train_converted.jsonl",
+    "dev_converted": "/Users/rexxa/github/worldsim-training/data/training/worldsim-v31-mix-v1/dev_converted.jsonl"
+  },
+  "counts": {
+    "train_source": 2201,
+    "dev_source": 251,
+    "train_converted": 2201,
+    "dev_converted": 251,
+    "excluded_total": 0
+  },
+  "task_counts": {
+    "train": {
+      "A": 88,
+      "B": 800,
+      "C": 389,
+      "E": 133,
+      "F": 233,
+      "G": 523,
+      "H": 35
+    },
+    "dev": {
+      "A": 12,
+      "B": 96,
+      "C": 40,
+      "E": 17,
+      "F": 17,
+      "G": 68,
+      "H": 1
+    }
+  },
+  "provenance_fields": [
+    "task",
+    "layer",
+    "source_batch",
+    "source_split",
+    "source_dataset_id",
+    "source_task"
+  ],
+  "assumptions": [
+    "The in-repo training contract is the messages schema enforced by scripts/prepare_dataset.py.",
+    "All structured WorldSim tasks keep assistant targets as canonical JSON strings.",
+    "No rows were excluded during conversion; any malformed source row would fail conversion explicitly."
+  ],
+  "source_manifest_payload": {
+    "dataset_id": "worldsim-v31-mix-v1",
+    "generated_at": "2026-03-09T12:21:52.429749+00:00",
+    "output_dir": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-mix-v1",
+    "input_sources": {
+      "batch_v31_01_abc": {
+        "train_file": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_01_abc/train.jsonl",
+        "dev_file": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_01_abc/dev.jsonl",
+        "manifest_file": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_01_abc/dataset_manifest.json",
+        "source_counts_by_split": {
+          "train": {
+            "A": 88,
+            "B": 1236,
+            "C": 260
+          },
+          "dev": {
+            "A": 12,
+            "B": 137,
+            "C": 26
+          }
+        },
+        "source_manifest": {
+          "dataset_name": "worldsim-v31-abc-final",
+          "generated_at": "2026-03-09T06:06:02.365488+00:00",
+          "seed": 42,
+          "dev_fraction": 0.1,
+          "output_files": {
+            "train": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-abc-final/train.jsonl",
+            "dev": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-abc-final/dev.jsonl",
+            "excluded": "/Users/rexxa/github/worldsim-training/data/final/worldsim-v31-abc-final/excluded.jsonl"
+          },
+          "source_files": {
+            "passed_file": "/Users/rexxa/github/worldsim-training/data/validated/postprocess/passed.jsonl",
+            "approved_review_file": "/Users/rexxa/github/worldsim-training/data/validated/review_samples/approved.jsonl",
+            "recovered_file": "/Users/rexxa/github/worldsim-training/data/validated/recovery/recovered.jsonl",
+            "review_file": "/Users/rexxa/github/worldsim-training/data/validated/postprocess/review.jsonl",
+            "failed_file": "/Users/rexxa/github/worldsim-training/data/validated/postprocess/failed.jsonl",
+            "needs_review_file": "/Users/rexxa/github/worldsim-training/data/validated/recovery/needs_review.jsonl",
+            "unrecoverable_file": "/Users/rexxa/github/worldsim-training/data/validated/recovery/unrecoverable.jsonl"
+          },
+          "counts": {
+            "train": 1584,
+            "dev": 175,
+            "included_total": 1759,
+            "excluded_total": 241
+          },
+          "input_counts": {
+            "passed": 1655,
+            "approved_review": 1,
+            "recovered": 103,
+            "review": 0,
+            "failed": 39,
+            "needs_review": 199,
+            "unrecoverable": 3
+          },
+          "included_counts_by_source": {
+            "approved_review": 1,
+            "passed": 1655,
+            "recovered": 103
+          },
+          "excluded_counts_by_reason": {
+            "failed_source": 39,
+            "needs_review_not_approved": 199,
+            "unrecoverable_source": 3
+          },
+          "included_task_counts": {
+            "A": 100,
+            "B": 1373,
+            "C": 286
+          },
+          "excluded_task_counts": {
+            "B": 227,
+            "C": 14
+          },
+          "included_recovered_rows": 103,
+          "normalization_version": "abc-postprocess-normalize-v1",
+          "validator_version": "abc-postprocess-validator-v1"
+        }
+      },
+      "batch_v31_02_gefhc": {
+        "train_file": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/train.jsonl",
+        "dev_file": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/dev.jsonl",
+        "manifest_file": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/dataset_manifest.json",
+        "source_counts_by_split": {
+          "train": {
+            "C": 129,
+            "E": 133,
+            "F": 233,
+            "G": 523,
+            "H": 35
+          },
+          "dev": {
+            "C": 14,
+            "E": 17,
+            "F": 17,
+            "G": 68,
+            "H": 1
+          }
+        },
+        "source_manifest": {
+          "dataset_name": "worldsim-v31-02-gefhc-final",
+          "generated_at": "2026-03-09T08:45:32.258454+00:00",
+          "seed": 42,
+          "dev_fraction": 0.1,
+          "output_files": {
+            "train": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/train.jsonl",
+            "dev": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/dev.jsonl",
+            "excluded": "/Users/rexxa/github/worldsim-training/data/final/batch_v31_02_gefhc/excluded.jsonl"
+          },
+          "source_files": {
+            "passed_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/passed.jsonl",
+            "approved_review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/review_samples/approved.jsonl",
+            "recovered_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/recovered.jsonl",
+            "review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/review.jsonl",
+            "failed_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/postprocess/failed.jsonl",
+            "needs_review_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/needs_review.jsonl",
+            "unrecoverable_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/recovery/unrecoverable.jsonl"
+          },
+          "counts": {
+            "train": 1053,
+            "dev": 117,
+            "included_total": 1170,
+            "excluded_total": 60
+          },
+          "input_counts": {
+            "passed": 1163,
+            "approved_review": 0,
+            "recovered": 7,
+            "review": 0,
+            "failed": 44,
+            "needs_review": 16,
+            "unrecoverable": 0
+          },
+          "included_counts_by_source": {
+            "passed": 1163,
+            "recovered": 7
+          },
+          "excluded_counts_by_reason": {
+            "failed_source": 44,
+            "needs_review_not_approved": 16
+          },
+          "included_task_counts": {
+            "C": 143,
+            "E": 150,
+            "F": 250,
+            "G": 591,
+            "H": 36
+          },
+          "excluded_task_counts": {
+            "C": 7,
+            "G": 9,
+            "H": 44
+          },
+          "included_recovered_rows": 7,
+          "normalization_version": "worldsim-postprocess-normalize-v2",
+          "validator_version": "worldsim-postprocess-validator-v2"
+        }
+      }
+    },
+    "b_cap": {
+      "train": 800,
+      "dev": 96
+    },
+    "included_counts_by_task": {
+      "A": {
+        "train": 88,
+        "dev": 12,
+        "total": 100
+      },
+      "B": {
+        "train": 800,
+        "dev": 96,
+        "total": 896
+      },
+      "C": {
+        "train": 389,
+        "dev": 40,
+        "total": 429
+      },
+      "E": {
+        "train": 133,
+        "dev": 17,
+        "total": 150
+      },
+      "F": {
+        "train": 233,
+        "dev": 17,
+        "total": 250
+      },
+      "G": {
+        "train": 523,
+        "dev": 68,
+        "total": 591
+      },
+      "H": {
+        "train": 35,
+        "dev": 1,
+        "total": 36
+      }
+    },
+    "excluded_counts_by_task": {
+      "B": {
+        "task_cap": 477
+      }
+    },
+    "excluded_counts_by_reason": {
+      "task_cap": 477
+    },
+    "duplicate_filtering": {
+      "exact_duplicates": 0,
+      "near_duplicates": 0,
+      "excluded_total": 0
+    },
+    "final_counts": {
+      "train": 2201,
+      "dev": 251,
+      "included_total": 2452,
+      "excluded_total": 477
+    },
+    "assumptions": [
+      "Merged only finalized train/dev rows from batch finals.",
+      "Dev rows were processed before train rows to prevent split leakage.",
+      "Task B was capped with deterministic hash ordering.",
+      "Duplicate filtering used task + canonical output exact match and punctuation-stripped loose match."
+    ]
+  }
+}
