@@ -42,6 +42,9 @@ elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, obser
 [감정 선택지]
 joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 
+[register 선택지]
+haera, hao, hae
+
 [출력 형식]
 {{"speech_ko":"순우리말 대사 1문장","speech_en":"English 1 sentence","register":"{register}","emotion_expressed":"감정 8개 중 하나","speaker_role":"화자 역할 1개","temperament_tone":"English snake_case phrase"}}
 
@@ -51,9 +54,15 @@ joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 - speech_ko에는 큰따옴표를 넣지 마라
 - register는 반드시 "{register}"로 고정하라
 - emotion_expressed는 현재 느낌에 맞는 영어 감정 id 하나를 고르라
+- emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation
+- register must be exactly one of: haera, hao, hae
 - speaker_role은 성격 설명에 가장 잘 맞는 역할 하나를 고르라
 - temperament_tone은 이 기질이 말의 결에 남긴 흔적을 영어 snake_case 한 구절로 적어라
 - JSON만 출력하라
+
+[유효값 다시 보기]
+emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation
+register must be exactly one of: haera, hao, hae
 
 [변형번호]
 {variant}

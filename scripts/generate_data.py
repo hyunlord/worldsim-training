@@ -99,6 +99,51 @@ DEFAULT_ORACLE_MISINTERPRETATIONS = [
     "passive_deferral",
     "symbolic_abstraction",
 ]
+EMOTION_VALUE_MAP = {
+    "joy": "joy",
+    "happiness": "joy",
+    "happy": "joy",
+    "기쁨": "joy",
+    "즐거움": "joy",
+    "sadness": "sadness",
+    "sad": "sadness",
+    "sorrow": "sadness",
+    "슬픔": "sadness",
+    "fear": "fear",
+    "afraid": "fear",
+    "fright": "fear",
+    "공포": "fear",
+    "두려움": "fear",
+    "겁": "fear",
+    "anger": "anger",
+    "angry": "anger",
+    "rage": "anger",
+    "분노": "anger",
+    "trust": "trust",
+    "belief": "trust",
+    "믿음": "trust",
+    "신뢰": "trust",
+    "disgust": "disgust",
+    "혐오": "disgust",
+    "역겨움": "disgust",
+    "surprise": "surprise",
+    "surprised": "surprise",
+    "놀람": "surprise",
+    "anticipation": "anticipation",
+    "expectation": "anticipation",
+    "기대": "anticipation",
+}
+REGISTER_VALUE_MAP = {
+    "haera": "haera",
+    "해라": "haera",
+    "해라체": "haera",
+    "hao": "hao",
+    "하오": "hao",
+    "하오체": "hao",
+    "hae": "hae",
+    "해": "hae",
+    "해체": "hae",
+}
 DEFAULT_DOMINANT_TRAITS = {
     "cautious_elder": "conscientiousness",
     "reckless_hunter": "extraversion",
@@ -908,7 +953,9 @@ def print_progress(
 def print_final_summary(*, result: AttrDict) -> None:
     print("Generation summary", flush=True)
     print(f"  output_path={result.output_path}", flush=True)
+    print(f"  skipped_path={result.skipped_path}", flush=True)
     print(f"  rows={result.count}", flush=True)
+    print(f"  skipped={result.skipped_count}", flush=True)
     print(f"  elapsed_seconds={result.elapsed_seconds:.2f}", flush=True)
     print(f"  prompt_tokens={result.prompt_tokens}", flush=True)
     print(f"  completion_tokens={result.completion_tokens}", flush=True)
@@ -1190,6 +1237,10 @@ def _append_jsonl(path: Path, row: dict) -> None:
         handle.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
+def _skip_output_path(output_path: Path) -> Path:
+    return output_path.parent / "skipped.jsonl"
+
+
 def _generation_retry_settings(settings: dict) -> tuple[int, float]:
     provider = settings.get("provider", {})
     attempts = max(1, int(provider.get("retry_attempts", 1)))
@@ -1197,14 +1248,60 @@ def _generation_retry_settings(settings: dict) -> tuple[int, float]:
     return attempts, backoff_seconds
 
 
+def _enum_lookup_key(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    stripped = value.strip()
+    if not stripped:
+        return None
+    lowered = stripped.lower()
+    lowered = re.sub(r"[\s\"'`]+", "", lowered)
+    lowered = re.sub(r"[^a-z가-힣_]+", "", lowered)
+    return lowered or None
+
+
+def _normalize_emotion_value(value: object) -> object:
+    key = _enum_lookup_key(value)
+    if key is None:
+        return value
+    return EMOTION_VALUE_MAP.get(key, value.strip().lower() if isinstance(value, str) else value)
+
+
+def _normalize_register_value(value: object) -> object:
+    key = _enum_lookup_key(value)
+    if key is None:
+        return value
+    return REGISTER_VALUE_MAP.get(key, value.strip().lower() if isinstance(value, str) else value)
+
+
+def normalize_generated_output(raw_text: object) -> object:
+    payload = raw_text
+    if isinstance(raw_text, str):
+        try:
+            payload = json.loads(raw_text)
+        except json.JSONDecodeError:
+            return raw_text
+    if not isinstance(payload, dict):
+        return raw_text
+
+    normalized = dict(payload)
+    for field in ("emotion_expressed", "emotion", "previous_emotion"):
+        if field in normalized:
+            normalized[field] = _normalize_emotion_value(normalized[field])
+    if "register" in normalized:
+        normalized["register"] = _normalize_register_value(normalized["register"])
+    return normalized
+
+
 def parse_and_validate(raw_text: object, job: dict, settings: dict) -> tuple[str | None, str | None]:
     from scripts.validate_data import repair_and_validate_json_output
 
     candidate = {key: value for key, value in job.items() if key != "system_prompt"}
-    if isinstance(raw_text, (dict, list)):
-        candidate["output"] = json.dumps(raw_text, ensure_ascii=False, separators=(",", ":"))
+    normalized_output = normalize_generated_output(raw_text)
+    if isinstance(normalized_output, (dict, list)):
+        candidate["output"] = json.dumps(normalized_output, ensure_ascii=False, separators=(",", ":"))
     else:
-        candidate["output"] = str(raw_text)
+        candidate["output"] = str(normalized_output)
     repaired_output, violations, _ = repair_and_validate_json_output(candidate, settings.get("validation", {}))
     if violations:
         return None, ",".join(violations)
@@ -1226,8 +1323,10 @@ def generate_dataset(
     jobs = build_jobs(repo_root, seed=seed, task_filter=task_filter)
     selected_jobs = select_jobs(jobs, limit)
     output_path = _resolve_cli_output_path(repo_root, settings, output_path)
+    skipped_path = _skip_output_path(output_path)
     ensure_directory(output_path.parent)
     output_path.write_text("", encoding="utf-8")
+    skipped_path.write_text("", encoding="utf-8")
     totals: dict[str, float] = {
         "prompt_tokens": 0,
         "completion_tokens": 0,
@@ -1238,6 +1337,7 @@ def generate_dataset(
     progress_every = int(reporting_settings(settings).get("progress_every", 10))
     retry_attempts, retry_backoff_seconds = _generation_retry_settings(settings)
     completed_rows = 0
+    skipped_rows = 0
 
     for index, job in enumerate(selected_jobs, start=1):
         request_started_at = perf_counter()
@@ -1246,6 +1346,7 @@ def generate_dataset(
         normalized = None
         validated_output = None
         validation_error = None
+        last_error = None
         for attempt in range(1, retry_attempts + 1):
             try:
                 raw_result = (
@@ -1257,17 +1358,19 @@ def generate_dataset(
                 validated_output, validation_error = parse_and_validate(normalized.output, job, settings)
                 if validation_error is None:
                     break
+                last_error = f"generation_validation_failed:{validation_error}"
                 if attempt == retry_attempts:
-                    raise RuntimeError(f"generation_validation_failed:{validation_error}")
+                    break
                 if verbose:
                     print(
                         f"[retry {attempt}/{retry_attempts - 1}] task={job['task']} variant={job.get('variant', 0)} "
                         f"validation={validation_error}",
                         flush=True,
                     )
-            except Exception:
+            except Exception as exc:
+                last_error = str(exc)
                 if attempt == retry_attempts:
-                    raise
+                    break
                 if verbose:
                     print(
                         f"[retry {attempt}/{retry_attempts - 1}] task={job['task']} variant={job.get('variant', 0)}",
@@ -1276,7 +1379,25 @@ def generate_dataset(
                 if retry_backoff_seconds > 0:
                     sleep(retry_backoff_seconds * attempt)
         if normalized is None or validated_output is None:
-            raise RuntimeError("generation_failed_without_result")
+            skipped_row = {key: value for key, value in job.items() if key != "system_prompt"}
+            skipped_row["prompt"] = prompt
+            skipped_row["skip_reason"] = last_error or "generation_failed_without_result"
+            skipped_row["attempts"] = retry_attempts
+            if normalized is not None:
+                skipped_row["output"] = normalized.output
+                skipped_row["model"] = normalized.model
+                skipped_row["prompt_tokens"] = normalized.usage["prompt_tokens"]
+                skipped_row["completion_tokens"] = normalized.usage["completion_tokens"]
+                skipped_row["total_tokens"] = normalized.usage["total_tokens"]
+                skipped_row["estimated_cost_usd"] = normalized.estimated_cost_usd
+            _append_jsonl(skipped_path, skipped_row)
+            skipped_rows += 1
+            if verbose:
+                print(
+                    f"[skip] task={job['task']} variant={job.get('variant', 0)} reason={skipped_row['skip_reason']}",
+                    flush=True,
+                )
+            continue
         request_elapsed = perf_counter() - request_started_at
         row = {key: value for key, value in job.items() if key != "system_prompt"}
         row["output"] = validated_output
@@ -1305,9 +1426,11 @@ def generate_dataset(
     elapsed_seconds = perf_counter() - started_at
     result = AttrDict(
         output_path=output_path,
+        skipped_path=skipped_path,
         count=completed_rows,
         record_count=completed_rows,
         jobs_count=len(selected_jobs),
+        skipped_count=skipped_rows,
         prompt_tokens=int(totals["prompt_tokens"]),
         completion_tokens=int(totals["completion_tokens"]),
         total_tokens=int(totals["total_tokens"]),
@@ -1393,6 +1516,8 @@ def main() -> None:
 
     result = generate_dataset(repo_root, limit=args.limit, seed=args.seed, output_path=output_path, task_filter=task_filter)
     print(f"Wrote {result.count} rows to {result.output_path}")
+    if result.skipped_count:
+        print(f"Skipped {result.skipped_count} rows to {result.skipped_path}")
 
 
 if __name__ == "__main__":

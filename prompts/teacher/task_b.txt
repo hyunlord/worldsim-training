@@ -42,6 +42,9 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [감정 선택지]
 joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 
+[register 선택지]
+haera, hao, hae
+
 [출력 형식]
 {{"text_ko":"순우리말 2문장","text_en":"English 2 sentences","register":"{register}","emotion_expressed":"감정 8개 중 하나","intensity":0.0,"mimetics":["쓴 의성어"],"temperament_influence":"English snake_case phrase"}}
 
@@ -50,10 +53,16 @@ joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 - text_en은 같은 뜻의 자연스러운 영어 2문장으로 써라
 - register는 반드시 "{register}"로 고정하라
 - emotion_expressed는 위 느낌에 맞는 영어 감정 id 하나를 고르라
+- emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation
+- register must be exactly one of: haera, hao, hae
 - intensity는 주어진 세기를 반영해 0.0~1.0으로 적어라
 - mimetics에는 text_ko에 실제로 쓴 의성어 또는 의태어만 배열로 넣어라
 - temperament_influence는 이 기질이 반응을 어떻게 바꿨는지 영어 snake_case 한 구절로 적어라
 - JSON만 출력하라
+
+[유효값 다시 보기]
+emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation
+register must be exactly one of: haera, hao, hae
 
 [변형번호]
 {variant}

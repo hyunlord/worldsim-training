@@ -1,0 +1,1642 @@
+Total jobs: 3900
+  Task A: 100
+  Task B: 1600
+  Task C: 300
+  Task D: 50
+  Task E: 200
+  Task F: 800
+  Task G: 800
+  Task H: 50
+[10/3900] elapsed=24.08s last=2.23s rows_per_second=0.42 tokens=10235 estimated_cost_usd=$0.040677
+  prompt_tokens=9404 completion_tokens=831 tokens_per_second=425.10
+[retry 1/2] task=A variant=1 validation=register_mismatch
+[20/3900] elapsed=48.34s last=2.22s rows_per_second=0.41 tokens=20552 estimated_cost_usd=$0.082212
+  prompt_tokens=18839 completion_tokens=1713 tokens_per_second=425.20
+[30/3900] elapsed=70.08s last=1.85s rows_per_second=0.43 tokens=30773 estimated_cost_usd=$0.122775
+  prompt_tokens=28235 completion_tokens=2538 tokens_per_second=439.10
+[40/3900] elapsed=95.88s last=2.25s rows_per_second=0.42 tokens=40964 estimated_cost_usd=$0.163668
+  prompt_tokens=37566 completion_tokens=3398 tokens_per_second=427.24
+[50/3900] elapsed=118.07s last=2.15s rows_per_second=0.42 tokens=51211 estimated_cost_usd=$0.204381
+  prompt_tokens=46982 completion_tokens=4229 tokens_per_second=433.74
+[60/3900] elapsed=139.73s last=2.11s rows_per_second=0.43 tokens=61430 estimated_cost_usd=$0.244866
+  prompt_tokens=56382 completion_tokens=5048 tokens_per_second=439.63
+[70/3900] elapsed=163.42s last=2.22s rows_per_second=0.43 tokens=71658 estimated_cost_usd=$0.285858
+  prompt_tokens=65751 completion_tokens=5907 tokens_per_second=438.48
+[80/3900] elapsed=184.52s last=2.56s rows_per_second=0.43 tokens=81884 estimated_cost_usd=$0.326616
+  prompt_tokens=75137 completion_tokens=6747 tokens_per_second=443.76
+[90/3900] elapsed=206.80s last=1.80s rows_per_second=0.44 tokens=92130 estimated_cost_usd=$0.367674
+  prompt_tokens=84523 completion_tokens=7607 tokens_per_second=445.50
+[100/3900] elapsed=228.01s last=2.14s rows_per_second=0.44 tokens=102358 estimated_cost_usd=$0.408246
+  prompt_tokens=93927 completion_tokens=8431 tokens_per_second=448.93
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[130/3900] elapsed=432.00s last=2.87s rows_per_second=0.30 tokens=120381 estimated_cost_usd=$0.485391
+  prompt_tokens=110027 completion_tokens=10354 tokens_per_second=278.66
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[140/3900] elapsed=490.47s last=2.47s rows_per_second=0.29 tokens=128105 estimated_cost_usd=$0.518151
+  prompt_tokens=116952 completion_tokens=11153 tokens_per_second=261.19
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[150/3900] elapsed=523.36s last=3.51s rows_per_second=0.29 tokens=141028 estimated_cost_usd=$0.573312
+  prompt_tokens=128509 completion_tokens=12519 tokens_per_second=269.47
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[160/3900] elapsed=556.75s last=2.56s rows_per_second=0.29 tokens=153953 estimated_cost_usd=$0.628455
+  prompt_tokens=140070 completion_tokens=13883 tokens_per_second=276.52
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[170/3900] elapsed=608.35s last=3.05s rows_per_second=0.28 tokens=164250 estimated_cost_usd=$0.672258
+  prompt_tokens=149291 completion_tokens=14959 tokens_per_second=269.99
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[180/3900] elapsed=646.70s last=3.41s rows_per_second=0.28 tokens=175846 estimated_cost_usd=$0.721854
+  prompt_tokens=159653 completion_tokens=16193 tokens_per_second=271.91
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[190/3900] elapsed=681.06s last=6.49s rows_per_second=0.28 tokens=188642 estimated_cost_usd=$0.776286
+  prompt_tokens=171112 completion_tokens=17530 tokens_per_second=276.98
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[210/3900] elapsed=776.90s last=3.37s rows_per_second=0.27 tokens=209077 estimated_cost_usd=$0.863079
+  prompt_tokens=189423 completion_tokens=19654 tokens_per_second=269.12
+[220/3900] elapsed=807.21s last=2.68s rows_per_second=0.27 tokens=221866 estimated_cost_usd=$0.917406
+  prompt_tokens=200882 completion_tokens=20984 tokens_per_second=274.85
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[230/3900] elapsed=844.66s last=2.64s rows_per_second=0.27 tokens=233389 estimated_cost_usd=$0.965643
+  prompt_tokens=211266 completion_tokens=22123 tokens_per_second=276.31
+[240/3900] elapsed=873.06s last=2.77s rows_per_second=0.27 tokens=246213 estimated_cost_usd=$1.019667
+  prompt_tokens=222794 completion_tokens=23419 tokens_per_second=282.01
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[250/3900] elapsed=909.49s last=2.66s rows_per_second=0.27 tokens=257813 estimated_cost_usd=$1.069035
+  prompt_tokens=233180 completion_tokens=24633 tokens_per_second=283.47
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[260/3900] elapsed=957.89s last=3.08s rows_per_second=0.27 tokens=268104 estimated_cost_usd=$1.112736
+  prompt_tokens=242402 completion_tokens=25702 tokens_per_second=279.89
+[270/3900] elapsed=985.78s last=3.00s rows_per_second=0.27 tokens=280822 estimated_cost_usd=$1.165650
+  prompt_tokens=253890 completion_tokens=26932 tokens_per_second=284.87
+[280/3900] elapsed=1012.52s last=3.24s rows_per_second=0.28 tokens=293507 estimated_cost_usd=$1.218141
+  prompt_tokens=265372 completion_tokens=28135 tokens_per_second=289.88
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[290/3900] elapsed=1059.29s last=2.96s rows_per_second=0.27 tokens=302463 estimated_cost_usd=$1.255953
+  prompt_tokens=273416 completion_tokens=29047 tokens_per_second=285.53
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[300/3900] elapsed=1109.34s last=2.41s rows_per_second=0.27 tokens=311455 estimated_cost_usd=$1.294257
+  prompt_tokens=281464 completion_tokens=29991 tokens_per_second=280.76
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 2/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[320/3900] elapsed=1227.06s last=2.59s rows_per_second=0.26 tokens=328041 estimated_cost_usd=$1.363995
+  prompt_tokens=296385 completion_tokens=31656 tokens_per_second=267.34
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[330/3900] elapsed=1289.41s last=2.45s rows_per_second=0.26 tokens=334347 estimated_cost_usd=$1.390389
+  prompt_tokens=302068 completion_tokens=32279 tokens_per_second=259.30
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[340/3900] elapsed=1332.51s last=2.53s rows_per_second=0.26 tokens=344449 estimated_cost_usd=$1.432851
+  prompt_tokens=311157 completion_tokens=33292 tokens_per_second=258.50
+[350/3900] elapsed=1360.48s last=2.55s rows_per_second=0.26 tokens=357100 estimated_cost_usd=$1.485624
+  prompt_tokens=322573 completion_tokens=34527 tokens_per_second=262.48
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[360/3900] elapsed=1398.23s last=2.45s rows_per_second=0.26 tokens=368451 estimated_cost_usd=$1.532625
+  prompt_tokens=332845 completion_tokens=35606 tokens_per_second=263.51
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[370/3900] elapsed=1446.63s last=3.34s rows_per_second=0.26 tokens=378681 estimated_cost_usd=$1.576131
+  prompt_tokens=342007 completion_tokens=36674 tokens_per_second=261.77
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[380/3900] elapsed=1496.02s last=2.40s rows_per_second=0.25 tokens=387633 estimated_cost_usd=$1.614267
+  prompt_tokens=350019 completion_tokens=37614 tokens_per_second=259.11
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[390/3900] elapsed=1531.51s last=2.26s rows_per_second=0.25 tokens=399105 estimated_cost_usd=$1.662423
+  prompt_tokens=360346 completion_tokens=38759 tokens_per_second=260.60
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[400/3900] elapsed=1570.39s last=2.77s rows_per_second=0.25 tokens=410502 estimated_cost_usd=$1.709586
+  prompt_tokens=370662 completion_tokens=39840 tokens_per_second=261.40
+[410/3900] elapsed=1601.28s last=2.71s rows_per_second=0.26 tokens=423225 estimated_cost_usd=$1.762887
+  prompt_tokens=382124 completion_tokens=41101 tokens_per_second=264.30
+[420/3900] elapsed=1630.97s last=2.93s rows_per_second=0.26 tokens=435964 estimated_cost_usd=$1.816524
+  prompt_tokens=393578 completion_tokens=42386 tokens_per_second=267.30
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[430/3900] elapsed=1666.26s last=3.07s rows_per_second=0.26 tokens=447554 estimated_cost_usd=$1.865574
+  prompt_tokens=403978 completion_tokens=43576 tokens_per_second=268.60
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[440/3900] elapsed=1729.58s last=2.91s rows_per_second=0.25 tokens=453984 estimated_cost_usd=$1.892880
+  prompt_tokens=409740 completion_tokens=44244 tokens_per_second=262.48
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[450/3900] elapsed=1771.29s last=3.17s rows_per_second=0.25 tokens=465630 estimated_cost_usd=$1.942974
+  prompt_tokens=420123 completion_tokens=45507 tokens_per_second=262.88
+[460/3900] elapsed=1804.10s last=3.86s rows_per_second=0.25 tokens=478612 estimated_cost_usd=$1.999332
+  prompt_tokens=431654 completion_tokens=46958 tokens_per_second=265.29
+[470/3900] elapsed=1834.14s last=2.40s rows_per_second=0.26 tokens=491378 estimated_cost_usd=$2.053554
+  prompt_tokens=443093 completion_tokens=48285 tokens_per_second=267.91
+[480/3900] elapsed=1866.08s last=2.86s rows_per_second=0.26 tokens=504210 estimated_cost_usd=$2.108886
+  prompt_tokens=454522 completion_tokens=49688 tokens_per_second=270.20
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[490/3900] elapsed=1922.85s last=6.69s rows_per_second=0.25 tokens=515704 estimated_cost_usd=$2.157612
+  prompt_tokens=464829 completion_tokens=50875 tokens_per_second=268.20
+[500/3900] elapsed=1957.19s last=2.55s rows_per_second=0.26 tokens=528441 estimated_cost_usd=$2.211435
+  prompt_tokens=476265 completion_tokens=52176 tokens_per_second=270.00
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[510/3900] elapsed=2006.83s last=2.67s rows_per_second=0.25 tokens=538742 estimated_cost_usd=$2.255310
+  prompt_tokens=485485 completion_tokens=53257 tokens_per_second=268.45
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[520/3900] elapsed=2657.61s last=2.50s rows_per_second=0.20 tokens=549046 estimated_cost_usd=$2.299350
+  prompt_tokens=494695 completion_tokens=54351 tokens_per_second=206.59
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[530/3900] elapsed=3296.08s last=3.25s rows_per_second=0.16 tokens=561948 estimated_cost_usd=$2.354652
+  prompt_tokens=506214 completion_tokens=55734 tokens_per_second=170.49
+[540/3900] elapsed=3330.70s last=3.66s rows_per_second=0.16 tokens=574899 estimated_cost_usd=$2.410749
+  prompt_tokens=517728 completion_tokens=57171 tokens_per_second=172.61
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 2/2] task=B variant=1 validation=register_mismatch
+[550/3900] elapsed=3368.24s last=3.16s rows_per_second=0.16 tokens=587682 estimated_cost_usd=$2.464434
+  prompt_tokens=529233 completion_tokens=58449 tokens_per_second=174.48
+[560/3900] elapsed=4011.56s last=5.30s rows_per_second=0.14 tokens=600505 estimated_cost_usd=$2.518815
+  prompt_tokens=540730 completion_tokens=59775 tokens_per_second=149.69
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[570/3900] elapsed=4071.38s last=4.41s rows_per_second=0.14 tokens=612045 estimated_cost_usd=$2.568495
+  prompt_tokens=551015 completion_tokens=61030 tokens_per_second=150.33
+[580/3900] elapsed=4713.01s last=3.25s rows_per_second=0.12 tokens=624826 estimated_cost_usd=$2.623182
+  prompt_tokens=562434 completion_tokens=62392 tokens_per_second=132.57
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[600/3900] elapsed=4847.90s last=3.80s rows_per_second=0.12 tokens=638911 estimated_cost_usd=$2.682801
+  prompt_tokens=575072 completion_tokens=63839 tokens_per_second=131.79
+[610/3900] elapsed=4882.97s last=2.97s rows_per_second=0.12 tokens=651664 estimated_cost_usd=$2.737128
+  prompt_tokens=586486 completion_tokens=65178 tokens_per_second=133.46
+[620/3900] elapsed=4916.13s last=3.67s rows_per_second=0.13 tokens=664428 estimated_cost_usd=$2.791704
+  prompt_tokens=597893 completion_tokens=66535 tokens_per_second=135.15
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[630/3900] elapsed=4951.18s last=3.65s rows_per_second=0.13 tokens=677101 estimated_cost_usd=$2.844807
+  prompt_tokens=609309 completion_tokens=67792 tokens_per_second=136.76
+[640/3900] elapsed=4985.09s last=3.13s rows_per_second=0.13 tokens=689778 estimated_cost_usd=$2.897922
+  prompt_tokens=620729 completion_tokens=69049 tokens_per_second=138.37
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[650/3900] elapsed=5025.40s last=3.01s rows_per_second=0.13 tokens=701258 estimated_cost_usd=$2.946258
+  prompt_tokens=631051 completion_tokens=70207 tokens_per_second=139.54
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[660/3900] elapsed=5081.91s last=4.68s rows_per_second=0.13 tokens=712705 estimated_cost_usd=$2.994171
+  prompt_tokens=641367 completion_tokens=71338 tokens_per_second=140.24
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[670/3900] elapsed=5121.09s last=2.73s rows_per_second=0.13 tokens=724249 estimated_cost_usd=$3.043179
+  prompt_tokens=651713 completion_tokens=72536 tokens_per_second=141.42
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[680/3900] elapsed=5180.01s last=2.44s rows_per_second=0.13 tokens=734516 estimated_cost_usd=$3.086928
+  prompt_tokens=660901 completion_tokens=73615 tokens_per_second=141.80
+[690/3900] elapsed=5216.08s last=3.18s rows_per_second=0.13 tokens=747259 estimated_cost_usd=$3.140493
+  prompt_tokens=672366 completion_tokens=74893 tokens_per_second=143.26
+[700/3900] elapsed=5256.15s last=3.78s rows_per_second=0.13 tokens=760002 estimated_cost_usd=$3.194154
+  prompt_tokens=683823 completion_tokens=76179 tokens_per_second=144.59
+[710/3900] elapsed=5285.02s last=2.41s rows_per_second=0.13 tokens=772649 estimated_cost_usd=$3.247287
+  prompt_tokens=695204 completion_tokens=77445 tokens_per_second=146.20
+[720/3900] elapsed=5312.84s last=2.89s rows_per_second=0.14 tokens=785238 estimated_cost_usd=$3.299682
+  prompt_tokens=706574 completion_tokens=78664 tokens_per_second=147.80
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[730/3900] elapsed=5351.32s last=3.07s rows_per_second=0.14 tokens=796700 estimated_cost_usd=$3.348276
+  prompt_tokens=716852 completion_tokens=79848 tokens_per_second=148.88
+[740/3900] elapsed=5386.78s last=2.52s rows_per_second=0.14 tokens=809356 estimated_cost_usd=$3.401268
+  prompt_tokens=728256 completion_tokens=81100 tokens_per_second=150.25
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[760/3900] elapsed=5576.76s last=3.52s rows_per_second=0.14 tokens=813193 estimated_cost_usd=$3.417927
+  prompt_tokens=731664 completion_tokens=81529 tokens_per_second=145.82
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[770/3900] elapsed=5619.43s last=3.16s rows_per_second=0.14 tokens=826034 estimated_cost_usd=$3.472806
+  prompt_tokens=743142 completion_tokens=82892 tokens_per_second=147.00
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[780/3900] elapsed=5658.34s last=2.50s rows_per_second=0.14 tokens=838838 estimated_cost_usd=$3.527226
+  prompt_tokens=754612 completion_tokens=84226 tokens_per_second=148.25
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[790/3900] elapsed=5720.57s last=4.42s rows_per_second=0.14 tokens=847843 estimated_cost_usd=$3.565557
+  prompt_tokens=762674 completion_tokens=85169 tokens_per_second=148.21
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=not_json
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[800/3900] elapsed=5790.18s last=3.17s rows_per_second=0.14 tokens=856857 estimated_cost_usd=$3.603927
+  prompt_tokens=770744 completion_tokens=86113 tokens_per_second=147.98
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[830/3900] elapsed=6031.85s last=3.10s rows_per_second=0.14 tokens=873518 estimated_cost_usd=$3.674310
+  prompt_tokens=785705 completion_tokens=87813 tokens_per_second=144.82
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[840/3900] elapsed=6106.35s last=3.11s rows_per_second=0.14 tokens=879952 estimated_cost_usd=$3.701796
+  prompt_tokens=791457 completion_tokens=88495 tokens_per_second=144.10
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[860/3900] elapsed=6213.57s last=2.78s rows_per_second=0.14 tokens=900378 estimated_cost_usd=$3.789126
+  prompt_tokens=809712 completion_tokens=90666 tokens_per_second=144.91
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[880/3900] elapsed=6341.47s last=3.97s rows_per_second=0.14 tokens=918154 estimated_cost_usd=$3.863814
+  prompt_tokens=825708 completion_tokens=92446 tokens_per_second=144.79
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[890/3900] elapsed=6443.48s last=11.02s rows_per_second=0.14 tokens=920736 estimated_cost_usd=$3.874836
+  prompt_tokens=828017 completion_tokens=92719 tokens_per_second=142.89
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[920/3900] elapsed=6646.87s last=3.68s rows_per_second=0.14 tokens=945123 estimated_cost_usd=$3.978525
+  prompt_tokens=849860 completion_tokens=95263 tokens_per_second=142.19
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[930/3900] elapsed=6698.70s last=10.73s rows_per_second=0.14 tokens=958096 estimated_cost_usd=$4.034160
+  prompt_tokens=861440 completion_tokens=96656 tokens_per_second=143.03
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[940/3900] elapsed=6737.80s last=3.64s rows_per_second=0.14 tokens=971063 estimated_cost_usd=$4.089801
+  prompt_tokens=873012 completion_tokens=98051 tokens_per_second=144.12
+[950/3900] elapsed=6771.61s last=3.76s rows_per_second=0.14 tokens=983955 estimated_cost_usd=$4.144233
+  prompt_tokens=884591 completion_tokens=99364 tokens_per_second=145.31
+[960/3900] elapsed=6804.28s last=3.23s rows_per_second=0.14 tokens=996838 estimated_cost_usd=$4.198842
+  prompt_tokens=896144 completion_tokens=100694 tokens_per_second=146.50
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[970/3900] elapsed=6846.47s last=3.91s rows_per_second=0.14 tokens=1009679 estimated_cost_usd=$4.253061
+  prompt_tokens=907677 completion_tokens=102002 tokens_per_second=147.47
+[980/3900] elapsed=6879.26s last=2.55s rows_per_second=0.14 tokens=1022505 estimated_cost_usd=$4.307091
+  prompt_tokens=919207 completion_tokens=103298 tokens_per_second=148.64
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[990/3900] elapsed=6948.07s last=3.48s rows_per_second=0.14 tokens=1031526 estimated_cost_usd=$4.345794
+  prompt_tokens=927258 completion_tokens=104268 tokens_per_second=148.46
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1010/3900] elapsed=7039.33s last=2.83s rows_per_second=0.14 tokens=1054509 estimated_cost_usd=$4.442847
+  prompt_tokens=947899 completion_tokens=106610 tokens_per_second=149.80
+[1020/3900] elapsed=7071.86s last=2.93s rows_per_second=0.14 tokens=1067278 estimated_cost_usd=$4.496730
+  prompt_tokens=959370 completion_tokens=107908 tokens_per_second=150.92
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 2/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1050/3900] elapsed=7226.18s last=4.08s rows_per_second=0.15 tokens=1096808 estimated_cost_usd=$4.620828
+  prompt_tokens=985941 completion_tokens=110867 tokens_per_second=151.78
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1060/3900] elapsed=7276.26s last=2.96s rows_per_second=0.15 tokens=1107144 estimated_cost_usd=$4.665060
+  prompt_tokens=995175 completion_tokens=111969 tokens_per_second=152.16
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[1090/3900] elapsed=7453.36s last=3.81s rows_per_second=0.15 tokens=1135649 estimated_cost_usd=$4.787919
+  prompt_tokens=1020568 completion_tokens=115081 tokens_per_second=152.37
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1100/3900] elapsed=7496.94s last=3.32s rows_per_second=0.15 tokens=1147314 estimated_cost_usd=$4.838082
+  prompt_tokens=1030969 completion_tokens=116345 tokens_per_second=153.04
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1120/3900] elapsed=7589.55s last=3.41s rows_per_second=0.15 tokens=1167847 estimated_cost_usd=$4.924893
+  prompt_tokens=1049401 completion_tokens=118446 tokens_per_second=153.88
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1140/3900] elapsed=7704.28s last=2.81s rows_per_second=0.15 tokens=1184398 estimated_cost_usd=$4.995054
+  prompt_tokens=1064243 completion_tokens=120155 tokens_per_second=153.73
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1180/3900] elapsed=7893.33s last=3.62s rows_per_second=0.15 tokens=1223946 estimated_cost_usd=$5.161218
+  prompt_tokens=1099831 completion_tokens=124115 tokens_per_second=155.06
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[1210/3900] elapsed=8042.83s last=3.61s rows_per_second=0.15 tokens=1254767 estimated_cost_usd=$5.291733
+  prompt_tokens=1127481 completion_tokens=127286 tokens_per_second=156.01
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[1220/3900] elapsed=8076.65s last=6.02s rows_per_second=0.15 tokens=1267627 estimated_cost_usd=$5.346465
+  prompt_tokens=1138995 completion_tokens=128632 tokens_per_second=156.95
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[1230/3900] elapsed=8119.99s last=2.65s rows_per_second=0.15 tokens=1279163 estimated_cost_usd=$5.395137
+  prompt_tokens=1149359 completion_tokens=129804 tokens_per_second=157.53
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1240/3900] elapsed=8161.09s last=3.78s rows_per_second=0.15 tokens=1290711 estimated_cost_usd=$5.444061
+  prompt_tokens=1159717 completion_tokens=130994 tokens_per_second=158.15
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1260/3900] elapsed=8236.43s last=2.93s rows_per_second=0.15 tokens=1313870 estimated_cost_usd=$5.542770
+  prompt_tokens=1180440 completion_tokens=133430 tokens_per_second=159.52
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1290/3900] elapsed=8376.81s last=3.10s rows_per_second=0.15 tokens=1345720 estimated_cost_usd=$5.677908
+  prompt_tokens=1208991 completion_tokens=136729 tokens_per_second=160.65
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1300/3900] elapsed=8422.93s last=2.93s rows_per_second=0.15 tokens=1355941 estimated_cost_usd=$5.721543
+  prompt_tokens=1218131 completion_tokens=137810 tokens_per_second=160.98
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[1310/3900] elapsed=8469.99s last=7.10s rows_per_second=0.15 tokens=1366163 estimated_cost_usd=$5.764461
+  prompt_tokens=1227332 completion_tokens=138831 tokens_per_second=161.29
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1320/3900] elapsed=8523.59s last=2.65s rows_per_second=0.15 tokens=1375050 estimated_cost_usd=$5.801298
+  prompt_tokens=1235371 completion_tokens=139679 tokens_per_second=161.32
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1330/3900] elapsed=8562.81s last=3.01s rows_per_second=0.16 tokens=1386647 estimated_cost_usd=$5.851053
+  prompt_tokens=1245721 completion_tokens=140926 tokens_per_second=161.94
+[1340/3900] elapsed=8595.20s last=3.11s rows_per_second=0.16 tokens=1399496 estimated_cost_usd=$5.905848
+  prompt_tokens=1257216 completion_tokens=142280 tokens_per_second=162.82
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[1350/3900] elapsed=8628.42s last=2.99s rows_per_second=0.16 tokens=1412331 estimated_cost_usd=$5.960565
+  prompt_tokens=1268700 completion_tokens=143631 tokens_per_second=163.68
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1360/3900] elapsed=8667.86s last=3.21s rows_per_second=0.16 tokens=1423915 estimated_cost_usd=$6.010401
+  prompt_tokens=1279027 completion_tokens=144888 tokens_per_second=164.28
+[1370/3900] elapsed=8698.73s last=3.26s rows_per_second=0.16 tokens=1436634 estimated_cost_usd=$6.064302
+  prompt_tokens=1290434 completion_tokens=146200 tokens_per_second=165.15
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[1380/3900] elapsed=8731.91s last=2.90s rows_per_second=0.16 tokens=1449333 estimated_cost_usd=$6.117999
+  prompt_tokens=1301833 completion_tokens=147500 tokens_per_second=165.98
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[1390/3900] elapsed=8774.60s last=2.55s rows_per_second=0.16 tokens=1462165 estimated_cost_usd=$6.172431
+  prompt_tokens=1313337 completion_tokens=148828 tokens_per_second=166.64
+[retry 1/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[1400/3900] elapsed=8817.94s last=4.35s rows_per_second=0.16 tokens=1474984 estimated_cost_usd=$6.226764
+  prompt_tokens=1324833 completion_tokens=150151 tokens_per_second=167.27
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[1410/3900] elapsed=8855.75s last=3.07s rows_per_second=0.16 tokens=1487856 estimated_cost_usd=$6.282612
+  prompt_tokens=1336269 completion_tokens=151587 tokens_per_second=168.01
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[1420/3900] elapsed=8900.72s last=3.05s rows_per_second=0.16 tokens=1499407 estimated_cost_usd=$6.332613
+  prompt_tokens=1346541 completion_tokens=152866 tokens_per_second=168.46
+[1430/3900] elapsed=8929.14s last=2.72s rows_per_second=0.16 tokens=1512184 estimated_cost_usd=$6.386820
+  prompt_tokens=1357995 completion_tokens=154189 tokens_per_second=169.35
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1440/3900] elapsed=8963.99s last=3.09s rows_per_second=0.16 tokens=1523669 estimated_cost_usd=$6.435591
+  prompt_tokens=1368287 completion_tokens=155382 tokens_per_second=169.98
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[1450/3900] elapsed=8998.86s last=2.89s rows_per_second=0.16 tokens=1536501 estimated_cost_usd=$6.490119
+  prompt_tokens=1379783 completion_tokens=156718 tokens_per_second=170.74
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1460/3900] elapsed=9045.73s last=3.66s rows_per_second=0.16 tokens=1545443 estimated_cost_usd=$6.527841
+  prompt_tokens=1387817 completion_tokens=157626 tokens_per_second=170.85
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1470/3900] elapsed=9081.04s last=2.86s rows_per_second=0.16 tokens=1556958 estimated_cost_usd=$6.576210
+  prompt_tokens=1398180 completion_tokens=158778 tokens_per_second=171.45
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1480/3900] elapsed=9118.36s last=2.98s rows_per_second=0.16 tokens=1568477 estimated_cost_usd=$6.624771
+  prompt_tokens=1408532 completion_tokens=159945 tokens_per_second=172.01
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[1490/3900] elapsed=9179.24s last=7.60s rows_per_second=0.16 tokens=1578749 estimated_cost_usd=$6.668691
+  prompt_tokens=1417712 completion_tokens=161037 tokens_per_second=171.99
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[1500/3900] elapsed=9223.01s last=3.17s rows_per_second=0.16 tokens=1590332 estimated_cost_usd=$6.718560
+  prompt_tokens=1428035 completion_tokens=162297 tokens_per_second=172.43
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 2/2] task=B variant=0 validation=register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 2/2] task=B variant=1 validation=register_mismatch
+[skip] task=B variant=1 reason=generation_validation_failed:register_mismatch
+[1510/3900] elapsed=9266.85s last=3.31s rows_per_second=0.16 tokens=1600503 estimated_cost_usd=$6.761757
+  prompt_tokens=1437149 completion_tokens=163354 tokens_per_second=172.71
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[1520/3900] elapsed=9299.85s last=2.42s rows_per_second=0.16 tokens=1613213 estimated_cost_usd=$6.815715
+  prompt_tokens=1448540 completion_tokens=164673 tokens_per_second=173.47
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[1530/3900] elapsed=9337.22s last=3.23s rows_per_second=0.16 tokens=1626034 estimated_cost_usd=$6.870846
+  prompt_tokens=1459972 completion_tokens=166062 tokens_per_second=174.15
+[1540/3900] elapsed=9363.97s last=2.39s rows_per_second=0.16 tokens=1638759 estimated_cost_usd=$6.924633
+  prompt_tokens=1471396 completion_tokens=167363 tokens_per_second=175.01
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1570/3900] elapsed=9597.70s last=2.77s rows_per_second=0.16 tokens=1656664 estimated_cost_usd=$7.000656
+  prompt_tokens=1487442 completion_tokens=169222 tokens_per_second=172.61
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion,register_mismatch
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1600/3900] elapsed=9739.35s last=3.18s rows_per_second=0.16 tokens=1686272 estimated_cost_usd=$7.126896
+  prompt_tokens=1513932 completion_tokens=172340 tokens_per_second=173.14
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1610/3900] elapsed=9783.79s last=2.21s rows_per_second=0.16 tokens=1695223 estimated_cost_usd=$7.164525
+  prompt_tokens=1521985 completion_tokens=173238 tokens_per_second=173.27
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=register_mismatch
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[1620/3900] elapsed=9839.61s last=5.27s rows_per_second=0.16 tokens=1702930 estimated_cost_usd=$7.197198
+  prompt_tokens=1528896 completion_tokens=174034 tokens_per_second=173.07
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1630/3900] elapsed=9890.95s last=3.13s rows_per_second=0.16 tokens=1711958 estimated_cost_usd=$7.235742
+  prompt_tokens=1536969 completion_tokens=174989 tokens_per_second=173.08
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[1640/3900] elapsed=9940.29s last=3.23s rows_per_second=0.16 tokens=1720940 estimated_cost_usd=$7.273692
+  prompt_tokens=1545034 completion_tokens=175906 tokens_per_second=173.13
+[1650/3900] elapsed=9971.72s last=3.49s rows_per_second=0.17 tokens=1733682 estimated_cost_usd=$7.327782
+  prompt_tokens=1556454 completion_tokens=177228 tokens_per_second=173.86
+[1660/3900] elapsed=10000.19s last=2.48s rows_per_second=0.17 tokens=1746422 estimated_cost_usd=$7.381890
+  prompt_tokens=1567870 completion_tokens=178552 tokens_per_second=174.64
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[retry 2/2] task=B variant=1 validation=invalid_emotion
+[skip] task=B variant=1 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1670/3900] elapsed=10040.87s last=2.69s rows_per_second=0.17 tokens=1756590 estimated_cost_usd=$7.424658
+  prompt_tokens=1577016 completion_tokens=179574 tokens_per_second=174.94
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=B variant=1 validation=invalid_emotion
+[1680/3900] elapsed=10080.20s last=2.78s rows_per_second=0.17 tokens=1768070 estimated_cost_usd=$7.473294
+  prompt_tokens=1587313 completion_tokens=180757 tokens_per_second=175.40
+[retry 1/2] task=B variant=1 validation=register_mismatch
+[1690/3900] elapsed=10114.87s last=3.61s rows_per_second=0.17 tokens=1780896 estimated_cost_usd=$7.527420
+  prompt_tokens=1598835 completion_tokens=182061 tokens_per_second=176.07
+[retry 1/2] task=B variant=0 validation=invalid_emotion
+[retry 2/2] task=B variant=0 validation=invalid_emotion
+[skip] task=B variant=0 reason=generation_validation_failed:invalid_emotion
+[1700/3900] elapsed=10148.17s last=2.66s rows_per_second=0.17 tokens=1792420 estimated_cost_usd=$7.576008
+  prompt_tokens=1609191 completion_tokens=183229 tokens_per_second=176.62
+[retry 1/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[1710/3900] elapsed=10191.07s last=2.28s rows_per_second=0.17 tokens=1800919 estimated_cost_usd=$7.608513
+  prompt_tokens=1617106 completion_tokens=183813 tokens_per_second=176.72
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[1720/3900] elapsed=10221.33s last=2.03s rows_per_second=0.17 tokens=1811817 estimated_cost_usd=$7.649811
+  prompt_tokens=1627287 completion_tokens=184530 tokens_per_second=177.26
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1730/3900] elapsed=10249.09s last=4.73s rows_per_second=0.17 tokens=1822693 estimated_cost_usd=$7.691151
+  prompt_tokens=1637437 completion_tokens=185256 tokens_per_second=177.84
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1740/3900] elapsed=10272.56s last=1.90s rows_per_second=0.17 tokens=1834795 estimated_cost_usd=$7.737069
+  prompt_tokens=1648738 completion_tokens=186057 tokens_per_second=178.61
+[retry 1/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[1750/3900] elapsed=10296.56s last=1.70s rows_per_second=0.17 tokens=1845642 estimated_cost_usd=$7.777986
+  prompt_tokens=1658887 completion_tokens=186755 tokens_per_second=179.25
+[1760/3900] elapsed=10315.15s last=1.76s rows_per_second=0.17 tokens=1857663 estimated_cost_usd=$7.823169
+  prompt_tokens=1670148 completion_tokens=187515 tokens_per_second=180.09
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1770/3900] elapsed=10346.06s last=1.82s rows_per_second=0.17 tokens=1868570 estimated_cost_usd=$7.864434
+  prompt_tokens=1680343 completion_tokens=188227 tokens_per_second=180.61
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[1780/3900] elapsed=10375.06s last=3.60s rows_per_second=0.17 tokens=1879489 estimated_cost_usd=$7.905903
+  prompt_tokens=1690536 completion_tokens=188953 tokens_per_second=181.15
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1800/3900] elapsed=10439.00s last=3.63s rows_per_second=0.17 tokens=1901154 estimated_cost_usd=$7.987590
+  prompt_tokens=1710810 completion_tokens=190344 tokens_per_second=182.12
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[1810/3900] elapsed=10463.13s last=2.00s rows_per_second=0.17 tokens=1913170 estimated_cost_usd=$8.032974
+  prompt_tokens=1722048 completion_tokens=191122 tokens_per_second=182.85
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[1830/3900] elapsed=10531.28s last=2.02s rows_per_second=0.17 tokens=1933595 estimated_cost_usd=$8.109933
+  prompt_tokens=1741166 completion_tokens=192429 tokens_per_second=183.60
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1840/3900] elapsed=10561.92s last=2.86s rows_per_second=0.17 tokens=1944434 estimated_cost_usd=$8.151030
+  prompt_tokens=1751290 completion_tokens=193144 tokens_per_second=184.10
+[retry 1/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[retry 2/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion,register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion,register_mismatch
+[1850/3900] elapsed=10591.70s last=2.06s rows_per_second=0.17 tokens=1955232 estimated_cost_usd=$8.191680
+  prompt_tokens=1761400 completion_tokens=193832 tokens_per_second=184.60
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1860/3900] elapsed=10614.66s last=1.90s rows_per_second=0.18 tokens=1967333 estimated_cost_usd=$8.237451
+  prompt_tokens=1772712 completion_tokens=194621 tokens_per_second=185.34
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1870/3900] elapsed=10638.56s last=2.11s rows_per_second=0.18 tokens=1979439 estimated_cost_usd=$8.283213
+  prompt_tokens=1784031 completion_tokens=195408 tokens_per_second=186.06
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[1880/3900] elapsed=10666.26s last=5.76s rows_per_second=0.18 tokens=1990278 estimated_cost_usd=$8.324034
+  prompt_tokens=1794178 completion_tokens=196100 tokens_per_second=186.60
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1890/3900] elapsed=10688.50s last=3.81s rows_per_second=0.18 tokens=2002437 estimated_cost_usd=$8.370123
+  prompt_tokens=1805536 completion_tokens=196901 tokens_per_second=187.35
+[1900/3900] elapsed=10708.31s last=2.10s rows_per_second=0.18 tokens=2014631 estimated_cost_usd=$8.416881
+  prompt_tokens=1816882 completion_tokens=197749 tokens_per_second=188.14
+[1910/3900] elapsed=10729.20s last=2.25s rows_per_second=0.18 tokens=2026794 estimated_cost_usd=$8.463486
+  prompt_tokens=1828202 completion_tokens=198592 tokens_per_second=188.90
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1920/3900] elapsed=10751.79s last=2.36s rows_per_second=0.18 tokens=2038916 estimated_cost_usd=$8.509572
+  prompt_tokens=1839514 completion_tokens=199402 tokens_per_second=189.64
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1930/3900] elapsed=10776.22s last=1.82s rows_per_second=0.18 tokens=2051044 estimated_cost_usd=$8.555832
+  prompt_tokens=1850819 completion_tokens=200225 tokens_per_second=190.33
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1950/3900] elapsed=10827.80s last=2.03s rows_per_second=0.18 tokens=2073947 estimated_cost_usd=$8.642421
+  prompt_tokens=1872232 completion_tokens=201715 tokens_per_second=191.54
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[1960/3900] elapsed=10858.10s last=2.17s rows_per_second=0.18 tokens=2084820 estimated_cost_usd=$8.683908
+  prompt_tokens=1882366 completion_tokens=202454 tokens_per_second=192.01
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1970/3900] elapsed=10881.60s last=1.82s rows_per_second=0.18 tokens=2096822 estimated_cost_usd=$8.729322
+  prompt_tokens=1893584 completion_tokens=203238 tokens_per_second=192.69
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[1980/3900] elapsed=10915.22s last=1.82s rows_per_second=0.18 tokens=2105267 estimated_cost_usd=$8.761125
+  prompt_tokens=1901490 completion_tokens=203777 tokens_per_second=192.87
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[retry 2/2] task=C variant=0 validation=register_mismatch
+[skip] task=C variant=0 reason=generation_validation_failed:register_mismatch
+[retry 1/2] task=C variant=0 validation=register_mismatch
+[1990/3900] elapsed=10950.21s last=1.88s rows_per_second=0.18 tokens=2114898 estimated_cost_usd=$8.797506
+  prompt_tokens=1910497 completion_tokens=204401 tokens_per_second=193.14
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 1/2] task=C variant=0 validation=invalid_emotion
+[retry 2/2] task=C variant=0 validation=invalid_emotion
+[skip] task=C variant=0 reason=generation_validation_failed:invalid_emotion
+[2000/3900] elapsed=10983.66s last=2.16s rows_per_second=0.18 tokens=2124526 estimated_cost_usd=$8.833950
+  prompt_tokens=1919495 completion_tokens=205031 tokens_per_second=193.43
+[2010/3900] elapsed=10997.59s last=1.34s rows_per_second=0.18 tokens=2133687 estimated_cost_usd=$8.867037
+  prompt_tokens=1928189 completion_tokens=205498 tokens_per_second=194.01
+[2020/3900] elapsed=11011.73s last=1.29s rows_per_second=0.18 tokens=2142879 estimated_cost_usd=$8.900229
+  prompt_tokens=1936913 completion_tokens=205966 tokens_per_second=194.60
+[2030/3900] elapsed=11025.63s last=1.42s rows_per_second=0.18 tokens=2152054 estimated_cost_usd=$8.933346
+  prompt_tokens=1945622 completion_tokens=206432 tokens_per_second=195.19
+[2040/3900] elapsed=11040.36s last=1.29s rows_per_second=0.18 tokens=2161287 estimated_cost_usd=$8.966613
+  prompt_tokens=1954391 completion_tokens=206896 tokens_per_second=195.76
+[2050/3900] elapsed=11058.37s last=1.25s rows_per_second=0.19 tokens=2170495 estimated_cost_usd=$8.999805
+  prompt_tokens=1963135 completion_tokens=207360 tokens_per_second=196.28
+[2060/3900] elapsed=11077.78s last=1.93s rows_per_second=0.19 tokens=2180991 estimated_cost_usd=$9.040377
+  prompt_tokens=1972874 completion_tokens=208117 tokens_per_second=196.88
+[2070/3900] elapsed=11096.69s last=1.95s rows_per_second=0.19 tokens=2191476 estimated_cost_usd=$9.080868
+  prompt_tokens=1982606 completion_tokens=208870 tokens_per_second=197.49
+[2080/3900] elapsed=11118.89s last=2.10s rows_per_second=0.19 tokens=2201984 estimated_cost_usd=$9.121476
+  prompt_tokens=1992357 completion_tokens=209627 tokens_per_second=198.04
+[2090/3900] elapsed=11139.14s last=2.16s rows_per_second=0.19 tokens=2212487 estimated_cost_usd=$9.162069
+  prompt_tokens=2002103 completion_tokens=210384 tokens_per_second=198.62
+[2100/3900] elapsed=11159.16s last=2.35s rows_per_second=0.19 tokens=2223069 estimated_cost_usd=$9.203031
+  prompt_tokens=2011917 completion_tokens=211152 tokens_per_second=199.21
+[2110/3900] elapsed=11177.95s last=1.66s rows_per_second=0.19 tokens=2233638 estimated_cost_usd=$9.243822
+  prompt_tokens=2021729 completion_tokens=211909 tokens_per_second=199.83
+[2120/3900] elapsed=11198.55s last=1.76s rows_per_second=0.19 tokens=2244208 estimated_cost_usd=$9.284904
+  prompt_tokens=2031518 completion_tokens=212690 tokens_per_second=200.40
+[2130/3900] elapsed=11218.90s last=1.79s rows_per_second=0.19 tokens=2254778 estimated_cost_usd=$9.326046
+  prompt_tokens=2041302 completion_tokens=213476 tokens_per_second=200.98
+[2140/3900] elapsed=11240.95s last=2.11s rows_per_second=0.19 tokens=2265316 estimated_cost_usd=$9.367188
+  prompt_tokens=2051046 completion_tokens=214270 tokens_per_second=201.52
+[2150/3900] elapsed=11261.74s last=2.29s rows_per_second=0.19 tokens=2275843 estimated_cost_usd=$9.408213
+  prompt_tokens=2060786 completion_tokens=215057 tokens_per_second=202.09
+[2160/3900] elapsed=11284.13s last=2.03s rows_per_second=0.19 tokens=2286458 estimated_cost_usd=$9.449682
+  prompt_tokens=2070599 completion_tokens=215859 tokens_per_second=202.63
+[2170/3900] elapsed=11306.42s last=1.96s rows_per_second=0.19 tokens=2297031 estimated_cost_usd=$9.490593
+  prompt_tokens=2080406 completion_tokens=216625 tokens_per_second=203.16
+[2180/3900] elapsed=11325.51s last=1.96s rows_per_second=0.19 tokens=2307616 estimated_cost_usd=$9.531396
+  prompt_tokens=2090237 completion_tokens=217379 tokens_per_second=203.75
+[2190/3900] elapsed=11345.21s last=1.80s rows_per_second=0.19 tokens=2318193 estimated_cost_usd=$9.572139
+  prompt_tokens=2100063 completion_tokens=218130 tokens_per_second=204.33
+[2200/3900] elapsed=11366.57s last=2.07s rows_per_second=0.19 tokens=2328797 estimated_cost_usd=$9.613599
+  prompt_tokens=2109863 completion_tokens=218934 tokens_per_second=204.88
+[2210/3900] elapsed=11387.51s last=1.87s rows_per_second=0.19 tokens=2339385 estimated_cost_usd=$9.654831
+  prompt_tokens=2119662 completion_tokens=219723 tokens_per_second=205.43
+[2220/3900] elapsed=11409.45s last=2.08s rows_per_second=0.19 tokens=2350000 estimated_cost_usd=$9.696324
+  prompt_tokens=2129473 completion_tokens=220527 tokens_per_second=205.97
+[2230/3900] elapsed=11429.69s last=1.71s rows_per_second=0.20 tokens=2360587 estimated_cost_usd=$9.737517
+  prompt_tokens=2139274 completion_tokens=221313 tokens_per_second=206.53
+[2240/3900] elapsed=11450.80s last=2.08s rows_per_second=0.20 tokens=2371063 estimated_cost_usd=$9.778077
+  prompt_tokens=2148989 completion_tokens=222074 tokens_per_second=207.07
+[2250/3900] elapsed=11469.88s last=1.91s rows_per_second=0.20 tokens=2381545 estimated_cost_usd=$9.818763
+  prompt_tokens=2158701 completion_tokens=222844 tokens_per_second=207.63
+[2260/3900] elapsed=11489.83s last=1.88s rows_per_second=0.20 tokens=2393575 estimated_cost_usd=$9.865089
+  prompt_tokens=2169878 completion_tokens=223697 tokens_per_second=208.32
+[2270/3900] elapsed=11510.00s last=1.80s rows_per_second=0.20 tokens=2405593 estimated_cost_usd=$9.911391
+  prompt_tokens=2181042 completion_tokens=224551 tokens_per_second=209.00
+[2280/3900] elapsed=11530.59s last=2.08s rows_per_second=0.20 tokens=2417610 estimated_cost_usd=$9.957810
+  prompt_tokens=2192195 completion_tokens=225415 tokens_per_second=209.67
+[2290/3900] elapsed=11553.97s last=2.58s rows_per_second=0.20 tokens=2429517 estimated_cost_usd=$10.003707
+  prompt_tokens=2203254 completion_tokens=226263 tokens_per_second=210.28
+[2300/3900] elapsed=11574.15s last=1.83s rows_per_second=0.20 tokens=2441546 estimated_cost_usd=$10.050186
+  prompt_tokens=2214417 completion_tokens=227129 tokens_per_second=210.95
+[2310/3900] elapsed=11594.88s last=1.99s rows_per_second=0.20 tokens=2453559 estimated_cost_usd=$10.096389
+  prompt_tokens=2225583 completion_tokens=227976 tokens_per_second=211.61
+[2320/3900] elapsed=11614.14s last=2.12s rows_per_second=0.20 tokens=2465561 estimated_cost_usd=$10.142631
+  prompt_tokens=2236732 completion_tokens=228829 tokens_per_second=212.29
+[2330/3900] elapsed=11634.52s last=1.94s rows_per_second=0.20 tokens=2477452 estimated_cost_usd=$10.188384
+  prompt_tokens=2247783 completion_tokens=229669 tokens_per_second=212.94
+[2340/3900] elapsed=11655.82s last=1.83s rows_per_second=0.20 tokens=2489503 estimated_cost_usd=$10.233945
+  prompt_tokens=2259050 completion_tokens=230453 tokens_per_second=213.58
+[2350/3900] elapsed=11675.40s last=1.75s rows_per_second=0.20 tokens=2501567 estimated_cost_usd=$10.279857
+  prompt_tokens=2270304 completion_tokens=231263 tokens_per_second=214.26
+[2360/3900] elapsed=11698.16s last=2.23s rows_per_second=0.20 tokens=2513616 estimated_cost_usd=$10.325676
+  prompt_tokens=2281547 completion_tokens=232069 tokens_per_second=214.87
+[2370/3900] elapsed=11717.69s last=2.11s rows_per_second=0.20 tokens=2525560 estimated_cost_usd=$10.371048
+  prompt_tokens=2292696 completion_tokens=232864 tokens_per_second=215.53
+[2380/3900] elapsed=12342.24s last=603.19s rows_per_second=0.19 tokens=2537656 estimated_cost_usd=$10.417452
+  prompt_tokens=2303949 completion_tokens=233707 tokens_per_second=205.61
+[2390/3900] elapsed=12365.76s last=2.22s rows_per_second=0.19 tokens=2549721 estimated_cost_usd=$10.463355
+  prompt_tokens=2315205 completion_tokens=234516 tokens_per_second=206.19
+[2400/3900] elapsed=12389.84s last=2.15s rows_per_second=0.19 tokens=2561775 estimated_cost_usd=$10.509297
+  prompt_tokens=2326444 completion_tokens=235331 tokens_per_second=206.76
+[2410/3900] elapsed=12411.32s last=2.00s rows_per_second=0.19 tokens=2573691 estimated_cost_usd=$10.554345
+  prompt_tokens=2337585 completion_tokens=236106 tokens_per_second=207.37
+[2420/3900] elapsed=12439.06s last=2.44s rows_per_second=0.19 tokens=2585854 estimated_cost_usd=$10.601226
+  prompt_tokens=2348882 completion_tokens=236972 tokens_per_second=207.88
+[2430/3900] elapsed=12471.63s last=2.38s rows_per_second=0.19 tokens=2598030 estimated_cost_usd=$10.648458
+  prompt_tokens=2360166 completion_tokens=237864 tokens_per_second=208.32
+[2440/3900] elapsed=12496.83s last=2.76s rows_per_second=0.20 tokens=2610179 estimated_cost_usd=$10.695417
+  prompt_tokens=2371439 completion_tokens=238740 tokens_per_second=208.87
+[2450/3900] elapsed=12521.53s last=2.48s rows_per_second=0.20 tokens=2622206 estimated_cost_usd=$10.741674
+  prompt_tokens=2382618 completion_tokens=239588 tokens_per_second=209.42
+[2460/3900] elapsed=12546.24s last=2.41s rows_per_second=0.20 tokens=2634364 estimated_cost_usd=$10.788648
+  prompt_tokens=2393901 completion_tokens=240463 tokens_per_second=209.97
+[2470/3900] elapsed=12572.31s last=2.81s rows_per_second=0.20 tokens=2646551 estimated_cost_usd=$10.836021
+  prompt_tokens=2405187 completion_tokens=241364 tokens_per_second=210.51
+[2480/3900] elapsed=12598.03s last=2.42s rows_per_second=0.20 tokens=2658707 estimated_cost_usd=$10.883133
+  prompt_tokens=2416456 completion_tokens=242251 tokens_per_second=211.04
+[2490/3900] elapsed=12621.30s last=1.84s rows_per_second=0.20 tokens=2670742 estimated_cost_usd=$10.929606
+  prompt_tokens=2427627 completion_tokens=243115 tokens_per_second=211.61
+[2500/3900] elapsed=12645.86s last=2.16s rows_per_second=0.20 tokens=2682866 estimated_cost_usd=$10.976022
+  prompt_tokens=2438914 completion_tokens=243952 tokens_per_second=212.15
+[2510/3900] elapsed=12669.70s last=2.61s rows_per_second=0.20 tokens=2694990 estimated_cost_usd=$11.022594
+  prompt_tokens=2450188 completion_tokens=244802 tokens_per_second=212.71
+[2520/3900] elapsed=12696.82s last=3.15s rows_per_second=0.20 tokens=2707123 estimated_cost_usd=$11.069433
+  prompt_tokens=2461451 completion_tokens=245672 tokens_per_second=213.21
+[2530/3900] elapsed=12718.33s last=2.21s rows_per_second=0.20 tokens=2719096 estimated_cost_usd=$11.115000
+  prompt_tokens=2472620 completion_tokens=246476 tokens_per_second=213.79
+[2540/3900] elapsed=12741.91s last=2.18s rows_per_second=0.20 tokens=2731214 estimated_cost_usd=$11.161494
+  prompt_tokens=2483893 completion_tokens=247321 tokens_per_second=214.35
+[2550/3900] elapsed=12764.62s last=2.12s rows_per_second=0.20 tokens=2743339 estimated_cost_usd=$11.208057
+  prompt_tokens=2495169 completion_tokens=248170 tokens_per_second=214.92
+[2560/3900] elapsed=12788.91s last=2.72s rows_per_second=0.20 tokens=2755455 estimated_cost_usd=$11.254689
+  prompt_tokens=2506428 completion_tokens=249027 tokens_per_second=215.46
+[2570/3900] elapsed=12810.85s last=2.55s rows_per_second=0.20 tokens=2767440 estimated_cost_usd=$11.300532
+  prompt_tokens=2517589 completion_tokens=249851 tokens_per_second=216.02
+[2580/3900] elapsed=12834.65s last=2.00s rows_per_second=0.20 tokens=2779583 estimated_cost_usd=$11.347473
+  prompt_tokens=2528856 completion_tokens=250727 tokens_per_second=216.57
+[2590/3900] elapsed=12862.59s last=2.16s rows_per_second=0.20 tokens=2791722 estimated_cost_usd=$11.394510
+  prompt_tokens=2540110 completion_tokens=251612 tokens_per_second=217.04
+[2600/3900] elapsed=12886.89s last=1.98s rows_per_second=0.20 tokens=2803877 estimated_cost_usd=$11.441919
+  prompt_tokens=2551353 completion_tokens=252524 tokens_per_second=217.58
+[2610/3900] elapsed=12912.39s last=2.00s rows_per_second=0.20 tokens=2815900 estimated_cost_usd=$11.488476
+  prompt_tokens=2562502 completion_tokens=253398 tokens_per_second=218.08
+[2620/3900] elapsed=12939.63s last=3.44s rows_per_second=0.20 tokens=2828027 estimated_cost_usd=$11.535345
+  prompt_tokens=2573755 completion_tokens=254272 tokens_per_second=218.56
+[2630/3900] elapsed=12963.62s last=2.13s rows_per_second=0.20 tokens=2840179 estimated_cost_usd=$11.582553
+  prompt_tokens=2585011 completion_tokens=255168 tokens_per_second=219.09
+[2640/3900] elapsed=12986.73s last=1.99s rows_per_second=0.20 tokens=2852302 estimated_cost_usd=$11.629530
+  prompt_tokens=2596250 completion_tokens=256052 tokens_per_second=219.63
+[2650/3900] elapsed=13009.94s last=2.40s rows_per_second=0.20 tokens=2864312 estimated_cost_usd=$11.675988
+  prompt_tokens=2607391 completion_tokens=256921 tokens_per_second=220.16
+[2660/3900] elapsed=13034.40s last=2.93s rows_per_second=0.20 tokens=2876373 estimated_cost_usd=$11.722659
+  prompt_tokens=2618578 completion_tokens=257795 tokens_per_second=220.68
+[2670/3900] elapsed=13057.67s last=2.51s rows_per_second=0.20 tokens=2888399 estimated_cost_usd=$11.768961
+  prompt_tokens=2629752 completion_tokens=258647 tokens_per_second=221.20
+[2680/3900] elapsed=13080.85s last=2.05s rows_per_second=0.20 tokens=2900408 estimated_cost_usd=$11.815140
+  prompt_tokens=2640915 completion_tokens=259493 tokens_per_second=221.73
+[2690/3900] elapsed=13103.94s last=2.33s rows_per_second=0.21 tokens=2912299 estimated_cost_usd=$11.860677
+  prompt_tokens=2651984 completion_tokens=260315 tokens_per_second=222.25
+[2700/3900] elapsed=13127.91s last=2.16s rows_per_second=0.21 tokens=2924334 estimated_cost_usd=$11.907126
+  prompt_tokens=2663157 completion_tokens=261177 tokens_per_second=222.76
+[2710/3900] elapsed=13149.44s last=2.31s rows_per_second=0.21 tokens=2936372 estimated_cost_usd=$11.953584
+  prompt_tokens=2674333 completion_tokens=262039 tokens_per_second=223.31
+[2720/3900] elapsed=13173.70s last=2.67s rows_per_second=0.21 tokens=2948376 estimated_cost_usd=$11.999736
+  prompt_tokens=2685492 completion_tokens=262884 tokens_per_second=223.81
+[2730/3900] elapsed=13195.08s last=2.46s rows_per_second=0.21 tokens=2960283 estimated_cost_usd=$12.045609
+  prompt_tokens=2696553 completion_tokens=263730 tokens_per_second=224.35
+[2740/3900] elapsed=13218.61s last=1.92s rows_per_second=0.21 tokens=2972474 estimated_cost_usd=$12.092550
+  prompt_tokens=2707880 completion_tokens=264594 tokens_per_second=224.87
+[2750/3900] elapsed=13243.29s last=2.08s rows_per_second=0.21 tokens=2984685 estimated_cost_usd=$12.139947
+  prompt_tokens=2719194 completion_tokens=265491 tokens_per_second=225.37
+[2760/3900] elapsed=13267.55s last=2.11s rows_per_second=0.21 tokens=2996844 estimated_cost_usd=$12.186696
+  prompt_tokens=2730497 completion_tokens=266347 tokens_per_second=225.88
+[2770/3900] elapsed=13291.41s last=2.15s rows_per_second=0.21 tokens=3008950 estimated_cost_usd=$12.233778
+  prompt_tokens=2741706 completion_tokens=267244 tokens_per_second=226.38
+[2780/3900] elapsed=13319.32s last=2.17s rows_per_second=0.21 tokens=3021137 estimated_cost_usd=$12.280827
+  prompt_tokens=2753019 completion_tokens=268118 tokens_per_second=226.82
+[2790/3900] elapsed=13342.85s last=2.20s rows_per_second=0.21 tokens=3033342 estimated_cost_usd=$12.328110
+  prompt_tokens=2764335 completion_tokens=269007 tokens_per_second=227.34
+[2800/3900] elapsed=13365.87s last=1.98s rows_per_second=0.21 tokens=3045512 estimated_cost_usd=$12.375072
+  prompt_tokens=2775634 completion_tokens=269878 tokens_per_second=227.86
+[2810/3900] elapsed=13387.45s last=2.00s rows_per_second=0.21 tokens=3057569 estimated_cost_usd=$12.421515
+  prompt_tokens=2786835 completion_tokens=270734 tokens_per_second=228.39
+[2820/3900] elapsed=13413.52s last=2.28s rows_per_second=0.21 tokens=3069720 estimated_cost_usd=$12.468456
+  prompt_tokens=2798112 completion_tokens=271608 tokens_per_second=228.85
+[2830/3900] elapsed=13436.84s last=2.20s rows_per_second=0.21 tokens=3081868 estimated_cost_usd=$12.515508
+  prompt_tokens=2809376 completion_tokens=272492 tokens_per_second=229.36
+[2840/3900] elapsed=13464.20s last=3.10s rows_per_second=0.21 tokens=3093973 estimated_cost_usd=$12.562047
+  prompt_tokens=2820629 completion_tokens=273344 tokens_per_second=229.79
+[2850/3900] elapsed=13486.79s last=3.02s rows_per_second=0.21 tokens=3105962 estimated_cost_usd=$12.607974
+  prompt_tokens=2831788 completion_tokens=274174 tokens_per_second=230.30
+[2860/3900] elapsed=13508.95s last=2.06s rows_per_second=0.21 tokens=3118083 estimated_cost_usd=$12.654633
+  prompt_tokens=2843051 completion_tokens=275032 tokens_per_second=230.82
+[2870/3900] elapsed=13531.78s last=2.86s rows_per_second=0.21 tokens=3130259 estimated_cost_usd=$12.702081
+  prompt_tokens=2854317 completion_tokens=275942 tokens_per_second=231.33
+[2880/3900] elapsed=13556.88s last=2.96s rows_per_second=0.21 tokens=3142425 estimated_cost_usd=$12.749583
+  prompt_tokens=2865566 completion_tokens=276859 tokens_per_second=231.80
+[2890/3900] elapsed=13580.70s last=2.37s rows_per_second=0.21 tokens=3154425 estimated_cost_usd=$12.795771
+  prompt_tokens=2876717 completion_tokens=277708 tokens_per_second=232.27
+[2900/3900] elapsed=13604.58s last=2.53s rows_per_second=0.21 tokens=3166631 estimated_cost_usd=$12.843177
+  prompt_tokens=2888024 completion_tokens=278607 tokens_per_second=232.76
+[2910/3900] elapsed=13629.27s last=2.56s rows_per_second=0.21 tokens=3178824 estimated_cost_usd=$12.890544
+  prompt_tokens=2899318 completion_tokens=279506 tokens_per_second=233.24
+[2920/3900] elapsed=13652.81s last=1.91s rows_per_second=0.21 tokens=3190992 estimated_cost_usd=$12.937668
+  prompt_tokens=2910601 completion_tokens=280391 tokens_per_second=233.72
+[2930/3900] elapsed=13675.45s last=1.93s rows_per_second=0.21 tokens=3203048 estimated_cost_usd=$12.984240
+  prompt_tokens=2921790 completion_tokens=281258 tokens_per_second=234.22
+[2940/3900] elapsed=13699.81s last=2.44s rows_per_second=0.21 tokens=3215216 estimated_cost_usd=$13.031244
+  prompt_tokens=2933083 completion_tokens=282133 tokens_per_second=234.69
+[2950/3900] elapsed=13725.47s last=2.72s rows_per_second=0.21 tokens=3227399 estimated_cost_usd=$13.078437
+  prompt_tokens=2944379 completion_tokens=283020 tokens_per_second=235.14
+[2960/3900] elapsed=13748.52s last=2.68s rows_per_second=0.22 tokens=3239566 estimated_cost_usd=$13.125594
+  prompt_tokens=2955658 completion_tokens=283908 tokens_per_second=235.63
+[2970/3900] elapsed=13771.86s last=1.90s rows_per_second=0.22 tokens=3251618 estimated_cost_usd=$13.172202
+  prompt_tokens=2966839 completion_tokens=284779 tokens_per_second=236.11
+[2980/3900] elapsed=13792.45s last=2.52s rows_per_second=0.22 tokens=3263730 estimated_cost_usd=$13.218678
+  prompt_tokens=2978106 completion_tokens=285624 tokens_per_second=236.63
+[2990/3900] elapsed=13817.74s last=1.73s rows_per_second=0.22 tokens=3275860 estimated_cost_usd=$13.265580
+  prompt_tokens=2989360 completion_tokens=286500 tokens_per_second=237.08
+[retry 1/2] task=F variant=0 validation=not_json
+[3000/3900] elapsed=13841.13s last=2.06s rows_per_second=0.22 tokens=3287943 estimated_cost_usd=$13.311909
+  prompt_tokens=3000603 completion_tokens=287340 tokens_per_second=237.55

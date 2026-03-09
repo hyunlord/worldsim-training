@@ -13,6 +13,7 @@ from scripts.generate_data import (
     load_catalogs,
     load_generation_config,
     load_prompt_assets,
+    parse_and_validate,
     render_prompt,
 )
 
@@ -336,11 +337,19 @@ def bootstrap_v31_assets(tmp_path: Path) -> tuple[Path, Path]:
     )
     (prompts_dir / "teacher" / "task_b.txt").write_text(
         '[TASK] B\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[PERS] {personality_keywords}\n'
+        '[RULE] emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n'
+        '[RULE] register must be exactly one of: haera, hao, hae\n'
+        '[ENUMS] joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n'
+        '[ENUMS] haera, hao, hae\n'
         '{"text_ko":"...", "text_en":"...", "register":"haera", "emotion_expressed":"{emotion_id}", "intensity":0.9, "mimetics":["{mimetic}"], "temperament_influence":"high_HA_amplified_fear"}',
         encoding="utf-8",
     )
     (prompts_dir / "teacher" / "task_c.txt").write_text(
         '[TASK] C\n[TEMP] {temperament_line}\n[STRESS] {stress}\n[WORLD] {world_id}\n[ROLE] {speaker_role}\n'
+        '[RULE] emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n'
+        '[RULE] register must be exactly one of: haera, hao, hae\n'
+        '[ENUMS] joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n'
+        '[ENUMS] haera, hao, hae\n'
         '{"speech_ko":"...", "speech_en":"...", "register":"{register}", "emotion_expressed":"{emotion_id}", "speaker_role":"{speaker_role}", "temperament_tone":"choleric_directness"}',
         encoding="utf-8",
     )
@@ -361,6 +370,8 @@ def bootstrap_v31_assets(tmp_path: Path) -> tuple[Path, Path]:
     )
     (prompts_dir / "teacher" / "task_g.txt").write_text(
         '[TASK] G\n[TEMP] {temperament_line}\n[PERS] {personality_keywords}\n[ORACLE] {oracle_text_ko}\n[WORLD] {world_id}\n'
+        '[RULE] register must be exactly one of: haera, hao, hae\n'
+        '[ENUMS] haera, hao, hae\n'
         '{"interpretation_ko":"...", "interpretation_en":"...", "action_tendency":"mobilize", "confidence":0.9, "register":"hao", "misinterpretation_type":"overconfident_literal", "temperament_bias":"choleric_action_oriented"}',
         encoding="utf-8",
     )
@@ -582,12 +593,18 @@ def test_generate_dataset_retries_transient_failures_and_checkpoints_completed_r
         }
 
     output_path = tmp_path / "data" / "raw" / "checkpoint.jsonl"
-    with pytest.raises(RuntimeError, match="persistent"):
-        generate_dataset(tmp_path, generator=flaky_generator, limit=2, output_path=output_path, verbose=False)
+    result = generate_dataset(tmp_path, generator=flaky_generator, limit=2, output_path=output_path, verbose=False)
+    skipped_path = output_path.parent / "skipped.jsonl"
 
     rows = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    skipped_rows = [json.loads(line) for line in skipped_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     assert attempts["count"] == 4
+    assert result.count == 1
+    assert result.skipped_count == 1
     assert len(rows) == 1
+    assert len(skipped_rows) == 1
+    assert skipped_rows[0]["task"] == "A"
+    assert skipped_rows[0]["skip_reason"] == "persistent"
     assert json.loads(rows[0]["output"])["dominant_trait"] == "conscientiousness"
 
 
@@ -622,6 +639,89 @@ def test_generate_dataset_retries_validation_failures_before_checkpointing(tmp_p
     assert attempts["count"] == 2
     assert len(rows) == 1
     assert json.loads(rows[0]["output"])["dominant_trait"] == "conscientiousness"
+
+
+def test_parse_and_validate_normalizes_emotion_and_register_variants_before_validation(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+    settings = load_generation_config(tmp_path / "config")
+    job = next(job for job in build_jobs(tmp_path, task_filter={"B"}) if job["task"] == "B")
+
+    normalized, validation_error = parse_and_validate(
+        compact_json(
+            {
+                "text_ko": "풀숲이 거세게 흔들렸다. 온몸이 오들오들 떨리며 물러섰다.",
+                "text_en": "The bushes shook hard. Trembling all over, they backed away.",
+                "register": "해라체",
+                "emotion_expressed": "공포",
+                "intensity": 0.9,
+                "mimetics": ["오들오들"],
+                "temperament_influence": "high_HA_amplified_fear",
+            }
+        ),
+        job,
+        settings,
+    )
+
+    assert validation_error is None
+    payload = json.loads(normalized)
+    assert payload["register"] == "haera"
+    assert payload["emotion_expressed"] == "fear"
+
+
+def test_generate_dataset_skips_unrecoverable_validation_failures_and_records_them(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+    settings = load_generation_config(tmp_path / "config")
+    settings["task_variants"] = {"A": 0, "B": 1, "C": 0, "D": 0, "E": 0, "F": 0, "G": 0, "H": 0}
+    settings["provider"]["retry_attempts"] = 2
+    settings["provider"]["retry_backoff_seconds"] = 0
+    write_yaml(tmp_path / "config" / "generation.yaml", settings)
+
+    attempts = {"count": 0}
+
+    def invalid_generator(job: dict, system_prompt: str) -> dict:
+        attempts["count"] += 1
+        return {
+            "output": compact_json(
+                {
+                    "text_ko": "풀숲이 거세게 흔들렸다. 온몸이 오들오들 떨리며 물러섰다.",
+                    "text_en": "The bushes shook hard. Trembling all over, they backed away.",
+                    "register": "haera",
+                    "emotion_expressed": "mood",
+                    "intensity": 0.9,
+                    "mimetics": ["오들오들"],
+                    "temperament_influence": "high_HA_amplified_fear",
+                }
+            ),
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+            "model": "test-model",
+        }
+
+    output_path = tmp_path / "data" / "raw" / "skip_validation.jsonl"
+    result = generate_dataset(tmp_path, generator=invalid_generator, limit=1, output_path=output_path, verbose=False)
+    skipped_path = output_path.parent / "skipped.jsonl"
+
+    assert result.count == 0
+    assert result.skipped_count == 1
+    assert attempts["count"] == 2
+    assert output_path.read_text(encoding="utf-8") == ""
+    skipped_rows = [json.loads(line) for line in skipped_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert len(skipped_rows) == 1
+    assert skipped_rows[0]["task"] == "B"
+    assert skipped_rows[0]["skip_reason"] == "generation_validation_failed:invalid_emotion"
+
+
+def test_rendered_task_b_prompt_repeats_exact_enum_constraints(tmp_path: Path) -> None:
+    bootstrap_v31_assets(tmp_path)
+    job = next(job for job in build_jobs(tmp_path, task_filter={"B"}) if job["task"] == "B")
+    prompt = job["prompt"]
+
+    emotion_line = "emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation"
+    register_line = "register must be exactly one of: haera, hao, hae"
+
+    assert emotion_line in prompt
+    assert register_line in prompt
+    assert prompt.count("joy, sadness, fear, anger, trust, disgust, surprise, anticipation") >= 2
+    assert prompt.count("haera, hao, hae") >= 2
 
 
 def test_render_prompt_preserves_literal_placeholder_tokens_inside_values() -> None:
