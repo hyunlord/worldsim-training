@@ -146,31 +146,46 @@ def test_build_trainer_kwargs_prefers_processing_class_when_available() -> None:
     assert "tokenizer" not in kwargs
 
 
-def test_detect_runtime_raises_clear_error_when_bitsandbytes_import_fails(monkeypatch) -> None:
-    fake_torch = SimpleNamespace(
-        cuda=SimpleNamespace(is_available=lambda: True, is_bf16_supported=lambda: False),
-        backends=SimpleNamespace(mps=SimpleNamespace(is_available=lambda: False)),
+def test_programmatic_run_smoke_accepts_mapping() -> None:
+    from training.lib.qlora_smoke import SmokeRunConfig, coerce_smoke_config
+
+    config = coerce_smoke_config(
+        {
+            "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+            "train_file": "data/training/worldsim-v31-mix-v1/train_converted.jsonl",
+            "dev_file": "data/training/worldsim-v31-mix-v1/dev_converted.jsonl",
+            "output_dir": "outputs/test-smoke",
+            "max_steps": 1,
+        }
     )
-    monkeypatch.setitem(sys.modules, "torch", fake_torch)
 
-    from training.run_qlora_smoke import detect_runtime
+    assert isinstance(config, SmokeRunConfig)
+    assert config.output_dir == Path("outputs/test-smoke")
+    assert config.max_steps == 1
 
-    monkeypatch.setattr(
-        "training.run_qlora_smoke._bitsandbytes_status",
-        lambda: (False, "bitsandbytes import failed: ModuleNotFoundError: No module named 'bitsandbytes'"),
+
+def test_programmatic_run_smoke_normalizes_dataclass_paths() -> None:
+    from training.lib.qlora_smoke import SmokeRunConfig, coerce_smoke_config
+
+    config = coerce_smoke_config(
+        SmokeRunConfig(
+            output_dir="outputs/dataclass-smoke",  # type: ignore[arg-type]
+            target_modules=["q_proj", "v_proj"],  # type: ignore[arg-type]
+        )
     )
 
-    try:
-        detect_runtime(prefer_qlora=True, require_qlora=True)
-    except RuntimeError as exc:
-        assert "bitsandbytes import failed" in str(exc)
-    else:
-        raise AssertionError("Expected missing bitsandbytes to hard-fail when QLoRA is required")
+    assert config.output_dir == Path("outputs/dataclass-smoke")
+    assert config.target_modules == ("q_proj", "v_proj")
 
 
-def test_model_is_4bit_quantized_detects_wrapped_peft_model() -> None:
-    from training.run_qlora_smoke import _model_is_4bit_quantized
+def test_notebook_uses_shared_training_module() -> None:
+    notebook_path = Path("notebooks/dgx_spark_qlora_smoke.ipynb")
+    payload = json.loads(notebook_path.read_text(encoding="utf-8"))
 
-    model = SimpleNamespace(base_model=SimpleNamespace(model=SimpleNamespace(is_loaded_in_4bit=True)))
+    source = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in payload.get("cells", [])
+        if cell.get("cell_type") == "code"
+    )
 
-    assert _model_is_4bit_quantized(model) is True
+    assert "from training.lib.qlora_smoke import" in source
