@@ -567,73 +567,143 @@ def count_parseable_json_samples(samples: Sequence[Mapping[str, Any]]) -> dict[s
     }
 
 
+def strip_json_fence(text: str) -> str:
+    stripped = text.strip()
+    if not stripped.startswith("```"):
+        return stripped
+
+    lines = stripped.splitlines()
+    if len(lines) >= 2 and lines[0].strip().startswith("```") and lines[-1].strip() == "```":
+        return "\n".join(lines[1:-1]).strip()
+    return stripped
+
+
+def _parse_json_payload(text: str) -> tuple[Any | None, str | None]:
+    try:
+        return json.loads(text), None
+    except Exception as exc:  # noqa: BLE001
+        return None, type(exc).__name__
+
+
+def _enum_drift_issues(task: str, payload: Any) -> list[tuple[str, str]]:
+    if not isinstance(payload, dict):
+        return []
+
+    issues: list[tuple[str, str]] = []
+    if task in {"B", "C"}:
+        emotion_value = payload.get("emotion_expressed")
+        register_value = payload.get("register")
+        if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
+            issues.append(("emotion_expressed", str(emotion_value)))
+        if register_value is not None and register_value not in VALID_REGISTERS:
+            issues.append(("register", str(register_value)))
+    elif task == "F":
+        emotion_value = payload.get("emotion")
+        transition_type = payload.get("transition_type")
+        if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
+            issues.append(("emotion", str(emotion_value)))
+        if transition_type is not None and transition_type not in VALID_TRANSITION_TYPES:
+            issues.append(("transition_type", str(transition_type)))
+    elif task == "G":
+        action_tendency = payload.get("action_tendency")
+        register_value = payload.get("register")
+        misinterpretation_type = payload.get("misinterpretation_type")
+        if action_tendency is not None and action_tendency not in VALID_ACTION_TENDENCIES:
+            issues.append(("action_tendency", str(action_tendency)))
+        if register_value is not None and register_value not in VALID_REGISTERS:
+            issues.append(("register", str(register_value)))
+        if misinterpretation_type is not None and misinterpretation_type not in VALID_MISINTERPRETATION_TYPES:
+            issues.append(("misinterpretation_type", str(misinterpretation_type)))
+    return issues
+
+
+def analyze_sample_generation(sample: Mapping[str, Any]) -> dict[str, Any]:
+    task = str(sample.get("task", "unknown"))
+    raw_text = str(sample.get("generated_assistant", "")).strip()
+    stripped_text = strip_json_fence(raw_text)
+    fenced_json = stripped_text != raw_text
+
+    raw_payload, raw_error = _parse_json_payload(raw_text)
+    stripped_payload, stripped_error = _parse_json_payload(stripped_text)
+    payload = raw_payload if raw_payload is not None else stripped_payload
+    issues = _enum_drift_issues(task, payload)
+
+    raw_parseable = raw_payload is not None
+    stripped_parseable = stripped_payload is not None
+    recoverable_fenced = fenced_json and not raw_parseable and stripped_parseable
+    malformed_json = not stripped_parseable
+
+    if malformed_json:
+        classification = "malformed_json"
+    elif recoverable_fenced and issues:
+        classification = "fenced_recoverable_with_enum_drift"
+    elif recoverable_fenced:
+        classification = "fenced_recoverable"
+    elif issues:
+        classification = "enum_drift"
+    else:
+        classification = "raw_parseable"
+
+    return {
+        "task": task,
+        "raw_parseable_json": raw_parseable,
+        "fenced_json": fenced_json,
+        "fence_stripped_parseable_json": stripped_parseable,
+        "recoverable_fenced_json": recoverable_fenced,
+        "malformed_json": malformed_json,
+        "enum_drift_total": len(issues),
+        "enum_drift_fields": [field_name for field_name, _ in issues],
+        "classification": classification,
+        "raw_json_parse_error": str(sample.get("json_parse_error") or raw_error) if (sample.get("json_parse_error") or raw_error) else None,
+        "stripped_json_parse_error": stripped_error,
+        "generated_assistant": raw_text,
+        "stripped_assistant": stripped_text,
+    }
+
+
 def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     json_parse_errors = Counter(str(row.get("json_parse_error") or "ok") for row in samples)
-    fenced_json = 0
     enum_drift_fields: Counter[str] = Counter()
     enum_drift_examples: list[dict[str, Any]] = []
+    recoverable_examples: list[dict[str, Any]] = []
+    analyses = [analyze_sample_generation(sample) for sample in samples]
+    classifications = Counter(analysis["classification"] for analysis in analyses)
 
-    for row in samples:
-        generated_text = str(row.get("generated_assistant", "")).strip()
-        if generated_text.startswith("```") or "```json" in generated_text or "\n```" in generated_text:
-            fenced_json += 1
-
-        if row.get("json_parse_error"):
-            continue
-
-        try:
-            payload = json.loads(generated_text)
-        except Exception:  # noqa: BLE001
-            continue
-
-        task = str(row.get("task", "unknown"))
-        issues: list[tuple[str, str]] = []
-
-        if task in {"B", "C"}:
-            emotion_value = payload.get("emotion_expressed")
-            register_value = payload.get("register")
-            if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
-                issues.append(("emotion_expressed", str(emotion_value)))
-            if register_value is not None and register_value not in VALID_REGISTERS:
-                issues.append(("register", str(register_value)))
-        elif task == "F":
-            emotion_value = payload.get("emotion")
-            transition_type = payload.get("transition_type")
-            if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
-                issues.append(("emotion", str(emotion_value)))
-            if transition_type is not None and transition_type not in VALID_TRANSITION_TYPES:
-                issues.append(("transition_type", str(transition_type)))
-        elif task == "G":
-            action_tendency = payload.get("action_tendency")
-            register_value = payload.get("register")
-            misinterpretation_type = payload.get("misinterpretation_type")
-            if action_tendency is not None and action_tendency not in VALID_ACTION_TENDENCIES:
-                issues.append(("action_tendency", str(action_tendency)))
-            if register_value is not None and register_value not in VALID_REGISTERS:
-                issues.append(("register", str(register_value)))
-            if misinterpretation_type is not None and misinterpretation_type not in VALID_MISINTERPRETATION_TYPES:
-                issues.append(("misinterpretation_type", str(misinterpretation_type)))
-
-        for field_name, bad_value in issues:
+    for analysis in analyses:
+        task = str(analysis["task"])
+        for field_name in analysis["enum_drift_fields"]:
             enum_drift_fields[field_name] += 1
             if len(enum_drift_examples) < 5:
                 enum_drift_examples.append(
                     {
                         "task": task,
                         "field": field_name,
-                        "value": bad_value,
-                        "generated_assistant": generated_text,
+                        "generated_assistant": analysis["generated_assistant"],
                     }
                 )
+        if analysis["recoverable_fenced_json"] and len(recoverable_examples) < 3:
+            recoverable_examples.append(
+                {
+                    "task": task,
+                    "before": analysis["generated_assistant"],
+                    "after": analysis["stripped_assistant"],
+                }
+            )
 
-    parseable_counts = count_parseable_json_samples(samples)
     return {
-        **parseable_counts,
-        "fenced_json": fenced_json,
+        "total": len(samples),
+        "raw_parseable_json": sum(1 for analysis in analyses if analysis["raw_parseable_json"]),
+        "fenced_json": sum(1 for analysis in analyses if analysis["fenced_json"]),
+        "fence_stripped_parseable_json": sum(1 for analysis in analyses if analysis["fence_stripped_parseable_json"]),
+        "recoverable_fenced_json": sum(1 for analysis in analyses if analysis["recoverable_fenced_json"]),
+        "malformed_json": sum(1 for analysis in analyses if analysis["malformed_json"]),
         "json_parse_error_types": dict(sorted(json_parse_errors.items())),
         "enum_drift_total": sum(enum_drift_fields.values()),
+        "enum_drift_samples": sum(1 for analysis in analyses if analysis["enum_drift_total"]),
         "enum_drift_fields": dict(sorted(enum_drift_fields.items())),
         "enum_drift_examples": enum_drift_examples,
+        "recoverable_examples": recoverable_examples,
+        "classifications": dict(sorted(classifications.items())),
     }
 
 

@@ -198,7 +198,23 @@ def test_true_qlora_preflight_surfaces_blocker(monkeypatch) -> None:
 
 
 def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
-    from training.lib.qlora_smoke import summarize_sample_generations
+    from training.lib.qlora_smoke import analyze_sample_generation, strip_json_fence, summarize_sample_generations
+
+    fenced = "```json\n{\"action_id\": 0}\n```"
+    assert strip_json_fence(fenced) == "{\"action_id\": 0}"
+
+    analyzed = analyze_sample_generation(
+        {
+            "task": "E",
+            "generated_assistant": fenced,
+            "json_parse_error": "JSONDecodeError",
+        }
+    )
+
+    assert analyzed["classification"] == "fenced_recoverable"
+    assert analyzed["raw_parseable_json"] is False
+    assert analyzed["fence_stripped_parseable_json"] is True
+    assert analyzed["malformed_json"] is False
 
     samples = [
         {
@@ -221,9 +237,14 @@ def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
     summary = summarize_sample_generations(samples)
 
     assert summary["total"] == 3
+    assert summary["raw_parseable_json"] == 2
     assert summary["fenced_json"] == 1
+    assert summary["fence_stripped_parseable_json"] == 3
+    assert summary["recoverable_fenced_json"] == 1
+    assert summary["malformed_json"] == 0
     assert summary["enum_drift_total"] == 1
     assert summary["enum_drift_fields"]["emotion"] == 1
+    assert len(summary["recoverable_examples"]) == 1
 
 
 def test_notebook_uses_shared_training_module() -> None:
@@ -240,3 +261,5 @@ def test_notebook_uses_shared_training_module() -> None:
     assert "get_true_qlora_preflight" in source
     assert "load_json_artifact" in source
     assert "summarize_sample_generations" in source
+    assert "recoverable_fenced_json" in source
+    assert "recommended_next_action" in source

@@ -9,6 +9,7 @@ from .qlora_smoke import (
     build_trainer_kwargs,
     build_training_arguments_kwargs,
     coerce_smoke_config,
+    analyze_sample_generation,
     count_parseable_json_samples,
     detect_runtime,
     get_environment_summary,
@@ -23,6 +24,7 @@ from .qlora_smoke import (
     render_conversation,
     run_smoke,
     run_smoke_or_raise,
+    strip_json_fence,
     summarize_sample_generations,
 )
 
@@ -37,6 +39,7 @@ __all__ = [
     "build_trainer_kwargs",
     "build_training_arguments_kwargs",
     "coerce_smoke_config",
+    "analyze_sample_generation",
     "count_parseable_json_samples",
     "detect_runtime",
     "get_environment_summary",
@@ -51,5 +54,6 @@ __all__ = [
     "render_conversation",
     "run_smoke",
     "run_smoke_or_raise",
+    "strip_json_fence",
     "summarize_sample_generations",
 ]

@@ -18,6 +18,7 @@ from training.lib.qlora_smoke import (  # noqa: F401
     build_trainer_kwargs,
     build_training_arguments_kwargs,
     coerce_smoke_config,
+    analyze_sample_generation,
     count_parseable_json_samples,
     detect_runtime,
     get_environment_summary,
@@ -32,6 +33,7 @@ from training.lib.qlora_smoke import (  # noqa: F401
     render_conversation,
     run_smoke,
     run_smoke_or_raise,
+    strip_json_fence,
     summarize_sample_generations,
 )
 
