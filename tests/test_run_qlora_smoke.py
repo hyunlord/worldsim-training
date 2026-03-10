@@ -323,6 +323,22 @@ def test_trim_trivial_json_tail_removes_only_trailing_comma() -> None:
     assert reason is None
 
 
+def test_trim_follow_on_json_object_keeps_only_first_object() -> None:
+    from training.lib.qlora_smoke import _trim_follow_on_json_object
+
+    trimmed, reason = _trim_follow_on_json_object('{"task":"A"},{"task":"B"}')
+    assert trimmed == '{"task":"A"}'
+    assert reason == "trim_follow_on_json_object"
+
+    spaced_trimmed, reason = _trim_follow_on_json_object('{"task":"A"}   {"task":"B"}')
+    assert spaced_trimmed == '{"task":"A"}'
+    assert reason == "trim_follow_on_json_object"
+
+    unchanged, reason = _trim_follow_on_json_object('{"task":"A"} trailing words')
+    assert unchanged == '{"task":"A"} trailing words'
+    assert reason is None
+
+
 def test_build_sample_prompt_messages_appends_generic_generation_rules() -> None:
     from training.lib.qlora_smoke import _build_sample_prompt_messages
 
@@ -341,6 +357,34 @@ def test_build_sample_prompt_messages_appends_generic_generation_rules() -> None
     assert user_content.startswith("[과제]")
     assert "JSON object 하나만 출력하라." in user_content
     assert "첫 글자는 반드시 { 여야 한다." in user_content
+
+
+def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_messages = _build_sample_prompt_messages(
+        {
+            "task": "G",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {"role": "user", "content": "[TASK] G"},
+                {"role": "assistant", "content": "{\"action_tendency\":\"wait\"}"},
+            ],
+        }
+    )
+
+    user_content = prompt_messages[-1]["content"]
+    assert "interpretation_ko는 한국어 한두 문장만 짧게 써라." in user_content
+    assert "action_tendency는 정확히 one of" in user_content
+    assert "misinterpretation_type는 정확히 one of" in user_content
+
+
+def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
+    from training.lib.qlora_smoke import _sample_generation_max_new_tokens
+
+    assert _sample_generation_max_new_tokens("G") == 512
+    assert _sample_generation_max_new_tokens("H") == 512
+    assert _sample_generation_max_new_tokens("F") == 288
 
 
 def test_normalize_known_enum_values_only_fixes_case_style() -> None:

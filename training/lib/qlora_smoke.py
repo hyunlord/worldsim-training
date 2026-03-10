@@ -529,17 +529,34 @@ def _select_generation_rows(train_rows: list[dict], eval_rows: list[dict]) -> li
 def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]]:
     prompt_messages = [dict(message) for message in row["messages"][:-1]]
     if prompt_messages and prompt_messages[-1]["role"] == "user":
+        task = str(row.get("task", "unknown"))
         prompt_messages[-1] = dict(prompt_messages[-1])
-        prompt_messages[-1]["content"] = prompt_messages[-1]["content"].rstrip() + SAMPLE_GENERATION_REMINDER
+        prompt_messages[-1]["content"] = (
+            prompt_messages[-1]["content"].rstrip()
+            + SAMPLE_GENERATION_REMINDER
+            + _task_specific_generation_reminder(task)
+        )
     return prompt_messages
 
 
 def _sample_generation_max_new_tokens(task: str) -> int:
     if task == "H":
-        return 384
-    if task in {"F", "G"}:
+        return 512
+    if task == "G":
+        return 512
+    if task == "F":
         return 288
     return 224
+
+
+def _task_specific_generation_reminder(task: str) -> str:
+    if task == "G":
+        return (
+            "- interpretation_ko는 한국어 한두 문장만 짧게 써라. 성격 설명을 길게 반복하지 마라.\n"
+            "- action_tendency는 정확히 one of: mobilize, defend, wait, retreat, celebrate, mourn\n"
+            "- misinterpretation_type는 정확히 one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction\n"
+        )
+    return ""
 
 
 def _json_object_complete(text: str) -> bool:
@@ -610,6 +627,9 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
         generated_tokens = generated[0][encoded["input_ids"].shape[1] :]
         raw_generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
         generated_text, normalization = _trim_trivial_json_tail(raw_generated_text)
+        generated_text, extra_normalization = _trim_follow_on_json_object(generated_text)
+        if extra_normalization:
+            normalization = extra_normalization if normalization is None else f"{normalization}+{extra_normalization}"
         normalization_details: list[dict[str, str]] = []
         parse_error = None
         try:
@@ -700,6 +720,26 @@ def _trim_trivial_json_tail(text: str) -> tuple[str, str | None]:
     trailing = stripped[end_index:]
     if trailing and not trailing.strip(" \t\r\n,"):
         return stripped[:end_index].strip(), "trim_trailing_comma"
+    return text, None
+
+
+def _trim_follow_on_json_object(text: str) -> tuple[str, str | None]:
+    stripped = text.strip()
+    if not stripped or stripped[0] not in "{[":
+        return text, None
+
+    try:
+        _, end_index = json.JSONDecoder().raw_decode(stripped)
+    except json.JSONDecodeError:
+        return text, None
+
+    trailing = stripped[end_index:]
+    trailing_lstripped = trailing.lstrip()
+    if trailing_lstripped.startswith(","):
+        trailing_lstripped = trailing_lstripped[1:].lstrip()
+
+    if trailing_lstripped.startswith(("{", "[")):
+        return stripped[:end_index].strip(), "trim_follow_on_json_object"
     return text, None
 
 
