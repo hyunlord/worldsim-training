@@ -307,25 +307,9 @@ def _torch_dtype(runtime: RuntimeConfig, torch: Any) -> Any:
 
 
 def _tokenize_rows(rows: list[dict], tokenizer: Any, max_length: int, Dataset: Any) -> Any:
-    formatted = [
-        {
-            "task": row.get("task"),
-            "messages": row["messages"],
-            "text": render_conversation(tokenizer, row["messages"], add_generation_prompt=False),
-        }
-        for row in rows
-    ]
-    dataset = Dataset.from_list(formatted)
-
-    def tokenize_batch(batch: dict) -> dict:
-        return tokenizer(
-            batch["text"],
-            truncation=True,
-            max_length=max_length,
-            padding=False,
-        )
-
-    return dataset.map(tokenize_batch, batched=True, remove_columns=dataset.column_names)
+    texts = [render_conversation(tokenizer, row["messages"], add_generation_prompt=False) for row in rows]
+    encoded = tokenizer(texts, truncation=True, max_length=max_length, padding=False)
+    return Dataset.from_dict(dict(encoded))
 
 
 def _load_model_and_tokenizer(config: SmokeRunConfig, runtime: RuntimeConfig, libs: dict[str, Any]) -> tuple[Any, Any]:
