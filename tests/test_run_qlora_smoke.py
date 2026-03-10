@@ -142,3 +142,48 @@ def test_build_trainer_kwargs_prefers_processing_class_when_available() -> None:
 
     assert kwargs["processing_class"] == "tokenizer"
     assert "tokenizer" not in kwargs
+
+
+def test_programmatic_run_smoke_accepts_mapping() -> None:
+    from training.lib.qlora_smoke import SmokeRunConfig, coerce_smoke_config
+
+    config = coerce_smoke_config(
+        {
+            "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+            "train_file": "data/training/worldsim-v31-mix-v1/train_converted.jsonl",
+            "dev_file": "data/training/worldsim-v31-mix-v1/dev_converted.jsonl",
+            "output_dir": "outputs/test-smoke",
+            "max_steps": 1,
+        }
+    )
+
+    assert isinstance(config, SmokeRunConfig)
+    assert config.output_dir == Path("outputs/test-smoke")
+    assert config.max_steps == 1
+
+
+def test_programmatic_run_smoke_normalizes_dataclass_paths() -> None:
+    from training.lib.qlora_smoke import SmokeRunConfig, coerce_smoke_config
+
+    config = coerce_smoke_config(
+        SmokeRunConfig(
+            output_dir="outputs/dataclass-smoke",  # type: ignore[arg-type]
+            target_modules=["q_proj", "v_proj"],  # type: ignore[arg-type]
+        )
+    )
+
+    assert config.output_dir == Path("outputs/dataclass-smoke")
+    assert config.target_modules == ("q_proj", "v_proj")
+
+
+def test_notebook_uses_shared_training_module() -> None:
+    notebook_path = Path("notebooks/dgx_spark_qlora_smoke.ipynb")
+    payload = json.loads(notebook_path.read_text(encoding="utf-8"))
+
+    source = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in payload.get("cells", [])
+        if cell.get("cell_type") == "code"
+    )
+
+    assert "from training.lib.qlora_smoke import" in source
