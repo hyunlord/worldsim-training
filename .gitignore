@@ -1,13 +1,58 @@
+# Environment & Virtual Environments
 .env
+.env.local
 .venv/
 .venv-train/
-.omx/
-.omx-local/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
 .pytest_cache/
 __pycache__/
 *.pyc
-outputs/
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
+# OMC & Agent orchestration
+.omx/
+.omx-local/
+.omx-shims/
+.agents/
+.codex/
+.omc/
+omx
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Outputs & Artifacts
+outputs/
 data/raw/*
 !data/raw/.gitkeep
 data/validated/*
@@ -18,3 +63,16 @@ artifacts/merged/*
 !artifacts/merged/.gitkeep
 artifacts/gguf/*
 !artifacts/gguf/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
