@@ -371,6 +371,132 @@ def test_normalize_known_enum_values_only_fixes_case_style() -> None:
     ]
 
 
+def test_validate_g_semantics_classifies_language_and_semantic_drift() -> None:
+    from training.lib.qlora_smoke import validate_g_semantics
+
+    language_drift = validate_g_semantics(
+        {
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "This oracle means we should advance with certainty.",
+                    "misinterpretation_type": "overconfident_literal",
+                },
+                ensure_ascii=False,
+            )
+        }
+    )
+    assert language_drift["semantic_status"] == "LANGUAGE_DRIFT"
+
+    semantic_drift = validate_g_semantics(
+        {
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "나는 이 말을 해석하고 곧 나서야 한다고 생각하오",
+                    "misinterpretation_type": "overconfident_literal",
+                },
+                ensure_ascii=False,
+            )
+        }
+    )
+    assert semantic_drift["semantic_status"] == "SEMANTIC_DRIFT"
+
+
+def test_validate_g_semantics_marks_valid_and_low_quality() -> None:
+    from training.lib.qlora_smoke import validate_g_semantics
+
+    valid = validate_g_semantics(
+        {
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "나는 이 말을 해석하며 과신으로 곧 나서야 한다고 생각하오",
+                    "misinterpretation_type": "overconfident_literal",
+                },
+                ensure_ascii=False,
+            )
+        }
+    )
+    assert valid["semantic_status"] == "VALID"
+
+    low_quality = validate_g_semantics(
+        {
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "나는 곧 나서야 하오",
+                    "misinterpretation_type": "cautious_reversal",
+                },
+                ensure_ascii=False,
+            )
+        }
+    )
+    assert low_quality["semantic_status"] == "LOW_QUALITY"
+
+
+def test_summarize_sample_generations_counts_g_semantic_statuses() -> None:
+    from training.lib.qlora_smoke import summarize_sample_generations
+
+    samples = [
+        {
+            "task": "G",
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "나는 이 말을 해석하며 과신으로 곧 나서야 한다고 생각하오",
+                    "misinterpretation_type": "overconfident_literal",
+                    "action_tendency": "wait",
+                    "register": "hao",
+                },
+                ensure_ascii=False,
+            ),
+            "json_parse_error": None,
+        },
+        {
+            "task": "G",
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "This oracle means we should defend the camp now.",
+                    "misinterpretation_type": "overconfident_literal",
+                    "action_tendency": "wait",
+                    "register": "hao",
+                },
+                ensure_ascii=False,
+            ),
+            "json_parse_error": None,
+        },
+        {
+            "task": "G",
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "나는 이 말을 해석하고 곧 나서야 한다고 생각하오",
+                    "misinterpretation_type": "overconfident_literal",
+                    "action_tendency": "wait",
+                    "register": "hao",
+                },
+                ensure_ascii=False,
+            ),
+            "json_parse_error": None,
+        },
+        {
+            "task": "G",
+            "generated_assistant": json.dumps(
+                {
+                    "interpretation_ko": "나는 곧 나서야 하오",
+                    "misinterpretation_type": "cautious_reversal",
+                    "action_tendency": "wait",
+                    "register": "hao",
+                },
+                ensure_ascii=False,
+            ),
+            "json_parse_error": None,
+        },
+    ]
+
+    summary = summarize_sample_generations(samples)
+
+    assert summary["semantic_valid"] == 1
+    assert summary["language_drift"] == 1
+    assert summary["semantic_drift"] == 1
+    assert summary["semantic_low_quality"] == 1
+
+
 def test_notebook_uses_shared_training_module() -> None:
     notebook_path = Path("notebooks/dgx_spark_qlora_smoke.ipynb")
     payload = json.loads(notebook_path.read_text(encoding="utf-8"))
@@ -389,6 +515,10 @@ def test_notebook_uses_shared_training_module() -> None:
     assert "build_operational_judgment" in source
     assert "recoverable_fenced_json" in source
     assert "failure_categories" in source
+    assert "semantic_valid" in source
+    assert "semantic_low_quality" in source
+    assert "semantic_drift" in source
+    assert "language_drift" in source
     assert "recommended_next_action" in source
     assert "RUN_MODE" in source
     assert "longer_smoke" in source

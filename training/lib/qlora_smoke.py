@@ -44,6 +44,12 @@ VALID_MISINTERPRETATION_TYPES = {
     "passive_deferral",
     "symbolic_abstraction",
 }
+INTERPRETATION_VERBS = ("해석", "판단", "생각", "느끼", "여기")
+SEMANTIC_HINTS = {
+    "overconfident_literal": ("과신", "단순", "확신"),
+    "fear_projection": ("두려움", "위협", "공포"),
+    "defensive_bias": ("방어", "정당화"),
+}
 
 
 @dataclass(slots=True)
@@ -822,6 +828,76 @@ def _enum_drift_issues(task: str, payload: Any) -> list[tuple[str, str]]:
     return issues
 
 
+def _hangul_ratio(text: str) -> float:
+    significant = [char for char in text if not char.isspace() and (char.isalpha() or ("\uac00" <= char <= "\ud7a3"))]
+    if not significant:
+        return 0.0
+    hangul = sum(1 for char in significant if "\uac00" <= char <= "\ud7a3")
+    return hangul / len(significant)
+
+
+def validate_g_semantics(sample: Mapping[str, Any]) -> dict[str, Any]:
+    raw_text = str(sample.get("generated_assistant", "")).strip()
+    stripped_text = strip_json_fence(raw_text)
+    payload, _ = _parse_json_payload(stripped_text)
+
+    if not isinstance(payload, dict):
+        return {
+            "semantic_status": "LOW_QUALITY",
+            "score": 0.0,
+            "reason": "generated_assistant_not_parseable",
+        }
+
+    interpretation = str(payload.get("interpretation_ko", "")).strip()
+    if not interpretation:
+        return {
+            "semantic_status": "LOW_QUALITY",
+            "score": 0.0,
+            "reason": "missing_interpretation_ko",
+        }
+
+    hangul_ratio = _hangul_ratio(interpretation)
+    if hangul_ratio < 0.6:
+        return {
+            "semantic_status": "LANGUAGE_DRIFT",
+            "score": round(hangul_ratio, 3),
+            "reason": f"low_hangul_ratio:{hangul_ratio:.3f}",
+        }
+
+    reasons: list[str] = []
+    score = 1.0
+
+    if not 12 <= len(interpretation) <= 200:
+        reasons.append("length_out_of_range")
+        score -= 0.25
+
+    if not any(verb in interpretation for verb in INTERPRETATION_VERBS):
+        reasons.append("missing_interpretation_verb")
+        score -= 0.25
+
+    misinterpretation_type = str(payload.get("misinterpretation_type", "")).strip()
+    hint_words = SEMANTIC_HINTS.get(misinterpretation_type)
+    if hint_words and not any(hint in interpretation for hint in hint_words):
+        return {
+            "semantic_status": "SEMANTIC_DRIFT",
+            "score": max(0.0, round(score - 0.35, 3)),
+            "reason": f"missing_semantic_hint:{misinterpretation_type}",
+        }
+
+    if reasons:
+        return {
+            "semantic_status": "LOW_QUALITY",
+            "score": max(0.0, round(score, 3)),
+            "reason": ",".join(reasons),
+        }
+
+    return {
+        "semantic_status": "VALID",
+        "score": round(score, 3),
+        "reason": "ok",
+    }
+
+
 def analyze_sample_generation(sample: Mapping[str, Any]) -> dict[str, Any]:
     task = str(sample.get("task", "unknown"))
     raw_text = str(sample.get("generated_assistant", "")).strip()
@@ -857,6 +933,8 @@ def analyze_sample_generation(sample: Mapping[str, Any]) -> dict[str, Any]:
     else:
         classification = "raw_parseable"
 
+    semantic_result = validate_g_semantics(sample) if task == "G" else None
+
     return {
         "task": task,
         "raw_parseable_json": raw_parseable,
@@ -872,6 +950,9 @@ def analyze_sample_generation(sample: Mapping[str, Any]) -> dict[str, Any]:
         "stripped_json_parse_error": stripped_error,
         "generated_assistant": raw_text,
         "stripped_assistant": stripped_text,
+        "semantic_status": semantic_result["semantic_status"] if semantic_result else None,
+        "semantic_score": semantic_result["score"] if semantic_result else None,
+        "semantic_reason": semantic_result["reason"] if semantic_result else None,
     }
 
 
@@ -883,6 +964,11 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
     analyses = [analyze_sample_generation(sample) for sample in samples]
     classifications = Counter(analysis["classification"] for analysis in analyses)
     failure_categories = Counter(analysis["failure_category"] for analysis in analyses)
+    semantic_statuses = Counter(
+        analysis["semantic_status"]
+        for analysis in analyses
+        if analysis["task"] == "G" and analysis["semantic_status"] is not None
+    )
 
     for analysis in analyses:
         task = str(analysis["task"])
@@ -920,6 +1006,10 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         "recoverable_examples": recoverable_examples,
         "classifications": dict(sorted(classifications.items())),
         "failure_categories": dict(sorted(failure_categories.items())),
+        "semantic_valid": semantic_statuses.get("VALID", 0),
+        "semantic_low_quality": semantic_statuses.get("LOW_QUALITY", 0),
+        "semantic_drift": semantic_statuses.get("SEMANTIC_DRIFT", 0),
+        "language_drift": semantic_statuses.get("LANGUAGE_DRIFT", 0),
     }
 
 
