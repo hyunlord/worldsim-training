@@ -602,10 +602,17 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
             )
         generated_tokens = generated[0][encoded["input_ids"].shape[1] :]
-        generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+        raw_generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+        generated_text, normalization = _trim_trivial_json_tail(raw_generated_text)
+        normalization_details: list[dict[str, str]] = []
         parse_error = None
         try:
-            json.loads(generated_text)
+            payload = json.loads(generated_text)
+            normalized_payload, enum_normalization_details = _normalize_known_enum_values(str(row.get("task", "unknown")), payload)
+            if enum_normalization_details:
+                generated_text = json.dumps(normalized_payload, ensure_ascii=False)
+                normalization_details.extend(enum_normalization_details)
+                normalization = "normalize_known_enum_values" if normalization is None else f"{normalization}+normalize_known_enum_values"
         except Exception as exc:  # noqa: BLE001
             parse_error = type(exc).__name__
         samples.append(
@@ -615,8 +622,11 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "prompt_messages": prompt_messages,
                 "expected_assistant": row["messages"][-1]["content"],
                 "generated_assistant": generated_text,
+                "raw_generated_assistant": raw_generated_text,
                 "json_parse_error": parse_error,
                 "generation_max_new_tokens": max_new_tokens,
+                "generation_normalization": normalization,
+                "generation_normalization_details": normalization_details,
             }
         )
 
@@ -669,6 +679,68 @@ def _parse_json_payload(text: str) -> tuple[Any | None, str | None]:
         return json.loads(text), None
     except Exception as exc:  # noqa: BLE001
         return None, type(exc).__name__
+
+
+def _trim_trivial_json_tail(text: str) -> tuple[str, str | None]:
+    stripped = text.strip()
+    if not stripped or stripped[0] not in "{[":
+        return text, None
+
+    try:
+        _, end_index = json.JSONDecoder().raw_decode(stripped)
+    except json.JSONDecodeError:
+        return text, None
+
+    trailing = stripped[end_index:]
+    if trailing and not trailing.strip(" \t\r\n,"):
+        return stripped[:end_index].strip(), "trim_trailing_comma"
+    return text, None
+
+
+def _normalize_enum_candidate(value: str) -> str:
+    normalized = value.strip().lower().replace("-", "_").replace(" ", "_")
+    while "__" in normalized:
+        normalized = normalized.replace("__", "_")
+    return normalized
+
+
+def _normalize_known_enum_values(task: str, payload: Any) -> tuple[Any, list[dict[str, str]]]:
+    if not isinstance(payload, dict):
+        return payload, []
+
+    valid_fields: dict[str, set[str]]
+    if task in {"B", "C"}:
+        valid_fields = {
+            "register": VALID_REGISTERS,
+            "emotion_expressed": VALID_EMOTIONS,
+        }
+    elif task == "F":
+        valid_fields = {
+            "emotion": VALID_EMOTIONS,
+            "previous_emotion": VALID_EMOTIONS,
+            "transition_type": VALID_TRANSITION_TYPES,
+        }
+    elif task == "G":
+        valid_fields = {
+            "register": VALID_REGISTERS,
+            "action_tendency": VALID_ACTION_TENDENCIES,
+            "misinterpretation_type": VALID_MISINTERPRETATION_TYPES,
+        }
+    else:
+        return payload, []
+
+    normalized_payload = dict(payload)
+    details: list[dict[str, str]] = []
+    for field_name, valid_values in valid_fields.items():
+        current = normalized_payload.get(field_name)
+        if not isinstance(current, str):
+            continue
+        candidate = _normalize_enum_candidate(current)
+        if candidate != current and candidate in valid_values:
+            normalized_payload[field_name] = candidate
+            details.append({"field": field_name, "from": current, "to": candidate})
+
+    return normalized_payload, details
 
 
 def _has_trailing_text(text: str) -> bool:

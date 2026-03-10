@@ -311,6 +311,66 @@ def test_json_object_complete_stops_after_first_balanced_object() -> None:
     assert _json_object_complete("{\"task\":\"A\", \"text\":\"brace } inside string\"}") is True
 
 
+def test_trim_trivial_json_tail_removes_only_trailing_comma() -> None:
+    from training.lib.qlora_smoke import _trim_trivial_json_tail
+
+    trimmed, reason = _trim_trivial_json_tail('{"task":"A"},')
+    assert trimmed == '{"task":"A"}'
+    assert reason == "trim_trailing_comma"
+
+    unchanged, reason = _trim_trivial_json_tail('{"task":"A"} trailing words')
+    assert unchanged == '{"task":"A"} trailing words'
+    assert reason is None
+
+
+def test_build_sample_prompt_messages_appends_generic_generation_rules() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_messages = _build_sample_prompt_messages(
+        {
+            "task": "G",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {"role": "user", "content": "[과제]"},
+                {"role": "assistant", "content": "{\"action_tendency\":\"wait\"}"},
+            ],
+        }
+    )
+
+    user_content = prompt_messages[-1]["content"]
+    assert user_content.startswith("[과제]")
+    assert "JSON object 하나만 출력하라." in user_content
+    assert "첫 글자는 반드시 { 여야 한다." in user_content
+
+
+def test_normalize_known_enum_values_only_fixes_case_style() -> None:
+    from training.lib.qlora_smoke import _normalize_known_enum_values
+
+    normalized, details = _normalize_known_enum_values(
+        "G",
+        {
+            "action_tendency": "Defend",
+            "misinterpretation_type": "Overconfident Literal",
+            "register": "HAO",
+            "temperament_bias": "Melancholic Snake Case Phrase",
+        },
+    )
+
+    assert normalized["action_tendency"] == "defend"
+    assert normalized["misinterpretation_type"] == "overconfident_literal"
+    assert normalized["register"] == "hao"
+    assert normalized["temperament_bias"] == "Melancholic Snake Case Phrase"
+    assert details == [
+        {"field": "register", "from": "HAO", "to": "hao"},
+        {"field": "action_tendency", "from": "Defend", "to": "defend"},
+        {
+            "field": "misinterpretation_type",
+            "from": "Overconfident Literal",
+            "to": "overconfident_literal",
+        },
+    ]
+
+
 def test_notebook_uses_shared_training_module() -> None:
     notebook_path = Path("notebooks/dgx_spark_qlora_smoke.ipynb")
     payload = json.loads(notebook_path.read_text(encoding="utf-8"))
