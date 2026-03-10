@@ -21,6 +21,17 @@ from scripts.prepare_dataset import _validate_messages_row
 DEFAULT_MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+VALID_EMOTIONS = {"joy", "sadness", "fear", "anger", "trust", "disgust", "surprise", "anticipation"}
+VALID_REGISTERS = {"haera", "hao", "hae"}
+VALID_TRANSITION_TYPES = {"gradual", "sudden", "sustained"}
+VALID_ACTION_TENDENCIES = {"mobilize", "defend", "wait", "retreat", "celebrate", "mourn"}
+VALID_MISINTERPRETATION_TYPES = {
+    "overconfident_literal",
+    "cautious_reversal",
+    "optimistic_expansion",
+    "passive_deferral",
+    "symbolic_abstraction",
+}
 
 
 @dataclass(slots=True)
@@ -274,12 +285,14 @@ def get_environment_summary() -> dict[str, Any]:
         torch_info: dict[str, Any] = {
             "available": True,
             "version": getattr(torch, "__version__", "unknown"),
+            "cuda_version": getattr(getattr(torch, "version", None), "cuda", None),
             "cuda_available": bool(torch.cuda.is_available()),
             "mps_available": bool(getattr(torch.backends, "mps", None) and torch.backends.mps.is_available()),
         }
         if torch.cuda.is_available():
             torch_info["cuda_device_count"] = torch.cuda.device_count()
             torch_info["cuda_device_name"] = torch.cuda.get_device_name(0)
+            torch_info["cuda_device_names"] = [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())]
             torch_info["cuda_bf16_supported"] = torch.cuda.is_bf16_supported()
         summary["torch"] = torch_info
     except Exception as exc:  # noqa: BLE001
@@ -296,6 +309,26 @@ def get_environment_summary() -> dict[str, Any]:
             summary[module_name] = {"available": False, "error": f"{type(exc).__name__}: {exc}"}
 
     return summary
+
+
+def get_true_qlora_preflight() -> dict[str, Any]:
+    environment = get_environment_summary()
+    try:
+        runtime = detect_runtime(prefer_qlora=True, require_qlora=True)
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "ok": False,
+            "runtime": None,
+            "environment": environment,
+            "blocker_reason": f"{type(exc).__name__}: {exc}",
+        }
+
+    return {
+        "ok": True,
+        "runtime": asdict(runtime),
+        "environment": environment,
+        "blocker_reason": None,
+    }
 
 
 def _torch_dtype(runtime: RuntimeConfig, torch: Any) -> Any:
@@ -514,6 +547,11 @@ def preview_metrics(output_dir: Path | str) -> dict[str, Any]:
     return json.loads(metrics_path.read_text(encoding="utf-8"))
 
 
+def load_json_artifact(output_dir: Path | str, artifact_name: str) -> dict[str, Any]:
+    artifact_path = Path(output_dir) / artifact_name
+    return json.loads(artifact_path.read_text(encoding="utf-8"))
+
+
 def load_sample_generations(output_dir: Path | str) -> list[dict]:
     sample_path = Path(output_dir) / "sample_generations.jsonl"
     return read_jsonl(sample_path) if sample_path.exists() else []
@@ -526,6 +564,76 @@ def count_parseable_json_samples(samples: Sequence[Mapping[str, Any]]) -> dict[s
         "total": total,
         "parseable_json": parseable,
         "failed_json": total - parseable,
+    }
+
+
+def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    json_parse_errors = Counter(str(row.get("json_parse_error") or "ok") for row in samples)
+    fenced_json = 0
+    enum_drift_fields: Counter[str] = Counter()
+    enum_drift_examples: list[dict[str, Any]] = []
+
+    for row in samples:
+        generated_text = str(row.get("generated_assistant", "")).strip()
+        if generated_text.startswith("```") or "```json" in generated_text or "\n```" in generated_text:
+            fenced_json += 1
+
+        if row.get("json_parse_error"):
+            continue
+
+        try:
+            payload = json.loads(generated_text)
+        except Exception:  # noqa: BLE001
+            continue
+
+        task = str(row.get("task", "unknown"))
+        issues: list[tuple[str, str]] = []
+
+        if task in {"B", "C"}:
+            emotion_value = payload.get("emotion_expressed")
+            register_value = payload.get("register")
+            if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
+                issues.append(("emotion_expressed", str(emotion_value)))
+            if register_value is not None and register_value not in VALID_REGISTERS:
+                issues.append(("register", str(register_value)))
+        elif task == "F":
+            emotion_value = payload.get("emotion")
+            transition_type = payload.get("transition_type")
+            if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
+                issues.append(("emotion", str(emotion_value)))
+            if transition_type is not None and transition_type not in VALID_TRANSITION_TYPES:
+                issues.append(("transition_type", str(transition_type)))
+        elif task == "G":
+            action_tendency = payload.get("action_tendency")
+            register_value = payload.get("register")
+            misinterpretation_type = payload.get("misinterpretation_type")
+            if action_tendency is not None and action_tendency not in VALID_ACTION_TENDENCIES:
+                issues.append(("action_tendency", str(action_tendency)))
+            if register_value is not None and register_value not in VALID_REGISTERS:
+                issues.append(("register", str(register_value)))
+            if misinterpretation_type is not None and misinterpretation_type not in VALID_MISINTERPRETATION_TYPES:
+                issues.append(("misinterpretation_type", str(misinterpretation_type)))
+
+        for field_name, bad_value in issues:
+            enum_drift_fields[field_name] += 1
+            if len(enum_drift_examples) < 5:
+                enum_drift_examples.append(
+                    {
+                        "task": task,
+                        "field": field_name,
+                        "value": bad_value,
+                        "generated_assistant": generated_text,
+                    }
+                )
+
+    parseable_counts = count_parseable_json_samples(samples)
+    return {
+        **parseable_counts,
+        "fenced_json": fenced_json,
+        "json_parse_error_types": dict(sorted(json_parse_errors.items())),
+        "enum_drift_total": sum(enum_drift_fields.values()),
+        "enum_drift_fields": dict(sorted(enum_drift_fields.items())),
+        "enum_drift_examples": enum_drift_examples,
     }
 
 
