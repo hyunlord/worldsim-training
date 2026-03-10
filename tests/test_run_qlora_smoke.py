@@ -237,6 +237,7 @@ def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
 
     fenced = "```json\n{\"action_id\": 0}\n```"
     assert strip_json_fence(fenced) == "{\"action_id\": 0}"
+    assert strip_json_fence("```json\n{\"action_id\": 0") == "{\"action_id\": 0"
 
     analyzed = analyze_sample_generation(
         {
@@ -247,6 +248,7 @@ def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
     )
 
     assert analyzed["classification"] == "fenced_recoverable"
+    assert analyzed["failure_category"] == "fenced_json"
     assert analyzed["raw_parseable_json"] is False
     assert analyzed["fence_stripped_parseable_json"] is True
     assert analyzed["malformed_json"] is False
@@ -279,7 +281,34 @@ def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
     assert summary["malformed_json"] == 0
     assert summary["enum_drift_total"] == 1
     assert summary["enum_drift_fields"]["emotion"] == 1
+    assert summary["failure_categories"]["fenced_json"] == 1
     assert len(summary["recoverable_examples"]) == 1
+
+
+def test_sample_summary_detects_truncation_for_incomplete_fenced_json() -> None:
+    from training.lib.qlora_smoke import analyze_sample_generation
+
+    analyzed = analyze_sample_generation(
+        {
+            "task": "H",
+            "generated_assistant": "```json\n{\"name\": \"World\", \"description_en\": \"desc\"",
+            "json_parse_error": "JSONDecodeError",
+        }
+    )
+
+    assert analyzed["fenced_json"] is True
+    assert analyzed["fence_stripped_parseable_json"] is False
+    assert analyzed["malformed_json"] is True
+    assert analyzed["failure_category"] == "truncation"
+
+
+def test_json_object_complete_stops_after_first_balanced_object() -> None:
+    from training.lib.qlora_smoke import _json_object_complete
+
+    assert _json_object_complete("{\"task\":\"A\"}") is True
+    assert _json_object_complete("{\"task\":\"A\"}{\"task\":\"B\"}") is True
+    assert _json_object_complete("{\"task\":\"A\"") is False
+    assert _json_object_complete("{\"task\":\"A\", \"text\":\"brace } inside string\"}") is True
 
 
 def test_notebook_uses_shared_training_module() -> None:
@@ -299,6 +328,7 @@ def test_notebook_uses_shared_training_module() -> None:
     assert "resolve_notebook_run_mode" in source
     assert "build_operational_judgment" in source
     assert "recoverable_fenced_json" in source
+    assert "failure_categories" in source
     assert "recommended_next_action" in source
     assert "RUN_MODE" in source
     assert "longer_smoke" in source

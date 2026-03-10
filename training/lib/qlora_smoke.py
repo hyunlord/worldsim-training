@@ -21,6 +21,13 @@ from scripts.prepare_dataset import _validate_messages_row
 DEFAULT_MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+SAMPLE_GENERATION_REMINDER = (
+    "\n\n[생성 규칙]\n"
+    "- JSON object 하나만 출력하라.\n"
+    "- markdown fence를 쓰지 마라.\n"
+    "- 설명문을 덧붙이지 마라.\n"
+    "- 첫 글자는 반드시 { 여야 한다.\n"
+)
 NOTEBOOK_RUN_MODES = {
     "preflight": {"max_steps": 0, "max_train_samples": 8, "max_eval_samples": 4},
     "smoke": {"max_steps": 3, "max_train_samples": 32, "max_eval_samples": 16},
@@ -513,10 +520,57 @@ def _select_generation_rows(train_rows: list[dict], eval_rows: list[dict]) -> li
     return picked
 
 
+def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]]:
+    prompt_messages = [dict(message) for message in row["messages"][:-1]]
+    if prompt_messages and prompt_messages[-1]["role"] == "user":
+        prompt_messages[-1] = dict(prompt_messages[-1])
+        prompt_messages[-1]["content"] = prompt_messages[-1]["content"].rstrip() + SAMPLE_GENERATION_REMINDER
+    return prompt_messages
+
+
+def _sample_generation_max_new_tokens(task: str) -> int:
+    if task == "H":
+        return 384
+    if task in {"F", "G"}:
+        return 288
+    return 224
+
+
+def _json_object_complete(text: str) -> bool:
+    depth = 0
+    in_string = False
+    escape = False
+    saw_open = False
+
+    for char in text:
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == "\"":
+                in_string = False
+            continue
+
+        if char == "\"":
+            in_string = True
+        elif char == "{":
+            depth += 1
+            saw_open = True
+        elif char == "}":
+            depth -= 1
+            if saw_open and depth == 0:
+                return True
+
+    return False
+
+
 def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path: Path, runtime: RuntimeConfig, torch: Any) -> list[dict]:
     if not rows:
         write_jsonl(output_path, [])
         return []
+
+    from transformers import StoppingCriteria, StoppingCriteriaList
 
     samples: list[dict] = []
     model.eval()
@@ -524,21 +578,31 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
     device = runtime.device
 
     for row in rows:
-        prompt_messages = row["messages"][:-1]
-        prompt_text = render_conversation(tokenizer, prompt_messages, add_generation_prompt=True)
+        prompt_messages = _build_sample_prompt_messages(row)
+        assistant_prefix = "{"
+        prompt_text = render_conversation(tokenizer, prompt_messages, add_generation_prompt=True) + assistant_prefix
         encoded = tokenizer(prompt_text, return_tensors="pt")
         encoded = {key: value.to(device) for key, value in encoded.items()}
+        max_new_tokens = _sample_generation_max_new_tokens(str(row.get("task", "unknown")))
+
+        class JsonObjectStopper(StoppingCriteria):
+            def __call__(self, input_ids, scores, **kwargs):  # noqa: ANN001, D401
+                generated_tokens = input_ids[0][encoded["input_ids"].shape[1] :]
+                generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+                return _json_object_complete(generated_text)
+
         with torch.no_grad():
             generated = model.generate(
                 **encoded,
-                max_new_tokens=160,
+                max_new_tokens=max_new_tokens,
                 do_sample=False,
                 temperature=None,
                 pad_token_id=tokenizer.pad_token_id,
                 eos_token_id=tokenizer.eos_token_id,
+                stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
             )
         generated_tokens = generated[0][encoded["input_ids"].shape[1] :]
-        generated_text = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+        generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
         parse_error = None
         try:
             json.loads(generated_text)
@@ -552,6 +616,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "expected_assistant": row["messages"][-1]["content"],
                 "generated_assistant": generated_text,
                 "json_parse_error": parse_error,
+                "generation_max_new_tokens": max_new_tokens,
             }
         )
 
@@ -590,9 +655,13 @@ def strip_json_fence(text: str) -> str:
         return stripped
 
     lines = stripped.splitlines()
-    if len(lines) >= 2 and lines[0].strip().startswith("```") and lines[-1].strip() == "```":
-        return "\n".join(lines[1:-1]).strip()
-    return stripped
+    if not lines or not lines[0].strip().startswith("```"):
+        return stripped
+
+    body_lines = lines[1:]
+    if body_lines and body_lines[-1].strip() == "```":
+        body_lines = body_lines[:-1]
+    return "\n".join(body_lines).strip()
 
 
 def _parse_json_payload(text: str) -> tuple[Any | None, str | None]:
@@ -600,6 +669,53 @@ def _parse_json_payload(text: str) -> tuple[Any | None, str | None]:
         return json.loads(text), None
     except Exception as exc:  # noqa: BLE001
         return None, type(exc).__name__
+
+
+def _has_trailing_text(text: str) -> bool:
+    stripped = text.strip()
+    if not stripped:
+        return False
+    try:
+        _, index = json.JSONDecoder().raw_decode(stripped)
+    except json.JSONDecodeError:
+        return False
+    return bool(stripped[index:].strip())
+
+
+def _categorize_generation_failure(
+    *,
+    raw_text: str,
+    stripped_text: str,
+    raw_parseable: bool,
+    stripped_parseable: bool,
+    fenced_json: bool,
+    enum_drift_total: int,
+) -> str:
+    if raw_parseable and enum_drift_total == 0:
+        return "ok"
+    if raw_parseable and enum_drift_total > 0:
+        return "enum_drift"
+    if fenced_json and stripped_parseable and enum_drift_total == 0:
+        return "fenced_json"
+    if fenced_json and stripped_parseable and enum_drift_total > 0:
+        return "fenced_json_with_enum_drift"
+
+    normalized = stripped_text.strip()
+    if not normalized:
+        return "non_json_answer"
+    if normalized[0] not in "{[":
+        return "non_json_answer"
+    if _has_trailing_text(normalized):
+        return "trailing_text"
+
+    unbalanced_object = normalized.count("{") > normalized.count("}")
+    unbalanced_array = normalized.count("[") > normalized.count("]")
+    missing_terminal = not normalized.endswith(("}", "]"))
+    if not stripped_parseable and (unbalanced_object or unbalanced_array or missing_terminal):
+        return "truncation"
+    if not stripped_parseable:
+        return "invalid_syntax"
+    return "ok"
 
 
 def _enum_drift_issues(task: str, payload: Any) -> list[tuple[str, str]]:
@@ -649,6 +765,14 @@ def analyze_sample_generation(sample: Mapping[str, Any]) -> dict[str, Any]:
     stripped_parseable = stripped_payload is not None
     recoverable_fenced = fenced_json and not raw_parseable and stripped_parseable
     malformed_json = not stripped_parseable
+    failure_category = _categorize_generation_failure(
+        raw_text=raw_text,
+        stripped_text=stripped_text,
+        raw_parseable=raw_parseable,
+        stripped_parseable=stripped_parseable,
+        fenced_json=fenced_json,
+        enum_drift_total=len(issues),
+    )
 
     if malformed_json:
         classification = "malformed_json"
@@ -671,6 +795,7 @@ def analyze_sample_generation(sample: Mapping[str, Any]) -> dict[str, Any]:
         "enum_drift_total": len(issues),
         "enum_drift_fields": [field_name for field_name, _ in issues],
         "classification": classification,
+        "failure_category": failure_category,
         "raw_json_parse_error": str(sample.get("json_parse_error") or raw_error) if (sample.get("json_parse_error") or raw_error) else None,
         "stripped_json_parse_error": stripped_error,
         "generated_assistant": raw_text,
@@ -685,6 +810,7 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
     recoverable_examples: list[dict[str, Any]] = []
     analyses = [analyze_sample_generation(sample) for sample in samples]
     classifications = Counter(analysis["classification"] for analysis in analyses)
+    failure_categories = Counter(analysis["failure_category"] for analysis in analyses)
 
     for analysis in analyses:
         task = str(analysis["task"])
@@ -721,6 +847,7 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         "enum_drift_examples": enum_drift_examples,
         "recoverable_examples": recoverable_examples,
         "classifications": dict(sorted(classifications.items())),
+        "failure_categories": dict(sorted(failure_categories.items())),
     }
 
 
