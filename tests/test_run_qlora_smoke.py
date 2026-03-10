@@ -178,6 +178,54 @@ def test_programmatic_run_smoke_normalizes_dataclass_paths() -> None:
     assert config.target_modules == ("q_proj", "v_proj")
 
 
+def test_true_qlora_preflight_surfaces_blocker(monkeypatch) -> None:
+    from training.lib import qlora_smoke
+
+    monkeypatch.setattr(qlora_smoke, "get_environment_summary", lambda: {"torch": {"cuda_available": False}})
+
+    def fail_runtime(*, prefer_qlora: bool, require_qlora: bool):
+        assert prefer_qlora is True
+        assert require_qlora is True
+        raise RuntimeError("QLoRA unavailable")
+
+    monkeypatch.setattr(qlora_smoke, "detect_runtime", fail_runtime)
+
+    report = qlora_smoke.get_true_qlora_preflight()
+
+    assert report["ok"] is False
+    assert report["runtime"] is None
+    assert "QLoRA unavailable" in report["blocker_reason"]
+
+
+def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
+    from training.lib.qlora_smoke import summarize_sample_generations
+
+    samples = [
+        {
+            "task": "E",
+            "generated_assistant": "```json\n{\"action_id\": 0, \"confidence\": 0.9, \"hint_ko\": \"곧 달아났다\", \"hint_en\": \"fled\", \"personality_reasoning\": \"high_HA\"}\n```",
+            "json_parse_error": "JSONDecodeError",
+        },
+        {
+            "task": "F",
+            "generated_assistant": "{\"emotion\": \"panic\", \"intensity\": 0.8, \"cause_ko\": \"겁에 질렸다\", \"cause_en\": \"afraid\", \"previous_emotion\": \"trust\", \"transition_type\": \"sudden\", \"temperament_amplifier\": \"high_HA\"}",
+            "json_parse_error": None,
+        },
+        {
+            "task": "C",
+            "generated_assistant": "{\"speech_ko\": \"나서거라\", \"speech_en\": \"step forward\", \"register\": \"hao\", \"emotion_expressed\": \"anger\", \"speaker_role\": \"chief\", \"temperament_tone\": \"direct\"}",
+            "json_parse_error": None,
+        },
+    ]
+
+    summary = summarize_sample_generations(samples)
+
+    assert summary["total"] == 3
+    assert summary["fenced_json"] == 1
+    assert summary["enum_drift_total"] == 1
+    assert summary["enum_drift_fields"]["emotion"] == 1
+
+
 def test_notebook_uses_shared_training_module() -> None:
     notebook_path = Path("notebooks/dgx_spark_qlora_smoke.ipynb")
     payload = json.loads(notebook_path.read_text(encoding="utf-8"))
@@ -189,3 +237,6 @@ def test_notebook_uses_shared_training_module() -> None:
     )
 
     assert "from training.lib.qlora_smoke import" in source
+    assert "get_true_qlora_preflight" in source
+    assert "load_json_artifact" in source
+    assert "summarize_sample_generations" in source
