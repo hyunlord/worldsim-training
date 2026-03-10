@@ -93,12 +93,34 @@ def _load_training_libraries():
     }
 
 
-def _bitsandbytes_available() -> bool:
+def _bitsandbytes_status() -> tuple[bool, str | None]:
     try:
         import bitsandbytes  # noqa: F401
-    except Exception:
-        return False
-    return True
+    except Exception as exc:  # noqa: BLE001
+        return False, f"bitsandbytes import failed: {type(exc).__name__}: {exc}"
+    return True, None
+
+
+def _model_is_4bit_quantized(model: Any) -> bool:
+    pending = [model]
+    visited: set[int] = set()
+
+    while pending:
+        candidate = pending.pop()
+        if candidate is None:
+            continue
+        candidate_id = id(candidate)
+        if candidate_id in visited:
+            continue
+        visited.add(candidate_id)
+
+        if getattr(candidate, "is_loaded_in_4bit", False):
+            return True
+
+        pending.append(getattr(candidate, "model", None))
+        pending.append(getattr(candidate, "base_model", None))
+
+    return False
 
 
 def detect_runtime(prefer_qlora: bool, require_qlora: bool) -> RuntimeConfig:
@@ -112,10 +134,11 @@ def detect_runtime(prefer_qlora: bool, require_qlora: bool) -> RuntimeConfig:
     if torch.cuda.is_available():
         device = "cuda"
         torch_dtype = "bfloat16" if torch.cuda.is_bf16_supported() else "float16"
-        if prefer_qlora and _bitsandbytes_available():
+        bitsandbytes_available, bitsandbytes_error = _bitsandbytes_status()
+        if prefer_qlora and bitsandbytes_available:
             use_qlora = True
         elif prefer_qlora:
-            fallback_reason = "bitsandbytes is unavailable in this environment"
+            fallback_reason = bitsandbytes_error or "bitsandbytes is unavailable in this environment"
     elif getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
         device = "mps"
         torch_dtype = "float32"
@@ -185,7 +208,21 @@ def _load_model_and_tokenizer(args: argparse.Namespace, runtime: RuntimeConfig, 
     else:
         model_kwargs["torch_dtype"] = _torch_dtype(runtime, torch)
 
-    model = AutoModelForCausalLM.from_pretrained(args.model_name, **model_kwargs)
+    try:
+        model = AutoModelForCausalLM.from_pretrained(args.model_name, **model_kwargs)
+    except Exception as exc:  # noqa: BLE001
+        if runtime.use_qlora:
+            raise RuntimeError(
+                "True QLoRA 4-bit model load failed on CUDA via bitsandbytes: "
+                f"{type(exc).__name__}: {exc}"
+            ) from exc
+        raise
+
+    if runtime.use_qlora and not _model_is_4bit_quantized(model):
+        raise RuntimeError(
+            "True QLoRA was requested, but the loaded model is not marked as 4-bit bitsandbytes quantized."
+        )
+
     if runtime.use_qlora:
         model = prepare_model_for_kbit_training(model)
 
@@ -414,6 +451,7 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
 
     set_seed(args.seed)
     model, tokenizer = _load_model_and_tokenizer(args, runtime, libs)
+    qlora_verified = runtime.use_qlora and _model_is_4bit_quantized(model)
     train_dataset = _tokenize_rows(train_rows, tokenizer, args.max_length, Dataset)
     eval_dataset = _tokenize_rows(eval_rows, tokenizer, args.max_length, Dataset)
     collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
@@ -467,6 +505,7 @@ def run_smoke(args: argparse.Namespace) -> dict[str, Any]:
     summary = {
         "status": "ok",
         "runtime": asdict(runtime),
+        "qlora_verified": qlora_verified,
         "train_rows": len(train_rows),
         "eval_rows": len(eval_rows),
         "train_task_counts": _count_tasks(train_rows),

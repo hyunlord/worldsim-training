@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -142,3 +144,33 @@ def test_build_trainer_kwargs_prefers_processing_class_when_available() -> None:
 
     assert kwargs["processing_class"] == "tokenizer"
     assert "tokenizer" not in kwargs
+
+
+def test_detect_runtime_raises_clear_error_when_bitsandbytes_import_fails(monkeypatch) -> None:
+    fake_torch = SimpleNamespace(
+        cuda=SimpleNamespace(is_available=lambda: True, is_bf16_supported=lambda: False),
+        backends=SimpleNamespace(mps=SimpleNamespace(is_available=lambda: False)),
+    )
+    monkeypatch.setitem(sys.modules, "torch", fake_torch)
+
+    from training.run_qlora_smoke import detect_runtime
+
+    monkeypatch.setattr(
+        "training.run_qlora_smoke._bitsandbytes_status",
+        lambda: (False, "bitsandbytes import failed: ModuleNotFoundError: No module named 'bitsandbytes'"),
+    )
+
+    try:
+        detect_runtime(prefer_qlora=True, require_qlora=True)
+    except RuntimeError as exc:
+        assert "bitsandbytes import failed" in str(exc)
+    else:
+        raise AssertionError("Expected missing bitsandbytes to hard-fail when QLoRA is required")
+
+
+def test_model_is_4bit_quantized_detects_wrapped_peft_model() -> None:
+    from training.run_qlora_smoke import _model_is_4bit_quantized
+
+    model = SimpleNamespace(base_model=SimpleNamespace(model=SimpleNamespace(is_loaded_in_4bit=True)))
+
+    assert _model_is_4bit_quantized(model) is True
