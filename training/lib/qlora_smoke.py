@@ -21,6 +21,11 @@ from scripts.prepare_dataset import _validate_messages_row
 DEFAULT_MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+NOTEBOOK_RUN_MODES = {
+    "preflight": {"max_steps": 0, "max_train_samples": 8, "max_eval_samples": 4},
+    "smoke": {"max_steps": 3, "max_train_samples": 32, "max_eval_samples": 16},
+    "longer_smoke": {"max_steps": 25, "max_train_samples": 256, "max_eval_samples": 64},
+}
 VALID_EMOTIONS = {"joy", "sadness", "fear", "anger", "trust", "disgust", "surprise", "anticipation"}
 VALID_REGISTERS = {"haera", "hao", "hae"}
 VALID_TRANSITION_TYPES = {"gradual", "sudden", "sustained"}
@@ -329,6 +334,18 @@ def get_true_qlora_preflight() -> dict[str, Any]:
         "environment": environment,
         "blocker_reason": None,
     }
+
+
+def resolve_notebook_run_mode(run_mode: str, *, run_id: str | None = None) -> dict[str, Any]:
+    normalized = str(run_mode).strip().lower()
+    if normalized not in NOTEBOOK_RUN_MODES:
+        valid = ", ".join(sorted(NOTEBOOK_RUN_MODES))
+        raise ValueError(f"Unsupported RUN_MODE '{run_mode}'. Expected one of: {valid}")
+
+    resolved = dict(NOTEBOOK_RUN_MODES[normalized])
+    resolved["run_mode"] = normalized
+    resolved["run_id"] = run_id or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    return resolved
 
 
 def _torch_dtype(runtime: RuntimeConfig, torch: Any) -> Any:
@@ -704,6 +721,60 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         "enum_drift_examples": enum_drift_examples,
         "recoverable_examples": recoverable_examples,
         "classifications": dict(sorted(classifications.items())),
+    }
+
+
+def build_operational_judgment(
+    summary: Mapping[str, Any],
+    sample_summary: Mapping[str, Any],
+    *,
+    output_dir: Path | str | None = None,
+) -> dict[str, Any]:
+    raw_parseable_json = int(sample_summary.get("raw_parseable_json", 0) or 0)
+    fence_stripped_parseable_json = int(sample_summary.get("fence_stripped_parseable_json", 0) or 0)
+    recoverable_fenced_json = int(sample_summary.get("recoverable_fenced_json", 0) or 0)
+    malformed_json = int(sample_summary.get("malformed_json", 0) or 0)
+    enum_drift_total = int(sample_summary.get("enum_drift_total", 0) or 0)
+    used_true_qlora = bool(summary.get("used_true_qlora"))
+
+    if raw_parseable_json == 0 and recoverable_fenced_json > 0 and malformed_json == 0 and enum_drift_total == 0:
+        operational_issue = "markdown_fencing_only"
+        recommended_next_action = "Fix generation formatting or decoding to suppress markdown fences; do not redesign dataset or trainer yet."
+    elif malformed_json > 0:
+        operational_issue = "malformed_json_present"
+        recommended_next_action = "Investigate generation formatting and decoding deeper; malformed JSON remains after fence stripping."
+    elif enum_drift_total > 0:
+        operational_issue = "enum_drift_present"
+        recommended_next_action = "Investigate post-train structural quality and enum compliance before broader smoke conclusions."
+    elif raw_parseable_json > 0:
+        operational_issue = "structurally_usable"
+        recommended_next_action = "Generation structure looks usable; move to the next smoke-run check or a slightly longer run."
+    else:
+        operational_issue = "raw_json_parse_failed"
+        recommended_next_action = "Inspect generation formatting first; samples were not parseable and no fenced recovery path was detected."
+
+    return {
+        "true_qlora_passed": used_true_qlora,
+        "raw_json_parse_failed": raw_parseable_json == 0,
+        "raw_parseable_json": raw_parseable_json,
+        "fence_stripped_parseable_json": fence_stripped_parseable_json,
+        "recoverable_fenced_json": recoverable_fenced_json,
+        "malformed_json": malformed_json,
+        "enum_drift_total": enum_drift_total,
+        "operational_issue": operational_issue,
+        "recommended_next_action": recommended_next_action,
+        "output_dir": str(output_dir) if output_dir is not None else None,
+    }
+
+
+def recommended_next_smoke_config() -> dict[str, int]:
+    return {
+        "max_steps": 50,
+        "max_train_samples": 512,
+        "max_eval_samples": 128,
+        "per_device_train_batch_size": 1,
+        "per_device_eval_batch_size": 1,
+        "gradient_accumulation_steps": 1,
     }
 
 

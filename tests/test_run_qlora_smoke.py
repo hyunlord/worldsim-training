@@ -178,6 +178,41 @@ def test_programmatic_run_smoke_normalizes_dataclass_paths() -> None:
     assert config.target_modules == ("q_proj", "v_proj")
 
 
+def test_resolve_notebook_run_mode_returns_expected_defaults() -> None:
+    from training.lib.qlora_smoke import resolve_notebook_run_mode
+
+    resolved = resolve_notebook_run_mode("longer_smoke", run_id="manual-run")
+
+    assert resolved == {
+        "run_mode": "longer_smoke",
+        "run_id": "manual-run",
+        "max_steps": 25,
+        "max_train_samples": 256,
+        "max_eval_samples": 64,
+    }
+
+
+def test_build_operational_judgment_distinguishes_fenced_only_case() -> None:
+    from training.lib.qlora_smoke import build_operational_judgment
+
+    judgment = build_operational_judgment(
+        {"used_true_qlora": True},
+        {
+            "raw_parseable_json": 0,
+            "fence_stripped_parseable_json": 7,
+            "recoverable_fenced_json": 7,
+            "malformed_json": 0,
+            "enum_drift_total": 0,
+        },
+        output_dir="outputs/smoke_cuda_notebook/worldsim-v31-mix-v1/example",
+    )
+
+    assert judgment["true_qlora_passed"] is True
+    assert judgment["operational_issue"] == "markdown_fencing_only"
+    assert judgment["raw_json_parse_failed"] is True
+    assert "markdown fences" in judgment["recommended_next_action"]
+
+
 def test_true_qlora_preflight_surfaces_blocker(monkeypatch) -> None:
     from training.lib import qlora_smoke
 
@@ -261,5 +296,9 @@ def test_notebook_uses_shared_training_module() -> None:
     assert "get_true_qlora_preflight" in source
     assert "load_json_artifact" in source
     assert "summarize_sample_generations" in source
+    assert "resolve_notebook_run_mode" in source
+    assert "build_operational_judgment" in source
     assert "recoverable_fenced_json" in source
     assert "recommended_next_action" in source
+    assert "RUN_MODE" in source
+    assert "longer_smoke" in source
