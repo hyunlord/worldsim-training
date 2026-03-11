@@ -16,6 +16,8 @@ from typing import Any
 
 from scripts.common import ensure_directory, read_jsonl, write_jsonl
 from scripts.prepare_dataset import _validate_messages_row
+from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
+from training.lib.structured_generation import StructuredGenerationError, generate_structured
 
 
 DEFAULT_MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
@@ -608,6 +610,10 @@ def _sample_generation_assistant_prefix(task: str) -> str:
     return "{"
 
 
+def _sample_generation_output_schema(task: str) -> Any | None:
+    return TASK_OUTPUT_SCHEMAS.get(task)
+
+
 def _task_specific_generation_reminder(task: str) -> str:
     if task == "A":
         return (
@@ -704,12 +710,58 @@ def _json_object_complete(text: str) -> bool:
     return False
 
 
+def _normalize_generation_candidate(text: str) -> dict[str, Any]:
+    normalized_text, normalization = _trim_trivial_json_tail(text)
+    normalized_text, extra_normalization = _trim_follow_on_json_object(normalized_text)
+    if extra_normalization:
+        normalization = extra_normalization if normalization is None else f"{normalization}+{extra_normalization}"
+    return {
+        "text": normalized_text,
+        "normalization": normalization,
+        "normalization_details": [],
+    }
+
+
+def _generate_sample_once(
+    *,
+    model: Any,
+    tokenizer: Any,
+    prompt_text: str,
+    assistant_prefix: str,
+    max_new_tokens: int,
+    encoded_inputs: dict[str, Any] | None,
+    device: str,
+    torch: Any,
+) -> str:
+    from transformers import StoppingCriteria, StoppingCriteriaList
+
+    encoded = tokenizer(prompt_text, return_tensors="pt") if encoded_inputs is None else encoded_inputs
+    encoded = {key: value.to(device) for key, value in encoded.items()}
+
+    class JsonObjectStopper(StoppingCriteria):
+        def __call__(self, input_ids, scores, **kwargs):  # noqa: ANN001, D401
+            generated_tokens = input_ids[0][encoded["input_ids"].shape[1] :]
+            generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+            return _json_object_complete(generated_text)
+
+    with torch.no_grad():
+        generated = model.generate(
+            **encoded,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            temperature=None,
+            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=tokenizer.eos_token_id,
+            stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
+        )
+    generated_tokens = generated[0][encoded["input_ids"].shape[1] :]
+    return assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+
+
 def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path: Path, runtime: RuntimeConfig, torch: Any) -> list[dict]:
     if not rows:
         write_jsonl(output_path, [])
         return []
-
-    from transformers import StoppingCriteria, StoppingCriteriaList
 
     samples: list[dict] = []
     model.eval()
@@ -720,43 +772,77 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
         task = str(row.get("task", "unknown"))
         prompt_messages = _build_sample_prompt_messages(row)
         assistant_prefix = _sample_generation_assistant_prefix(task)
-        prompt_text = render_conversation(tokenizer, prompt_messages, add_generation_prompt=True) + assistant_prefix
-        encoded = tokenizer(prompt_text, return_tensors="pt")
-        encoded = {key: value.to(device) for key, value in encoded.items()}
+        prompt_text = render_conversation(tokenizer, prompt_messages, add_generation_prompt=True)
         max_new_tokens = _sample_generation_max_new_tokens(task)
-
-        class JsonObjectStopper(StoppingCriteria):
-            def __call__(self, input_ids, scores, **kwargs):  # noqa: ANN001, D401
-                generated_tokens = input_ids[0][encoded["input_ids"].shape[1] :]
-                generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
-                return _json_object_complete(generated_text)
-
-        with torch.no_grad():
-            generated = model.generate(
-                **encoded,
-                max_new_tokens=max_new_tokens,
-                do_sample=False,
-                temperature=None,
-                pad_token_id=tokenizer.pad_token_id,
-                eos_token_id=tokenizer.eos_token_id,
-                stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
-            )
-        generated_tokens = generated[0][encoded["input_ids"].shape[1] :]
-        raw_generated_text = assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
-        generated_text, normalization = _trim_trivial_json_tail(raw_generated_text)
-        generated_text, extra_normalization = _trim_follow_on_json_object(generated_text)
-        if extra_normalization:
-            normalization = extra_normalization if normalization is None else f"{normalization}+{extra_normalization}"
+        schema = _sample_generation_output_schema(task)
         normalization_details: list[dict[str, str]] = []
+        normalization: str | None = None
         parse_error = None
+        validation_error = None
+        structured_attempt_count = 1
+        structured_attempts: list[dict[str, Any]] = []
+
+        def llm(generation_prompt: str) -> str:
+            return _generate_sample_once(
+                model=model,
+                tokenizer=tokenizer,
+                prompt_text=generation_prompt + assistant_prefix,
+                assistant_prefix=assistant_prefix,
+                max_new_tokens=max_new_tokens,
+                encoded_inputs=None,
+                device=device,
+                torch=torch,
+            )
+
         try:
-            payload = json.loads(generated_text)
-            normalized_payload, enum_normalization_details = _normalize_known_enum_values(task, payload)
-            if enum_normalization_details:
-                generated_text = json.dumps(normalized_payload, ensure_ascii=False)
-                normalization_details.extend(enum_normalization_details)
-                normalization = "normalize_known_enum_values" if normalization is None else f"{normalization}+normalize_known_enum_values"
+            if schema is None:
+                raw_generated_text = llm(prompt_text)
+                normalized = _normalize_generation_candidate(raw_generated_text)
+                generated_text = normalized["text"]
+                normalization = normalized["normalization"]
+                payload = json.loads(generated_text)
+                generated_text = json.dumps(payload, ensure_ascii=False)
+            else:
+                structured = generate_structured(
+                    llm,
+                    prompt_text,
+                    schema,
+                    output_normalizer=_normalize_generation_candidate,
+                )
+                raw_generated_text = structured.raw_output
+                generated_text = json.dumps(structured.payload, ensure_ascii=False)
+                normalization = structured.normalization
+                normalization_details = list(structured.normalization_details)
+                structured_attempt_count = structured.attempt_count
+                structured_attempts = [
+                    {
+                        "json_error": attempt.json_error,
+                        "validation_error": attempt.validation_error,
+                        "error_kind": attempt.error_kind,
+                    }
+                    for attempt in structured.attempts
+                ]
+        except StructuredGenerationError as exc:
+            raw_generated_text = exc.last_raw_output
+            generated_text = exc.last_output
+            normalization = exc.normalization
+            normalization_details = list(exc.normalization_details)
+            structured_attempt_count = exc.attempt_count
+            structured_attempts = [
+                {
+                    "json_error": attempt.json_error,
+                    "validation_error": attempt.validation_error,
+                    "error_kind": attempt.error_kind,
+                }
+                for attempt in exc.attempts
+            ]
+            if exc.last_error_kind == "json":
+                parse_error = "JSONDecodeError"
+            else:
+                validation_error = exc.attempts[-1].validation_error if exc.attempts else "structured_validation_failed"
         except Exception as exc:  # noqa: BLE001
+            raw_generated_text = ""
+            generated_text = ""
             parse_error = type(exc).__name__
         samples.append(
             {
@@ -767,6 +853,9 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "generated_assistant": generated_text,
                 "raw_generated_assistant": raw_generated_text,
                 "json_parse_error": parse_error,
+                "structured_validation_error": validation_error,
+                "structured_attempt_count": structured_attempt_count,
+                "structured_attempts": structured_attempts,
                 "generation_max_new_tokens": max_new_tokens,
                 "generation_normalization": normalization,
                 "generation_normalization_details": normalization_details,

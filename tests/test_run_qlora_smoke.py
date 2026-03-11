@@ -779,3 +779,83 @@ def test_notebook_uses_shared_training_module() -> None:
     assert "recommended_next_action" in source
     assert "RUN_MODE" in source
     assert "longer_smoke" in source
+
+
+def test_generate_structured_retries_on_malformed_json() -> None:
+    from training.lib.output_schema import TaskAOutput
+    from training.lib.structured_generation import generate_structured
+
+    responses = iter(
+        [
+            '{"text_ko":"겁 많지만 빈틈없다"',
+            '{"text_ko":"겁 많지만 빈틈없다","text_en":"Fearful but meticulous.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
+        ]
+    )
+
+    result = generate_structured(lambda _prompt: next(responses), "prompt", TaskAOutput)
+
+    assert result.attempt_count == 2
+    assert result.last_error_kind is None
+    assert result.model.text_ko == "겁 많지만 빈틈없다"
+    assert result.attempts[0].json_error == "JSONDecodeError"
+
+
+def test_generate_structured_retries_on_enum_drift() -> None:
+    from training.lib.output_schema import TaskFOutput
+    from training.lib.structured_generation import generate_structured
+
+    responses = iter(
+        [
+            '{"emotion":"panic","intensity":0.8,"cause_ko":"겁에 질렸다","cause_en":"Fear struck.","previous_emotion":"trust","transition_type":"sudden","temperament_amplifier":"high_HA"}',
+            '{"emotion":"fear","intensity":0.8,"cause_ko":"겁에 질렸다","cause_en":"Fear struck.","previous_emotion":"trust","transition_type":"sudden","temperament_amplifier":"high_HA"}',
+        ]
+    )
+
+    result = generate_structured(lambda _prompt: next(responses), "prompt", TaskFOutput)
+
+    assert result.attempt_count == 2
+    assert result.model.emotion == "fear"
+    assert result.attempts[0].validation_error is not None
+    assert "emotion" in result.attempts[0].validation_error
+
+
+def test_generate_structured_retries_on_missing_field() -> None:
+    from training.lib.output_schema import TaskEOutput
+    from training.lib.structured_generation import generate_structured
+
+    responses = iter(
+        [
+            '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA"}',
+            '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA","temperament_factor":"harm_avoidance_dominant"}',
+        ]
+    )
+
+    result = generate_structured(lambda _prompt: next(responses), "prompt", TaskEOutput)
+
+    assert result.attempt_count == 2
+    assert result.model.temperament_factor == "harm_avoidance_dominant"
+    assert result.attempts[0].validation_error is not None
+    assert "temperament_factor" in result.attempts[0].validation_error
+
+
+def test_generate_structured_raises_after_exhausting_retries() -> None:
+    from training.lib.output_schema import TaskCOutput
+    from training.lib.structured_generation import StructuredGenerationError, generate_structured
+
+    responses = iter(
+        [
+            '{"speech_ko":"앞으로 나서라","speech_en":"Step forward.","register":"haera","emotion_expressed":"anger"}',
+            '{"speech_ko":"앞으로 나서라","speech_en":"Step forward.","register":"haera","emotion_expressed":"anger"}',
+            '{"speech_ko":"앞으로 나서라","speech_en":"Step forward.","register":"haera","emotion_expressed":"anger"}',
+        ]
+    )
+
+    try:
+        generate_structured(lambda _prompt: next(responses), "prompt", TaskCOutput, max_retry=2)
+    except StructuredGenerationError as exc:
+        assert exc.attempt_count == 3
+        assert exc.last_error_kind == "validation"
+        assert exc.attempts[-1].validation_error is not None
+        assert "speaker_role" in exc.attempts[-1].validation_error
+    else:
+        raise AssertionError("Expected retries to exhaust and raise StructuredGenerationError")
