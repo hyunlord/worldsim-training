@@ -292,6 +292,35 @@ def generate_report(samples: Sequence[Mapping[str, Any]], *, examples_per_catego
     }
 
 
+def recommend_next_action(report: Mapping[str, Any]) -> dict[str, str]:
+    malformed_json_count = int(report.get("malformed_json_count", 0) or 0)
+    truncation_count = int(report.get("truncation_count", 0) or 0)
+    enum_drift_count = int(report.get("enum_drift_count", 0) or 0)
+    language_drift_count = int(report.get("language_drift_count", 0) or 0)
+    semantic_low_quality_count = int(report.get("semantic_low_quality_count", 0) or 0)
+    semantic_drift_count = int(report.get("semantic_drift_count", 0) or 0)
+
+    if malformed_json_count > 0 or truncation_count > 0:
+        return {
+            "status": "structure_failure",
+            "recommended_next_action": "Apply a generation-time fix before a longer smoke run.",
+        }
+    if enum_drift_count > 0:
+        return {
+            "status": "enum_instability",
+            "recommended_next_action": "Stabilize task-specific enum generation before the next smoke run.",
+        }
+    if language_drift_count > 0 or semantic_low_quality_count > 0 or semantic_drift_count > 0:
+        return {
+            "status": "semantic_quality_issue",
+            "recommended_next_action": "Investigate semantic quality before escalating training duration.",
+        }
+    return {
+        "status": "structurally_usable",
+        "recommended_next_action": "Proceed to the next longer smoke or a more realistic training step.",
+    }
+
+
 def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Analyze WorldSim sample_generations.jsonl artifacts.")
     parser.add_argument("sample_path", help="Path to sample_generations.jsonl")
@@ -317,6 +346,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "total_samples": report["total_samples"],
         "overall_status": report["overall_status"],
         "counts_by_failure_category": report["counts_by_failure_category"],
+        "recommended_next_action": recommend_next_action(report),
         "output": str(output_path),
     }
     print(json.dumps(stdout_payload, ensure_ascii=False, indent=2 if args.pretty else None))

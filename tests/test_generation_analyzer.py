@@ -184,3 +184,21 @@ def test_cli_writes_analysis_report(tmp_path: Path) -> None:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     assert report["total_samples"] == 2
     assert report["language_drift_count"] == 1
+
+
+def test_recommend_next_action_prefers_structure_failures() -> None:
+    from tools.generation_analyzer import recommend_next_action
+
+    recommendation = recommend_next_action(
+        {
+            "malformed_json_count": 1,
+            "truncation_count": 0,
+            "enum_drift_count": 2,
+            "language_drift_count": 0,
+            "semantic_low_quality_count": 0,
+            "semantic_drift_count": 0,
+        }
+    )
+
+    assert recommendation["status"] == "structure_failure"
+    assert "generation-time fix" in recommendation["recommended_next_action"]
