@@ -50,6 +50,14 @@ LEAKY_GENERATION_SECTION_LABELS = {
     "오해 방식 선택지",
     "지배 기질축 선택지",
 }
+TASK_G_SUPPRESSED_SECTION_LABELS = {
+    "기질 이름",
+    "기질 키워드",
+    "인물 성격",
+    "성격 이름",
+    "성격 설명",
+    "성격 키워드",
+}
 NOTEBOOK_RUN_MODES = {
     "preflight": {"max_steps": 0, "max_train_samples": 8, "max_eval_samples": 4},
     "smoke": {"max_steps": 3, "max_train_samples": 32, "max_eval_samples": 16},
@@ -566,8 +574,11 @@ def _strip_labeled_sections(content: str, labels: set[str]) -> str:
     return "\n".join(kept).strip()
 
 
-def _sanitize_generation_user_content(content: str) -> str:
-    return _strip_labeled_sections(content, LEAKY_GENERATION_SECTION_LABELS)
+def _sanitize_generation_user_content(content: str, task: str) -> str:
+    labels = set(LEAKY_GENERATION_SECTION_LABELS)
+    if task == "G":
+        labels.update(TASK_G_SUPPRESSED_SECTION_LABELS)
+    return _strip_labeled_sections(content, labels)
 
 
 def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -575,7 +586,7 @@ def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]
     if prompt_messages and prompt_messages[-1]["role"] == "user":
         task = str(row.get("task", "unknown"))
         prompt_messages[-1] = dict(prompt_messages[-1])
-        prompt_messages[-1]["content"] = _sanitize_generation_user_content(str(prompt_messages[-1]["content"]))
+        prompt_messages[-1]["content"] = _sanitize_generation_user_content(str(prompt_messages[-1]["content"]), task)
         prompt_messages[-1]["content"] = (
             prompt_messages[-1]["content"].rstrip()
             + SAMPLE_GENERATION_REMINDER
@@ -664,8 +675,14 @@ def _task_specific_generation_reminder(task: str) -> str:
         )
     if task == "G":
         return (
-            "- interpretation_ko는 한국어 한두 문장만 짧게 써라. 성격 설명을 길게 반복하지 마라.\n"
-            "- interpretation_ko에는 신탁 풀이만 쓰고 자기소개를 쓰지 마라.\n"
+            "- interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라.\n"
+            "- interpretation_ko는 주어 없는 해석 문장으로만 쓰고 \"...라고 여긴다\" 또는 \"...라고 판단한다\"처럼 끝내라.\n"
+            "- interpretation_en은 interpretation_ko와 같은 뜻의 영어 한 문장만 써라.\n"
+            "- interpretation_ko를 \"그는\", \"그녀는\", \"이 인물은\"으로 시작하지 마라.\n"
+            "- interpretation_ko에는 성격 분석, 기질 설명, 현재 상태 설명, 상황 요약을 쓰지 마라.\n"
+            "- interpretation_ko에는 추론 과정, 이유 설명, 메타 설명을 쓰지 마라.\n"
+            "- interpretation_ko에는 신탁 자체를 언급하지 말고 해석 결과만 직접 말하라.\n"
+            "- interpretation_ko에는 자기소개를 쓰지 마라.\n"
             "- interpretation_ko와 interpretation_en에는 placeholder 문구를 쓰지 마라.\n"
             "- action_tendency는 정확히 one of: mobilize, defend, wait, retreat, celebrate, mourn\n"
             "- misinterpretation_type는 정확히 one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction\n"

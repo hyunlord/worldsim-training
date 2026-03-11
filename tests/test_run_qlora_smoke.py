@@ -488,9 +488,100 @@ def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None
     )
 
     user_content = prompt_messages[-1]["content"]
-    assert "interpretation_ko는 한국어 한두 문장만 짧게 써라." in user_content
+    assert "interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라." in user_content
+    assert 'interpretation_ko는 주어 없는 해석 문장으로만 쓰고 "...라고 여긴다" 또는 "...라고 판단한다"처럼 끝내라.' in user_content
+    assert "interpretation_en은 interpretation_ko와 같은 뜻의 영어 한 문장만 써라." in user_content
+    assert 'interpretation_ko를 "그는", "그녀는", "이 인물은"으로 시작하지 마라.' in user_content
+    assert "interpretation_ko에는 성격 분석, 기질 설명, 현재 상태 설명, 상황 요약을 쓰지 마라." in user_content
+    assert "interpretation_ko에는 추론 과정, 이유 설명, 메타 설명을 쓰지 마라." in user_content
+    assert "interpretation_ko에는 신탁 자체를 언급하지 말고 해석 결과만 직접 말하라." in user_content
     assert "action_tendency는 정확히 one of" in user_content
     assert "misinterpretation_type는 정확히 one of" in user_content
+
+
+def test_semantic_guard_task_g_blocks_personality_meta_reasoning() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_messages = _build_sample_prompt_messages(
+        {
+            "task": "G",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {
+                    "role": "user",
+                    "content": (
+                        "[과제] 신탁 풀이\n"
+                        "[기질 이름]\n우울질\n"
+                        "[인물 성격]\n겁많음, 꼼꼼함, 조용함\n"
+                        "[ORACLE]\n북쪽 산 너머에 풍요가 있다"
+                    ),
+                },
+                {"role": "assistant", "content": "{}"},
+            ],
+        }
+    )
+
+    user_content = prompt_messages[-1]["content"]
+    assert "성격 분석" in user_content
+    assert "기질 설명" in user_content
+    assert "현재 상태 설명" in user_content
+    assert "상황 요약" in user_content
+    assert "추론 과정" in user_content
+    assert "메타 설명" in user_content
+    assert '"그는", "그녀는", "이 인물은"으로 시작하지 마라.' in user_content
+    assert "신탁 자체를 언급하지 말고 해석 결과만 직접 말하라." in user_content
+    assert "interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라." in user_content
+    assert '"...라고 여긴다" 또는 "...라고 판단한다"' in user_content
+
+
+def test_build_sample_prompt_messages_strips_personality_sections_for_g_only() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_g = _build_sample_prompt_messages(
+        {
+            "task": "G",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {
+                    "role": "user",
+                    "content": (
+                        "[기질 이름]\n우울질\n\n"
+                        "[기질 키워드]\n신중함, 불안함\n\n"
+                        "[인물 성격]\n겁많음, 조용함\n\n"
+                        "[ORACLE]\n북쪽 산 너머에 풍요가 있다"
+                    ),
+                },
+                {"role": "assistant", "content": "{}"},
+            ],
+        }
+    )[-1]["content"]
+
+    prompt_b = _build_sample_prompt_messages(
+        {
+            "task": "B",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {
+                    "role": "user",
+                    "content": (
+                        "[기질 이름]\n우울질\n\n"
+                        "[기질 키워드]\n신중함, 불안함\n\n"
+                        "[인물 성격]\n겁많음, 조용함\n\n"
+                        "[상황]\n날랜 짐승이 나타났다"
+                    ),
+                },
+                {"role": "assistant", "content": "{}"},
+            ],
+        }
+    )[-1]["content"]
+
+    assert "[기질 이름]" not in prompt_g
+    assert "[기질 키워드]" not in prompt_g
+    assert "[인물 성격]" not in prompt_g
+    assert "[ORACLE]" in prompt_g
+    assert "[기질 이름]" in prompt_b
+    assert "[기질 키워드]" in prompt_b
+    assert "[인물 성격]" in prompt_b
 
 
 def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -> None:
