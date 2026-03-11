@@ -31,6 +31,21 @@ SAMPLE_GENERATION_REMINDER = (
     "- 각 field에는 실제 값만 채워라.\n"
     "- 모든 key 이름과 문자열 값은 JSON 큰따옴표를 써라.\n"
 )
+LEAKY_GENERATION_SECTION_LABELS = {
+    "출력 형식",
+    "유효값 다시 보기",
+    "어투",
+    "말투",
+    "감정 선택지",
+    "register 선택지",
+    "화자 역할 선택지",
+    "판단 근거 선택지",
+    "이전 감정 고르기",
+    "전이 방식 선택지",
+    "행동 기울기 선택지",
+    "오해 방식 선택지",
+    "지배 기질축 선택지",
+}
 NOTEBOOK_RUN_MODES = {
     "preflight": {"max_steps": 0, "max_train_samples": 8, "max_eval_samples": 4},
     "smoke": {"max_steps": 3, "max_train_samples": 32, "max_eval_samples": 16},
@@ -548,7 +563,7 @@ def _strip_labeled_sections(content: str, labels: set[str]) -> str:
 
 
 def _sanitize_generation_user_content(content: str) -> str:
-    return _strip_labeled_sections(content, {"출력 형식", "유효값 다시 보기", "어투", "말투"})
+    return _strip_labeled_sections(content, LEAKY_GENERATION_SECTION_LABELS)
 
 
 def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -576,8 +591,10 @@ def _sample_generation_max_new_tokens(task: str) -> int:
 
 
 def _sample_generation_assistant_prefix(task: str) -> str:
+    if task == "E":
+        return "{\"action_id\": "
     if task == "F":
-        return "{\"emotion\": "
+        return "{\"emotion\": \""
     return "{"
 
 
@@ -587,12 +604,14 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다.\n"
             "- 모든 문자열 값은 JSON 큰따옴표를 지켜라.\n"
             "- 자기소개나 대화 라벨을 쓰지 마라.\n"
+            "- dominant_trait는 정확히 one of: novelty_seeking, harm_avoidance, reward_dependence, persistence\n"
         )
     if task == "B":
         return (
             "- key 순서는 text_ko, text_en, register, emotion_expressed, intensity, mimetics, temperament_influence 이다.\n"
             "- placeholder 문구를 그대로 쓰지 마라.\n"
             "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
+            "- emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라.\n"
         )
     if task == "C":
         return (
@@ -600,12 +619,15 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- register는 정확히 one of: haera, hao, hae\n"
             "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
             "- 실제 대사만 쓰고 지시문을 따라 적지 마라.\n"
+            "- speaker_role은 정확히 one of: elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer\n"
         )
     if task == "E":
         return (
             "- key 순서는 action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor 이다.\n"
             "- personality_reasoning은 정확히 one of: high_NS, high_HA, high_RD, high_P\n"
             "- hint_ko와 hint_en에는 실제 이유를 써라.\n"
+            "- hint_en에는 실제 영어 이유를 써라.\n"
+            "- action_id와 confidence만 숫자이고 나머지는 문자열이다.\n"
         )
     if task == "F":
         return (
@@ -614,6 +636,7 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- previous_emotion도 영어 감정 id 하나만 써라.\n"
             "- transition_type은 정확히 one of: gradual, sudden, sustained\n"
             "- 모든 key 이름은 반드시 JSON 큰따옴표를 써라.\n"
+            "- emotion과 previous_emotion에는 숫자를 쓰지 마라.\n"
         )
     if task == "G":
         return (
@@ -622,6 +645,7 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- action_tendency는 정확히 one of: mobilize, defend, wait, retreat, celebrate, mourn\n"
             "- misinterpretation_type는 정확히 one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction\n"
             "- confidence만 숫자이고 나머지 enum field는 문자열이다.\n"
+            "- action_tendency와 misinterpretation_type에는 목록 전체를 쓰지 말고 하나만 써라.\n"
         )
     if task == "H":
         return (

@@ -398,6 +398,50 @@ def test_build_sample_prompt_messages_strips_leaky_format_sections() -> None:
     assert "[규칙]" in user_content
 
 
+def test_build_sample_prompt_messages_strips_selection_lists_but_keeps_action_options() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_messages = _build_sample_prompt_messages(
+        {
+            "task": "F",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {
+                    "role": "user",
+                    "content": (
+                        "[과제]\n"
+                        "감정을 답하라.\n\n"
+                        "[감정 선택지]\n"
+                        "joy, sadness\n\n"
+                        "[이전 감정 고르기]\n"
+                        "기쁨=joy\n\n"
+                        "[전이 방식 선택지]\n"
+                        "gradual, sudden\n"
+                    ),
+                },
+                {"role": "assistant", "content": "{}"},
+            ],
+        }
+    )
+    user_content = prompt_messages[-1]["content"]
+    assert "[감정 선택지]" not in user_content
+    assert "[이전 감정 고르기]" not in user_content
+    assert "[전이 방식 선택지]" not in user_content
+
+    e_prompt = _build_sample_prompt_messages(
+        {
+            "task": "E",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {"role": "user", "content": "[선택지]\n0:도망 1:숨기 2:맞서기"},
+                {"role": "assistant", "content": "{}"},
+            ],
+        }
+    )[-1]["content"]
+    assert "[선택지]" in e_prompt
+    assert "0:도망 1:숨기 2:맞서기" in e_prompt
+
+
 def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None:
     from training.lib.qlora_smoke import _build_sample_prompt_messages
 
@@ -435,6 +479,7 @@ def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -
     assert "Human:" not in prompt_a[-1]["content"]
     assert "Assistant:" not in prompt_a[-1]["content"]
     assert "자기소개나 대화 라벨을 쓰지 마라." in prompt_a[-1]["content"]
+    assert "dominant_trait는 정확히 one of" in prompt_a[-1]["content"]
 
     prompt_c = _build_sample_prompt_messages(
         {
@@ -449,6 +494,7 @@ def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -
     assert "key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다." in prompt_c[-1]["content"]
     assert "emotion_expressed는 정확히 one of" in prompt_c[-1]["content"]
     assert "실제 대사만 쓰고 지시문을 따라 적지 마라." in prompt_c[-1]["content"]
+    assert "speaker_role은 정확히 one of" in prompt_c[-1]["content"]
 
 
 def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules() -> None:
@@ -474,6 +520,11 @@ def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules()
     assert "모든 key 이름은 반드시 JSON 큰따옴표를 써라." in prompts["F"]
     assert "자기소개를 쓰지 마라." in prompts["G"]
     assert "허용 key는 name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers 뿐이다." in prompts["H"]
+    assert "emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라." in prompts["B"]
+    assert "hint_en에는 실제 영어 이유를 써라." in prompts["E"]
+    assert "action_id와 confidence만 숫자이고 나머지는 문자열이다." in prompts["E"]
+    assert "emotion과 previous_emotion에는 숫자를 쓰지 마라." in prompts["F"]
+    assert "action_tendency와 misinterpretation_type에는 목록 전체를 쓰지 말고 하나만 써라." in prompts["G"]
 
 
 def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
@@ -487,7 +538,8 @@ def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
 def test_sample_generation_assistant_prefix_is_task_specific() -> None:
     from training.lib.qlora_smoke import _sample_generation_assistant_prefix
 
-    assert _sample_generation_assistant_prefix("F") == '{"emotion": '
+    assert _sample_generation_assistant_prefix("E") == '{"action_id": '
+    assert _sample_generation_assistant_prefix("F") == '{"emotion": "'
     assert _sample_generation_assistant_prefix("A") == "{"
 
 
