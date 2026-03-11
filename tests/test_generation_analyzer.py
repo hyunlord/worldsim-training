@@ -140,6 +140,29 @@ def test_analyze_sample_classifies_semantic_low_quality() -> None:
     assert analysis["primary_category"] == "semantic_low_quality"
 
 
+def test_analyze_sample_classifies_prompt_leakage() -> None:
+    from tools.generation_analyzer import analyze_sample
+
+    sample = {
+        "task": "C",
+        "generated_assistant": json.dumps(
+            {
+                "speech_ko": "I'm here to help you find your way.",
+                "speech_en": "I am here to assist you in finding your path.",
+                "register": "haera",
+                "emotion_expressed": "trust",
+                "speaker_role": "shaman",
+                "temperament_tone": "snake_case phrase",
+            },
+            ensure_ascii=False,
+        ),
+    }
+
+    analysis = analyze_sample(sample)
+    assert analysis["primary_category"] == "prompt_leakage"
+    assert analysis["prompt_leakage"]["pattern"] == "placeholder_literal"
+
+
 def test_summarize_samples_reports_counts() -> None:
     from tools.generation_analyzer import summarize_samples
 
@@ -202,3 +225,22 @@ def test_recommend_next_action_prefers_structure_failures() -> None:
 
     assert recommendation["status"] == "structure_failure"
     assert "generation-time fix" in recommendation["recommended_next_action"]
+
+
+def test_recommend_next_action_flags_prompt_leakage() -> None:
+    from tools.generation_analyzer import recommend_next_action
+
+    recommendation = recommend_next_action(
+        {
+            "malformed_json_count": 0,
+            "truncation_count": 0,
+            "enum_drift_count": 0,
+            "prompt_leakage_count": 2,
+            "language_drift_count": 0,
+            "semantic_low_quality_count": 0,
+            "semantic_drift_count": 0,
+        }
+    )
+
+    assert recommendation["status"] == "prompt_leakage_issue"
+    assert "prompt leakage" in recommendation["recommended_next_action"]

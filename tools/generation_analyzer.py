@@ -33,11 +33,36 @@ FAILURE_CATEGORIES = {
     "truncation",
     "fenced_json",
     "trailing_text",
+    "prompt_leakage",
     "enum_drift",
     "language_drift",
     "semantic_low_quality",
     "semantic_drift",
 }
+
+PLACEHOLDER_LITERALS = {
+    "snake_case phrase",
+    "english 1 sentence",
+    "english 2 sentences",
+    "감정 8개 중 하나",
+    "화자 역할 1개",
+    "행동 기울기 1개",
+    "오해 방식 1개",
+}
+INSTRUCTION_MARKERS = (
+    "[생성 규칙]",
+    "[과제]",
+    "[task]",
+    "must be exactly one of",
+    "json object 하나만 출력하라",
+)
+G_SELF_DESCRIPTION_MARKERS = (
+    "나는 우울질이 있는 인물입니다",
+    "나는 다혈질이 있는 인물입니다",
+    "나는 담즙질이 있는 인물입니다",
+    "나는 점액질이 있는 인물입니다",
+    "특징을 가지고 있습니다",
+)
 
 
 def load_samples(path: str | Path) -> list[dict]:
@@ -184,12 +209,54 @@ def check_enum_drift(sample_or_data: Mapping[str, Any]) -> list[dict[str, Any]]:
     return results
 
 
+def _iter_text_fields(payload: Mapping[str, Any]) -> list[tuple[str, str]]:
+    text_fields: list[tuple[str, str]] = []
+    for field_name, value in payload.items():
+        if isinstance(value, str):
+            text_fields.append((field_name, value))
+    return text_fields
+
+
+def detect_prompt_leakage(sample: Mapping[str, Any]) -> dict[str, Any] | None:
+    task = str(sample.get("task", "unknown"))
+    payload = validate_json_text(str(sample.get("generated_assistant", ""))).get("payload")
+    if not isinstance(payload, Mapping):
+        return None
+
+    for field_name, value in _iter_text_fields(payload):
+        lowered = value.lower()
+        if any(marker in lowered for marker in PLACEHOLDER_LITERALS):
+            return {
+                "pattern": "placeholder_literal",
+                "field_name": field_name,
+                "matched_text": value,
+            }
+        if any(marker in lowered for marker in INSTRUCTION_MARKERS):
+            return {
+                "pattern": "instruction_copy",
+                "field_name": field_name,
+                "matched_text": value,
+            }
+
+    if task == "G":
+        interpretation = str(payload.get("interpretation_ko", ""))
+        if any(marker in interpretation for marker in G_SELF_DESCRIPTION_MARKERS):
+            return {
+                "pattern": "self_description_copy",
+                "field_name": "interpretation_ko",
+                "matched_text": interpretation,
+            }
+
+    return None
+
+
 def analyze_sample(sample: Mapping[str, Any]) -> dict[str, Any]:
     task = str(sample.get("task", "unknown"))
     json_analysis = validate_json_text(str(sample.get("generated_assistant", "")))
     enum_drift = check_enum_drift(sample)
     base = analyze_sample_generation(sample)
     semantic = validate_g_semantics(sample) if task == "G" else None
+    prompt_leakage = detect_prompt_leakage(sample)
 
     primary_category = "ok"
     if json_analysis["json_failure"]["category"] == "fenced_json":
@@ -200,6 +267,8 @@ def analyze_sample(sample: Mapping[str, Any]) -> dict[str, Any]:
         primary_category = "trailing_text"
     elif json_analysis["malformed_json"]:
         primary_category = "malformed_json"
+    elif prompt_leakage:
+        primary_category = "prompt_leakage"
     elif enum_drift:
         primary_category = "enum_drift"
     elif semantic and semantic["semantic_status"] == "LANGUAGE_DRIFT":
@@ -214,6 +283,7 @@ def analyze_sample(sample: Mapping[str, Any]) -> dict[str, Any]:
         "primary_category": primary_category,
         "json_analysis": json_analysis,
         "enum_drift": enum_drift,
+        "prompt_leakage": prompt_leakage,
         "semantic": semantic,
         "base_analysis": base,
         "generated_assistant": str(sample.get("generated_assistant", "")),
@@ -232,6 +302,8 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     overall_status = "structurally_usable"
     if any(counts.get(category, 0) > 0 for category in ("malformed_json", "truncation", "fenced_json", "trailing_text")):
         overall_status = "structure_failure"
+    elif counts.get("prompt_leakage", 0) > 0:
+        overall_status = "prompt_leakage_issue"
     elif counts.get("enum_drift", 0) > 0:
         overall_status = "enum_instability"
     elif any(counts.get(category, 0) > 0 for category in ("language_drift", "semantic_low_quality", "semantic_drift")):
@@ -244,6 +316,7 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "truncation_count": counts.get("truncation", 0),
         "fenced_json_count": counts.get("fenced_json", 0),
         "trailing_text_count": counts.get("trailing_text", 0),
+        "prompt_leakage_count": counts.get("prompt_leakage", 0),
         "enum_drift_count": counts.get("enum_drift", 0),
         "language_drift_count": counts.get("language_drift", 0),
         "semantic_low_quality_count": counts.get("semantic_low_quality", 0),
@@ -270,6 +343,7 @@ def generate_report(samples: Sequence[Mapping[str, Any]], *, examples_per_catego
                 "task": analysis["task"],
                 "generated_assistant": analysis["generated_assistant"],
                 "json_failure": analysis["json_analysis"]["json_failure"],
+                "prompt_leakage": analysis["prompt_leakage"],
                 "enum_drift": analysis["enum_drift"],
                 "semantic": analysis["semantic"],
             }
@@ -282,6 +356,7 @@ def generate_report(samples: Sequence[Mapping[str, Any]], *, examples_per_catego
         "truncation_count": summary["truncation_count"],
         "fenced_json_count": summary["fenced_json_count"],
         "trailing_text_count": summary["trailing_text_count"],
+        "prompt_leakage_count": summary["prompt_leakage_count"],
         "enum_drift_count": summary["enum_drift_count"],
         "language_drift_count": summary["language_drift_count"],
         "semantic_low_quality_count": summary["semantic_low_quality_count"],
@@ -296,6 +371,7 @@ def recommend_next_action(report: Mapping[str, Any]) -> dict[str, str]:
     malformed_json_count = int(report.get("malformed_json_count", 0) or 0)
     truncation_count = int(report.get("truncation_count", 0) or 0)
     enum_drift_count = int(report.get("enum_drift_count", 0) or 0)
+    prompt_leakage_count = int(report.get("prompt_leakage_count", 0) or 0)
     language_drift_count = int(report.get("language_drift_count", 0) or 0)
     semantic_low_quality_count = int(report.get("semantic_low_quality_count", 0) or 0)
     semantic_drift_count = int(report.get("semantic_drift_count", 0) or 0)
@@ -309,6 +385,11 @@ def recommend_next_action(report: Mapping[str, Any]) -> dict[str, str]:
         return {
             "status": "enum_instability",
             "recommended_next_action": "Stabilize task-specific enum generation before the next smoke run.",
+        }
+    if prompt_leakage_count > 0:
+        return {
+            "status": "prompt_leakage_issue",
+            "recommended_next_action": "Tighten inference prompts to reduce prompt leakage before the next smoke run.",
         }
     if language_drift_count > 0 or semantic_low_quality_count > 0 or semantic_drift_count > 0:
         return {
