@@ -357,6 +357,45 @@ def test_build_sample_prompt_messages_appends_generic_generation_rules() -> None
     assert user_content.startswith("[과제]")
     assert "JSON object 하나만 출력하라." in user_content
     assert "첫 글자는 반드시 { 여야 한다." in user_content
+    assert "형식 예시나 placeholder 문구를 복사하지 마라." in user_content
+    assert "모든 key 이름과 문자열 값은 JSON 큰따옴표를 써라." in user_content
+
+
+def test_build_sample_prompt_messages_strips_leaky_format_sections() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_messages = _build_sample_prompt_messages(
+        {
+            "task": "B",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {
+                    "role": "user",
+                    "content": (
+                        "[과제]\n"
+                        "반응을 써라.\n\n"
+                        "[어투]\n"
+                        "해라체로 써라. 문장을 -다, -는다 로 끝내라.\n\n"
+                        "[출력 형식]\n"
+                        '{"text_ko":"순우리말 2문장","text_en":"English 2 sentences"}\n\n'
+                        "[유효값 다시 보기]\n"
+                        "emotion_expressed must be exactly one of: joy, sadness\n\n"
+                        "[규칙]\n"
+                        "JSON만 출력하라\n"
+                    ),
+                },
+                {"role": "assistant", "content": '{"text_ko":"..."}'},
+            ],
+        }
+    )
+
+    user_content = prompt_messages[-1]["content"]
+    assert "[출력 형식]" not in user_content
+    assert "[유효값 다시 보기]" not in user_content
+    assert "[어투]" not in user_content
+    assert "English 2 sentences" not in user_content
+    assert "emotion_expressed must be exactly one of: joy, sadness" not in user_content
+    assert "[규칙]" in user_content
 
 
 def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None:
@@ -393,6 +432,9 @@ def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -
         }
     )
     assert "key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다." in prompt_a[-1]["content"]
+    assert "Human:" not in prompt_a[-1]["content"]
+    assert "Assistant:" not in prompt_a[-1]["content"]
+    assert "자기소개나 대화 라벨을 쓰지 마라." in prompt_a[-1]["content"]
 
     prompt_c = _build_sample_prompt_messages(
         {
@@ -406,6 +448,32 @@ def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -
     )
     assert "key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다." in prompt_c[-1]["content"]
     assert "emotion_expressed는 정확히 one of" in prompt_c[-1]["content"]
+    assert "실제 대사만 쓰고 지시문을 따라 적지 마라." in prompt_c[-1]["content"]
+
+
+def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompts = {}
+    for task in ("B", "E", "F", "G", "H"):
+        prompts[task] = _build_sample_prompt_messages(
+            {
+                "task": task,
+                "messages": [
+                    {"role": "system", "content": "sys"},
+                    {"role": "user", "content": f"[TASK] {task}"},
+                    {"role": "assistant", "content": "{}"},
+                ],
+            }
+        )[-1]["content"]
+
+    assert "placeholder 문구를 그대로 쓰지 마라." in prompts["B"]
+    assert "key 순서는 action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor 이다." in prompts["E"]
+    assert "emotion은 정확히 one of" in prompts["F"]
+    assert "confidence만 숫자이고 나머지 enum field는 문자열이다." in prompts["G"]
+    assert "모든 key 이름은 반드시 JSON 큰따옴표를 써라." in prompts["F"]
+    assert "자기소개를 쓰지 마라." in prompts["G"]
+    assert "허용 key는 name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers 뿐이다." in prompts["H"]
 
 
 def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
@@ -414,6 +482,13 @@ def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
     assert _sample_generation_max_new_tokens("G") == 512
     assert _sample_generation_max_new_tokens("H") == 512
     assert _sample_generation_max_new_tokens("F") == 288
+
+
+def test_sample_generation_assistant_prefix_is_task_specific() -> None:
+    from training.lib.qlora_smoke import _sample_generation_assistant_prefix
+
+    assert _sample_generation_assistant_prefix("F") == '{"emotion": '
+    assert _sample_generation_assistant_prefix("A") == "{"
 
 
 def test_normalize_known_enum_values_only_fixes_case_style() -> None:

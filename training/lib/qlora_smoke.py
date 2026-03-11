@@ -27,6 +27,9 @@ SAMPLE_GENERATION_REMINDER = (
     "- markdown fence를 쓰지 마라.\n"
     "- 설명문을 덧붙이지 마라.\n"
     "- 첫 글자는 반드시 { 여야 한다.\n"
+    "- 형식 예시나 placeholder 문구를 복사하지 마라.\n"
+    "- 각 field에는 실제 값만 채워라.\n"
+    "- 모든 key 이름과 문자열 값은 JSON 큰따옴표를 써라.\n"
 )
 NOTEBOOK_RUN_MODES = {
     "preflight": {"max_steps": 0, "max_train_samples": 8, "max_eval_samples": 4},
@@ -526,11 +529,34 @@ def _select_generation_rows(train_rows: list[dict], eval_rows: list[dict]) -> li
     return picked
 
 
+def _strip_labeled_sections(content: str, labels: set[str]) -> str:
+    lines = content.splitlines()
+    kept: list[str] = []
+    skip = False
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("[") and stripped.endswith("]") and len(stripped) > 2:
+            label = stripped[1:-1].strip()
+            skip = label in labels
+            if skip:
+                continue
+        if not skip:
+            kept.append(line)
+
+    return "\n".join(kept).strip()
+
+
+def _sanitize_generation_user_content(content: str) -> str:
+    return _strip_labeled_sections(content, {"출력 형식", "유효값 다시 보기", "어투", "말투"})
+
+
 def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]]:
     prompt_messages = [dict(message) for message in row["messages"][:-1]]
     if prompt_messages and prompt_messages[-1]["role"] == "user":
         task = str(row.get("task", "unknown"))
         prompt_messages[-1] = dict(prompt_messages[-1])
+        prompt_messages[-1]["content"] = _sanitize_generation_user_content(str(prompt_messages[-1]["content"]))
         prompt_messages[-1]["content"] = (
             prompt_messages[-1]["content"].rstrip()
             + SAMPLE_GENERATION_REMINDER
@@ -549,23 +575,59 @@ def _sample_generation_max_new_tokens(task: str) -> int:
     return 224
 
 
+def _sample_generation_assistant_prefix(task: str) -> str:
+    if task == "F":
+        return "{\"emotion\": "
+    return "{"
+
+
 def _task_specific_generation_reminder(task: str) -> str:
     if task == "A":
         return (
             "- key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다.\n"
             "- 모든 문자열 값은 JSON 큰따옴표를 지켜라.\n"
+            "- 자기소개나 대화 라벨을 쓰지 마라.\n"
+        )
+    if task == "B":
+        return (
+            "- key 순서는 text_ko, text_en, register, emotion_expressed, intensity, mimetics, temperament_influence 이다.\n"
+            "- placeholder 문구를 그대로 쓰지 마라.\n"
+            "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
         )
     if task == "C":
         return (
             "- key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다.\n"
             "- register는 정확히 one of: haera, hao, hae\n"
             "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
+            "- 실제 대사만 쓰고 지시문을 따라 적지 마라.\n"
+        )
+    if task == "E":
+        return (
+            "- key 순서는 action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor 이다.\n"
+            "- personality_reasoning은 정확히 one of: high_NS, high_HA, high_RD, high_P\n"
+            "- hint_ko와 hint_en에는 실제 이유를 써라.\n"
+        )
+    if task == "F":
+        return (
+            "- key 순서는 emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type, temperament_amplifier 이다.\n"
+            "- emotion은 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
+            "- previous_emotion도 영어 감정 id 하나만 써라.\n"
+            "- transition_type은 정확히 one of: gradual, sudden, sustained\n"
+            "- 모든 key 이름은 반드시 JSON 큰따옴표를 써라.\n"
         )
     if task == "G":
         return (
             "- interpretation_ko는 한국어 한두 문장만 짧게 써라. 성격 설명을 길게 반복하지 마라.\n"
+            "- interpretation_ko에는 신탁 풀이만 쓰고 자기소개를 쓰지 마라.\n"
             "- action_tendency는 정확히 one of: mobilize, defend, wait, retreat, celebrate, mourn\n"
             "- misinterpretation_type는 정확히 one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction\n"
+            "- confidence만 숫자이고 나머지 enum field는 문자열이다.\n"
+        )
+    if task == "H":
+        return (
+            "- 허용 key는 name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers 뿐이다.\n"
+            "- 값이 없으면 빈 배열 []를 써라.\n"
+            "- schema 설명문이나 PascalCase example 문구를 복사하지 마라.\n"
         )
     return ""
 
@@ -614,7 +676,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
     for row in rows:
         task = str(row.get("task", "unknown"))
         prompt_messages = _build_sample_prompt_messages(row)
-        assistant_prefix = "{"
+        assistant_prefix = _sample_generation_assistant_prefix(task)
         prompt_text = render_conversation(tokenizer, prompt_messages, add_generation_prompt=True) + assistant_prefix
         encoded = tokenizer(prompt_text, return_tensors="pt")
         encoded = {key: value.to(device) for key, value in encoded.items()}
