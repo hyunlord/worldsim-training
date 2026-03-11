@@ -550,6 +550,17 @@ def _sample_generation_max_new_tokens(task: str) -> int:
 
 
 def _task_specific_generation_reminder(task: str) -> str:
+    if task == "A":
+        return (
+            "- key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다.\n"
+            "- 모든 문자열 값은 JSON 큰따옴표를 지켜라.\n"
+        )
+    if task == "C":
+        return (
+            "- key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다.\n"
+            "- register는 정확히 one of: haera, hao, hae\n"
+            "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
+        )
     if task == "G":
         return (
             "- interpretation_ko는 한국어 한두 문장만 짧게 써라. 성격 설명을 길게 반복하지 마라.\n"
@@ -601,12 +612,13 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
     device = runtime.device
 
     for row in rows:
+        task = str(row.get("task", "unknown"))
         prompt_messages = _build_sample_prompt_messages(row)
         assistant_prefix = "{"
         prompt_text = render_conversation(tokenizer, prompt_messages, add_generation_prompt=True) + assistant_prefix
         encoded = tokenizer(prompt_text, return_tensors="pt")
         encoded = {key: value.to(device) for key, value in encoded.items()}
-        max_new_tokens = _sample_generation_max_new_tokens(str(row.get("task", "unknown")))
+        max_new_tokens = _sample_generation_max_new_tokens(task)
 
         class JsonObjectStopper(StoppingCriteria):
             def __call__(self, input_ids, scores, **kwargs):  # noqa: ANN001, D401
@@ -634,7 +646,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
         parse_error = None
         try:
             payload = json.loads(generated_text)
-            normalized_payload, enum_normalization_details = _normalize_known_enum_values(str(row.get("task", "unknown")), payload)
+            normalized_payload, enum_normalization_details = _normalize_known_enum_values(task, payload)
             if enum_normalization_details:
                 generated_text = json.dumps(normalized_payload, ensure_ascii=False)
                 normalization_details.extend(enum_normalization_details)

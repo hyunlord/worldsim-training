@@ -379,6 +379,35 @@ def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None
     assert "misinterpretation_type는 정확히 one of" in user_content
 
 
+def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -> None:
+    from training.lib.qlora_smoke import _build_sample_prompt_messages
+
+    prompt_a = _build_sample_prompt_messages(
+        {
+            "task": "A",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {"role": "user", "content": "[TASK] A"},
+                {"role": "assistant", "content": "{\"text_ko\":\"...\"}"},
+            ],
+        }
+    )
+    assert "key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다." in prompt_a[-1]["content"]
+
+    prompt_c = _build_sample_prompt_messages(
+        {
+            "task": "C",
+            "messages": [
+                {"role": "system", "content": "sys"},
+                {"role": "user", "content": "[TASK] C"},
+                {"role": "assistant", "content": "{\"speech_ko\":\"...\"}"},
+            ],
+        }
+    )
+    assert "key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다." in prompt_c[-1]["content"]
+    assert "emotion_expressed는 정확히 one of" in prompt_c[-1]["content"]
+
+
 def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
     from training.lib.qlora_smoke import _sample_generation_max_new_tokens
 
