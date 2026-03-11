@@ -28,12 +28,14 @@ SAMPLE_GENERATION_REMINDER = (
     "- 설명문을 덧붙이지 마라.\n"
     "- 첫 글자는 반드시 { 여야 한다.\n"
     "- 형식 예시나 placeholder 문구를 복사하지 마라.\n"
+    "- 길이 설명문, enum 설명문, schema 설명문을 값으로 쓰지 마라.\n"
     "- 각 field에는 실제 값만 채워라.\n"
     "- 모든 key 이름과 문자열 값은 JSON 큰따옴표를 써라.\n"
 )
 LEAKY_GENERATION_SECTION_LABELS = {
     "출력 형식",
     "유효값 다시 보기",
+    "규칙",
     "어투",
     "말투",
     "감정 선택지",
@@ -591,10 +593,18 @@ def _sample_generation_max_new_tokens(task: str) -> int:
 
 
 def _sample_generation_assistant_prefix(task: str) -> str:
+    if task == "A":
+        return "{\"text_ko\": \""
+    if task == "B":
+        return "{\"text_ko\": \""
+    if task == "C":
+        return "{\"speech_ko\": \""
     if task == "E":
         return "{\"action_id\": "
     if task == "F":
         return "{\"emotion\": \""
+    if task == "G":
+        return "{\"interpretation_ko\": \""
     return "{"
 
 
@@ -603,6 +613,8 @@ def _task_specific_generation_reminder(task: str) -> str:
         return (
             "- key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다.\n"
             "- 모든 문자열 값은 JSON 큰따옴표를 지켜라.\n"
+            "- text_ko와 text_en에는 실제 묘사 문장을 쓰고 형용사 이름만 단독으로 쓰지 마라.\n"
+            "- register는 숫자가 아니라 haera, hao, hae 중 문자열 하나다.\n"
             "- 자기소개나 대화 라벨을 쓰지 마라.\n"
             "- dominant_trait는 정확히 one of: novelty_seeking, harm_avoidance, reward_dependence, persistence\n"
         )
@@ -610,6 +622,7 @@ def _task_specific_generation_reminder(task: str) -> str:
         return (
             "- key 순서는 text_ko, text_en, register, emotion_expressed, intensity, mimetics, temperament_influence 이다.\n"
             "- placeholder 문구를 그대로 쓰지 마라.\n"
+            "- text_ko와 text_en에는 길이 설명문이나 schema 문구를 쓰지 마라.\n"
             "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
             "- emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라.\n"
         )
@@ -618,6 +631,9 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다.\n"
             "- register는 정확히 one of: haera, hao, hae\n"
             "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
+            "- emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라.\n"
+            "- emotion_expressed는 JSON 배열이 아니라 문자열 하나다.\n"
+            "- speech_ko와 speech_en에는 자기소개를 쓰지 말고 바로 대사를 써라.\n"
             "- 실제 대사만 쓰고 지시문을 따라 적지 마라.\n"
             "- speaker_role은 정확히 one of: elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer\n"
         )
@@ -627,6 +643,7 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- personality_reasoning은 정확히 one of: high_NS, high_HA, high_RD, high_P\n"
             "- hint_ko와 hint_en에는 실제 이유를 써라.\n"
             "- hint_en에는 실제 영어 이유를 써라.\n"
+            "- hint_ko와 hint_en에는 길이 설명문이나 예시 문구를 쓰지 마라.\n"
             "- action_id와 confidence만 숫자이고 나머지는 문자열이다.\n"
         )
     if task == "F":
@@ -636,12 +653,14 @@ def _task_specific_generation_reminder(task: str) -> str:
             "- previous_emotion도 영어 감정 id 하나만 써라.\n"
             "- transition_type은 정확히 one of: gradual, sudden, sustained\n"
             "- 모든 key 이름은 반드시 JSON 큰따옴표를 써라.\n"
+            "- cause_ko와 cause_en에는 선택지나 규칙 문구를 쓰지 마라.\n"
             "- emotion과 previous_emotion에는 숫자를 쓰지 마라.\n"
         )
     if task == "G":
         return (
             "- interpretation_ko는 한국어 한두 문장만 짧게 써라. 성격 설명을 길게 반복하지 마라.\n"
             "- interpretation_ko에는 신탁 풀이만 쓰고 자기소개를 쓰지 마라.\n"
+            "- interpretation_ko와 interpretation_en에는 placeholder 문구를 쓰지 마라.\n"
             "- action_tendency는 정확히 one of: mobilize, defend, wait, retreat, celebrate, mourn\n"
             "- misinterpretation_type는 정확히 one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction\n"
             "- confidence만 숫자이고 나머지 enum field는 문자열이다.\n"
@@ -938,31 +957,47 @@ def _enum_drift_issues(task: str, payload: Any) -> list[tuple[str, str]]:
     if not isinstance(payload, dict):
         return []
 
+    def invalid_issue(field_name: str, value: Any, valid_values: set[str]) -> tuple[str, str] | None:
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return None if value in valid_values else (field_name, value)
+        if isinstance(value, (list, dict)):
+            return (field_name, json.dumps(value, ensure_ascii=False))
+        return (field_name, str(value))
+
     issues: list[tuple[str, str]] = []
     if task in {"B", "C"}:
         emotion_value = payload.get("emotion_expressed")
         register_value = payload.get("register")
-        if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
-            issues.append(("emotion_expressed", str(emotion_value)))
-        if register_value is not None and register_value not in VALID_REGISTERS:
-            issues.append(("register", str(register_value)))
+        issue = invalid_issue("emotion_expressed", emotion_value, VALID_EMOTIONS)
+        if issue:
+            issues.append(issue)
+        issue = invalid_issue("register", register_value, VALID_REGISTERS)
+        if issue:
+            issues.append(issue)
     elif task == "F":
         emotion_value = payload.get("emotion")
         transition_type = payload.get("transition_type")
-        if emotion_value is not None and emotion_value not in VALID_EMOTIONS:
-            issues.append(("emotion", str(emotion_value)))
-        if transition_type is not None and transition_type not in VALID_TRANSITION_TYPES:
-            issues.append(("transition_type", str(transition_type)))
+        issue = invalid_issue("emotion", emotion_value, VALID_EMOTIONS)
+        if issue:
+            issues.append(issue)
+        issue = invalid_issue("transition_type", transition_type, VALID_TRANSITION_TYPES)
+        if issue:
+            issues.append(issue)
     elif task == "G":
         action_tendency = payload.get("action_tendency")
         register_value = payload.get("register")
         misinterpretation_type = payload.get("misinterpretation_type")
-        if action_tendency is not None and action_tendency not in VALID_ACTION_TENDENCIES:
-            issues.append(("action_tendency", str(action_tendency)))
-        if register_value is not None and register_value not in VALID_REGISTERS:
-            issues.append(("register", str(register_value)))
-        if misinterpretation_type is not None and misinterpretation_type not in VALID_MISINTERPRETATION_TYPES:
-            issues.append(("misinterpretation_type", str(misinterpretation_type)))
+        issue = invalid_issue("action_tendency", action_tendency, VALID_ACTION_TENDENCIES)
+        if issue:
+            issues.append(issue)
+        issue = invalid_issue("register", register_value, VALID_REGISTERS)
+        if issue:
+            issues.append(issue)
+        issue = invalid_issue("misinterpretation_type", misinterpretation_type, VALID_MISINTERPRETATION_TYPES)
+        if issue:
+            issues.append(issue)
     return issues
 
 
