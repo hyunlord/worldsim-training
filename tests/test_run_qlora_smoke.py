@@ -489,7 +489,7 @@ def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None
 
     user_content = prompt_messages[-1]["content"]
     assert "interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라." in user_content
-    assert 'interpretation_ko는 주어 없는 해석 문장으로만 쓰고 "...라고 여긴다" 또는 "...라고 판단한다"처럼 끝내라.' in user_content
+    assert 'interpretation_ko는 반드시 "이 말은 ...라고 여긴다" 또는 "이 말은 ...라고 판단한다" 형태로 써라.' in user_content
     assert "interpretation_en은 interpretation_ko와 같은 뜻의 영어 한 문장만 써라." in user_content
     assert 'interpretation_ko를 "그는", "그녀는", "이 인물은"으로 시작하지 마라.' in user_content
     assert "interpretation_ko에는 성격 분석, 기질 설명, 현재 상태 설명, 상황 요약을 쓰지 마라." in user_content
@@ -531,7 +531,7 @@ def test_semantic_guard_task_g_blocks_personality_meta_reasoning() -> None:
     assert '"그는", "그녀는", "이 인물은"으로 시작하지 마라.' in user_content
     assert "신탁 자체를 언급하지 말고 해석 결과만 직접 말하라." in user_content
     assert "interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라." in user_content
-    assert '"...라고 여긴다" 또는 "...라고 판단한다"' in user_content
+    assert '"이 말은 ...라고 여긴다" 또는 "이 말은 ...라고 판단한다"' in user_content
 
 
 def test_build_sample_prompt_messages_strips_personality_sections_for_g_only() -> None:
@@ -674,7 +674,7 @@ def test_sample_generation_assistant_prefix_is_task_specific() -> None:
     assert _sample_generation_assistant_prefix("C") == '{"speech_ko": "'
     assert _sample_generation_assistant_prefix("E") == '{"action_id": '
     assert _sample_generation_assistant_prefix("F") == '{"emotion": "'
-    assert _sample_generation_assistant_prefix("G") == '{"interpretation_ko": "'
+    assert _sample_generation_assistant_prefix("G") == '{"interpretation_ko": "이 말은 '
 
 
 def test_normalize_known_enum_values_only_fixes_case_style() -> None:
