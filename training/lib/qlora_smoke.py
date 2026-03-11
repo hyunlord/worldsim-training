@@ -781,6 +781,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
         validation_error = None
         structured_attempt_count = 1
         structured_attempts: list[dict[str, Any]] = []
+        structured_validation_metadata: dict[str, Any] | None = None
 
         def llm(generation_prompt: str) -> str:
             return _generate_sample_once(
@@ -816,12 +817,20 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 structured_attempt_count = structured.attempt_count
                 structured_attempts = [
                     {
+                        "attempt_index": attempt.attempt_index,
+                        "raw_output": attempt.raw_output,
+                        "candidate_output": attempt.candidate_output,
                         "json_error": attempt.json_error,
                         "validation_error": attempt.validation_error,
                         "error_kind": attempt.error_kind,
                     }
                     for attempt in structured.attempts
                 ]
+                structured_validation_metadata = {
+                    "attempt_count": structured.attempt_count,
+                    "last_error_kind": structured.last_error_kind,
+                    "attempts": structured_attempts,
+                }
         except StructuredGenerationError as exc:
             raw_generated_text = exc.last_raw_output
             generated_text = exc.last_output
@@ -830,12 +839,20 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
             structured_attempt_count = exc.attempt_count
             structured_attempts = [
                 {
+                    "attempt_index": attempt.attempt_index,
+                    "raw_output": attempt.raw_output,
+                    "candidate_output": attempt.candidate_output,
                     "json_error": attempt.json_error,
                     "validation_error": attempt.validation_error,
                     "error_kind": attempt.error_kind,
                 }
                 for attempt in exc.attempts
             ]
+            structured_validation_metadata = {
+                "attempt_count": exc.attempt_count,
+                "last_error_kind": exc.last_error_kind,
+                "attempts": structured_attempts,
+            }
             if exc.last_error_kind == "json":
                 parse_error = "JSONDecodeError"
             else:
@@ -854,6 +871,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "raw_generated_assistant": raw_generated_text,
                 "json_parse_error": parse_error,
                 "structured_validation_error": validation_error,
+                "structured_validation_metadata": structured_validation_metadata,
                 "structured_attempt_count": structured_attempt_count,
                 "structured_attempts": structured_attempts,
                 "generation_max_new_tokens": max_new_tokens,

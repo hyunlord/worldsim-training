@@ -859,3 +859,27 @@ def test_generate_structured_raises_after_exhausting_retries() -> None:
         assert "speaker_role" in exc.attempts[-1].validation_error
     else:
         raise AssertionError("Expected retries to exhaust and raise StructuredGenerationError")
+
+
+def test_generate_structured_retry_prompt_includes_validation_feedback_and_previous_json() -> None:
+    from training.lib.output_schema import TaskEOutput
+    from training.lib.structured_generation import generate_structured
+
+    seen_prompts: list[str] = []
+
+    def fake_llm(prompt: str) -> str:
+        seen_prompts.append(prompt)
+        if "temperament_factor:missing" in prompt and '"personality_reasoning":"high_HA"' in prompt:
+            return '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA","temperament_factor":"harm_avoidance_dominant"}'
+        return '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA"}'
+
+    result = generate_structured(fake_llm, "prompt", TaskEOutput)
+
+    assert result.attempt_count == 2
+    assert len(seen_prompts) == 2
+    assert "failed schema validation" in seen_prompts[1]
+    assert "temperament_factor:missing" in seen_prompts[1]
+    assert '"personality_reasoning":"high_HA"' in seen_prompts[1]
+    assert "Return ONLY corrected JSON." in seen_prompts[1]
+    assert result.attempts[0].attempt_index == 0
+    assert result.attempts[0].raw_output.endswith('"personality_reasoning":"high_HA"}')
