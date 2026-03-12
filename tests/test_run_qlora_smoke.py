@@ -122,9 +122,15 @@ def test_training_arguments_kwargs_matches_available_signature() -> None:
         gradient_accumulation_steps=1,
         learning_rate=2e-4,
         seed=42,
+        logging_steps=1,
+        eval_steps=0,
+        save_steps=0,
+        save_total_limit=1,
     )
 
+    assert kwargs["logging_steps"] == 1
     assert kwargs["eval_strategy"] == "no"
+    assert kwargs["save_strategy"] == "no"
     assert "use_mps_device" not in kwargs
     assert "no_cuda" not in kwargs
 
@@ -164,6 +170,25 @@ def test_programmatic_run_smoke_accepts_mapping() -> None:
     assert config.max_steps == 1
 
 
+def test_programmatic_run_baseline_uses_baseline_defaults() -> None:
+    from training.lib.qlora_smoke import BASELINE_MODEL_NAME, SmokeRunConfig, coerce_smoke_config
+
+    config = coerce_smoke_config({"run_mode": "baseline"}, default_run_mode="baseline")
+
+    assert isinstance(config, SmokeRunConfig)
+    assert config.run_mode == "baseline"
+    assert config.model_name == BASELINE_MODEL_NAME
+    assert config.max_steps == 200
+    assert config.max_train_samples == 0
+    assert config.max_eval_samples == 0
+    assert config.gradient_accumulation_steps == 8
+    assert config.learning_rate == 1e-4
+    assert config.logging_steps == 5
+    assert config.eval_steps == 25
+    assert config.save_steps == 25
+    assert config.save_total_limit == 2
+
+
 def test_programmatic_run_smoke_normalizes_dataclass_paths() -> None:
     from training.lib.qlora_smoke import SmokeRunConfig, coerce_smoke_config
 
@@ -178,6 +203,66 @@ def test_programmatic_run_smoke_normalizes_dataclass_paths() -> None:
     assert config.target_modules == ("q_proj", "v_proj")
 
 
+def test_resolve_output_dir_uses_run_mode_roots(tmp_path: Path, monkeypatch) -> None:
+    from training.lib import qlora_smoke
+
+    monkeypatch.setitem(qlora_smoke.RUN_MODE_DEFAULTS, "smoke", {**qlora_smoke.RUN_MODE_DEFAULTS["smoke"], "output_root": tmp_path / "smoke"})
+    monkeypatch.setitem(qlora_smoke.RUN_MODE_DEFAULTS, "baseline", {**qlora_smoke.RUN_MODE_DEFAULTS["baseline"], "output_root": tmp_path / "baseline"})
+
+    smoke_output = qlora_smoke._resolve_output_dir(None, "smoke")
+    baseline_output = qlora_smoke._resolve_output_dir(None, "baseline")
+
+    assert smoke_output.parent == tmp_path / "smoke"
+    assert baseline_output.parent == tmp_path / "baseline"
+
+
+def test_build_training_arguments_kwargs_supports_baseline_step_strategies() -> None:
+    from training.run_qlora_smoke import RuntimeConfig, build_training_arguments_kwargs
+
+    available = {
+        "output_dir",
+        "max_steps",
+        "per_device_train_batch_size",
+        "per_device_eval_batch_size",
+        "gradient_accumulation_steps",
+        "learning_rate",
+        "logging_steps",
+        "eval_strategy",
+        "eval_steps",
+        "save_strategy",
+        "save_steps",
+        "save_total_limit",
+        "report_to",
+        "seed",
+        "remove_unused_columns",
+        "dataloader_pin_memory",
+        "use_cpu",
+    }
+    kwargs = build_training_arguments_kwargs(
+        RuntimeConfig(device="cpu", use_qlora=False, fallback_reason=None, torch_dtype="float32"),
+        available_parameters=available,
+        output_dir="out",
+        max_steps=200,
+        train_batch_size=1,
+        eval_batch_size=1,
+        gradient_accumulation_steps=8,
+        learning_rate=1e-4,
+        seed=42,
+        logging_steps=5,
+        eval_steps=25,
+        save_steps=25,
+        save_total_limit=2,
+    )
+
+    assert kwargs["eval_strategy"] == "steps"
+    assert kwargs["eval_steps"] == 25
+    assert kwargs["save_strategy"] == "steps"
+    assert kwargs["save_steps"] == 25
+    assert kwargs["save_total_limit"] == 2
+    assert kwargs["logging_steps"] == 5
+    assert kwargs["use_cpu"] is True
+
+
 def test_resolve_notebook_run_mode_returns_expected_defaults() -> None:
     from training.lib.qlora_smoke import resolve_notebook_run_mode
 
@@ -190,6 +275,32 @@ def test_resolve_notebook_run_mode_returns_expected_defaults() -> None:
         "max_train_samples": 256,
         "max_eval_samples": 64,
     }
+
+
+def test_parse_baseline_args_uses_baseline_defaults() -> None:
+    from training.lib.qlora_smoke import BASELINE_MODEL_NAME, parse_baseline_args
+
+    args = parse_baseline_args([])
+
+    assert args.run_mode == "baseline"
+    assert args.model_name == BASELINE_MODEL_NAME
+    assert args.max_steps == 200
+    assert args.max_train_samples == 0
+    assert args.max_eval_samples == 0
+    assert args.gradient_accumulation_steps == 8
+    assert args.logging_steps == 5
+    assert args.eval_steps == 25
+    assert args.save_steps == 25
+    assert args.save_total_limit == 2
+
+
+def test_run_qlora_train_uses_shared_baseline_entrypoint() -> None:
+    entrypoint_path = Path("training/run_qlora_train.py")
+    source = entrypoint_path.read_text(encoding="utf-8")
+
+    assert "from training.lib.qlora_smoke import" in source
+    assert "parse_baseline_args" in source
+    assert "run_baseline" in source or "main_baseline" in source
 
 
 def test_build_operational_judgment_distinguishes_fenced_only_case() -> None:

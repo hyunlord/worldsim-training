@@ -20,9 +20,45 @@ from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
 from training.lib.structured_generation import StructuredGenerationError, generate_structured
 
 
+DEFAULT_RUN_MODE = "smoke"
 DEFAULT_MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
+BASELINE_MODEL_NAME = "Qwen/Qwen3.5-0.8B-Base"
+DEFAULT_TRAIN_FILE = Path("data/training/worldsim-v31-mix-v1/train_converted.jsonl")
+DEFAULT_DEV_FILE = Path("data/training/worldsim-v31-mix-v1/dev_converted.jsonl")
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+RUN_MODE_DEFAULTS = {
+    "smoke": {
+        "model_name": DEFAULT_MODEL_NAME,
+        "output_root": Path("outputs") / "smoke" / "worldsim-v31-mix-v1",
+        "max_steps": 5,
+        "max_train_samples": 32,
+        "max_eval_samples": 16,
+        "per_device_train_batch_size": 1,
+        "per_device_eval_batch_size": 1,
+        "gradient_accumulation_steps": 1,
+        "learning_rate": 2e-4,
+        "logging_steps": 1,
+        "eval_steps": 0,
+        "save_steps": 0,
+        "save_total_limit": 1,
+    },
+    "baseline": {
+        "model_name": BASELINE_MODEL_NAME,
+        "output_root": Path("outputs") / "baseline" / "worldsim-v31-mix-v1",
+        "max_steps": 200,
+        "max_train_samples": 0,
+        "max_eval_samples": 0,
+        "per_device_train_batch_size": 1,
+        "per_device_eval_batch_size": 1,
+        "gradient_accumulation_steps": 8,
+        "learning_rate": 1e-4,
+        "logging_steps": 5,
+        "eval_steps": 25,
+        "save_steps": 25,
+        "save_total_limit": 2,
+    },
+}
 SAMPLE_GENERATION_REMINDER = (
     "\n\n[생성 규칙]\n"
     "- JSON object 하나만 출력하라.\n"
@@ -92,9 +128,10 @@ class RuntimeConfig:
 
 @dataclass(slots=True)
 class SmokeRunConfig:
+    run_mode: str = DEFAULT_RUN_MODE
     model_name: str = DEFAULT_MODEL_NAME
-    train_file: Path = Path("data/training/worldsim-v31-mix-v1/train_converted.jsonl")
-    dev_file: Path = Path("data/training/worldsim-v31-mix-v1/dev_converted.jsonl")
+    train_file: Path = DEFAULT_TRAIN_FILE
+    dev_file: Path = DEFAULT_DEV_FILE
     output_dir: Path | None = None
     max_steps: int = 5
     max_train_samples: int = 32
@@ -104,6 +141,10 @@ class SmokeRunConfig:
     per_device_eval_batch_size: int = 1
     gradient_accumulation_steps: int = 1
     learning_rate: float = 2e-4
+    logging_steps: int = 1
+    eval_steps: int = 0
+    save_steps: int = 0
+    save_total_limit: int = 1
     lora_r: int = 16
     lora_alpha: int = 32
     lora_dropout: float = 0.05
@@ -153,9 +194,30 @@ class SmokeRunBlockedError(RuntimeError):
     """Raised when a smoke run cannot proceed under the requested constraints."""
 
 
-def coerce_smoke_config(value: SmokeRunConfig | argparse.Namespace | Mapping[str, Any]) -> SmokeRunConfig:
+def _normalize_run_mode(run_mode: str) -> str:
+    normalized = str(run_mode).strip().lower()
+    if normalized not in RUN_MODE_DEFAULTS:
+        valid = ", ".join(sorted(RUN_MODE_DEFAULTS))
+        raise ValueError(f"Unsupported run mode '{run_mode}'. Expected one of: {valid}")
+    return normalized
+
+
+def _run_mode_defaults(run_mode: str) -> dict[str, Any]:
+    normalized = _normalize_run_mode(run_mode)
+    defaults = dict(RUN_MODE_DEFAULTS[normalized])
+    defaults["run_mode"] = normalized
+    return defaults
+
+
+def coerce_smoke_config(
+    value: SmokeRunConfig | argparse.Namespace | Mapping[str, Any],
+    *,
+    default_run_mode: str = DEFAULT_RUN_MODE,
+) -> SmokeRunConfig:
     if isinstance(value, SmokeRunConfig):
+        normalized_run_mode = _normalize_run_mode(value.run_mode)
         return SmokeRunConfig(
+            run_mode=normalized_run_mode,
             model_name=str(value.model_name),
             train_file=Path(value.train_file),
             dev_file=Path(value.dev_file),
@@ -168,6 +230,10 @@ def coerce_smoke_config(value: SmokeRunConfig | argparse.Namespace | Mapping[str
             per_device_eval_batch_size=int(value.per_device_eval_batch_size),
             gradient_accumulation_steps=int(value.gradient_accumulation_steps),
             learning_rate=float(value.learning_rate),
+            logging_steps=int(value.logging_steps),
+            eval_steps=int(value.eval_steps),
+            save_steps=int(value.save_steps),
+            save_total_limit=int(value.save_total_limit),
             lora_r=int(value.lora_r),
             lora_alpha=int(value.lora_alpha),
             lora_dropout=float(value.lora_dropout),
@@ -186,21 +252,27 @@ def coerce_smoke_config(value: SmokeRunConfig | argparse.Namespace | Mapping[str
     else:
         raise TypeError(f"Unsupported smoke config input: {type(value).__name__}")
 
+    defaults = _run_mode_defaults(str(payload.get("run_mode", default_run_mode)))
     target_modules = payload.get("target_modules", DEFAULT_TARGET_MODULES)
     output_dir = payload.get("output_dir")
     return SmokeRunConfig(
-        model_name=str(payload.get("model_name", DEFAULT_MODEL_NAME)),
-        train_file=Path(payload.get("train_file", SmokeRunConfig.train_file)),
-        dev_file=Path(payload.get("dev_file", SmokeRunConfig.dev_file)),
+        run_mode=str(defaults["run_mode"]),
+        model_name=str(payload.get("model_name", defaults["model_name"])),
+        train_file=Path(payload.get("train_file", DEFAULT_TRAIN_FILE)),
+        dev_file=Path(payload.get("dev_file", DEFAULT_DEV_FILE)),
         output_dir=Path(output_dir) if output_dir is not None else None,
-        max_steps=int(payload.get("max_steps", 5)),
-        max_train_samples=int(payload.get("max_train_samples", 32)),
-        max_eval_samples=int(payload.get("max_eval_samples", 16)),
+        max_steps=int(payload.get("max_steps", defaults["max_steps"])),
+        max_train_samples=int(payload.get("max_train_samples", defaults["max_train_samples"])),
+        max_eval_samples=int(payload.get("max_eval_samples", defaults["max_eval_samples"])),
         max_length=int(payload.get("max_length", 512)),
-        per_device_train_batch_size=int(payload.get("per_device_train_batch_size", 1)),
-        per_device_eval_batch_size=int(payload.get("per_device_eval_batch_size", 1)),
-        gradient_accumulation_steps=int(payload.get("gradient_accumulation_steps", 1)),
-        learning_rate=float(payload.get("learning_rate", 2e-4)),
+        per_device_train_batch_size=int(payload.get("per_device_train_batch_size", defaults["per_device_train_batch_size"])),
+        per_device_eval_batch_size=int(payload.get("per_device_eval_batch_size", defaults["per_device_eval_batch_size"])),
+        gradient_accumulation_steps=int(payload.get("gradient_accumulation_steps", defaults["gradient_accumulation_steps"])),
+        learning_rate=float(payload.get("learning_rate", defaults["learning_rate"])),
+        logging_steps=int(payload.get("logging_steps", defaults["logging_steps"])),
+        eval_steps=int(payload.get("eval_steps", defaults["eval_steps"])),
+        save_steps=int(payload.get("save_steps", defaults["save_steps"])),
+        save_total_limit=int(payload.get("save_total_limit", defaults["save_total_limit"])),
         lora_r=int(payload.get("lora_r", 16)),
         lora_alpha=int(payload.get("lora_alpha", 32)),
         lora_dropout=float(payload.get("lora_dropout", 0.05)),
@@ -472,11 +544,12 @@ def _count_tasks(rows: list[dict]) -> dict[str, int]:
     return dict(sorted(counter.items()))
 
 
-def _resolve_output_dir(base_output_dir: Path | None) -> Path:
+def _resolve_output_dir(base_output_dir: Path | None, run_mode: str) -> Path:
     if base_output_dir is not None:
         return ensure_directory(base_output_dir)
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    return ensure_directory(Path("outputs") / "smoke" / "worldsim-v31-mix-v1" / timestamp)
+    defaults = _run_mode_defaults(run_mode)
+    return ensure_directory(Path(defaults["output_root"]) / timestamp)
 
 
 def build_training_arguments_kwargs(
@@ -490,6 +563,10 @@ def build_training_arguments_kwargs(
     gradient_accumulation_steps: int,
     learning_rate: float,
     seed: int,
+    logging_steps: int,
+    eval_steps: int,
+    save_steps: int,
+    save_total_limit: int,
 ) -> dict[str, Any]:
     kwargs: dict[str, Any] = {
         "output_dir": output_dir,
@@ -498,17 +575,32 @@ def build_training_arguments_kwargs(
         "per_device_eval_batch_size": eval_batch_size,
         "gradient_accumulation_steps": gradient_accumulation_steps,
         "learning_rate": learning_rate,
-        "logging_steps": 1,
+        "logging_steps": logging_steps,
         "report_to": [],
         "seed": seed,
         "remove_unused_columns": False,
         "dataloader_pin_memory": False,
     }
-    if "eval_strategy" in available_parameters:
-        kwargs["eval_strategy"] = "no"
-    elif "evaluation_strategy" in available_parameters:
-        kwargs["evaluation_strategy"] = "no"
-    if "save_strategy" in available_parameters:
+    if eval_steps > 0:
+        if "eval_strategy" in available_parameters:
+            kwargs["eval_strategy"] = "steps"
+        elif "evaluation_strategy" in available_parameters:
+            kwargs["evaluation_strategy"] = "steps"
+        if "eval_steps" in available_parameters:
+            kwargs["eval_steps"] = eval_steps
+    else:
+        if "eval_strategy" in available_parameters:
+            kwargs["eval_strategy"] = "no"
+        elif "evaluation_strategy" in available_parameters:
+            kwargs["evaluation_strategy"] = "no"
+    if save_steps > 0:
+        if "save_strategy" in available_parameters:
+            kwargs["save_strategy"] = "steps"
+        if "save_steps" in available_parameters:
+            kwargs["save_steps"] = save_steps
+        if "save_total_limit" in available_parameters:
+            kwargs["save_total_limit"] = save_total_limit
+    elif "save_strategy" in available_parameters:
         kwargs["save_strategy"] = "no"
     if runtime.device == "cpu" and "use_cpu" in available_parameters:
         kwargs["use_cpu"] = True
@@ -1407,8 +1499,8 @@ def _build_blocked_result(
 
 
 def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, Any]) -> SmokeRunResult:
-    config = coerce_smoke_config(config_input)
-    output_dir = _resolve_output_dir(config.output_dir)
+    config = coerce_smoke_config(config_input, default_run_mode="smoke")
+    output_dir = _resolve_output_dir(config.output_dir, config.run_mode)
     config_snapshot_path = output_dir / "run_config.json"
     summary_path = output_dir / "summary.json"
     sample_path = output_dir / "sample_generations.jsonl"
@@ -1484,6 +1576,10 @@ def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, A
             gradient_accumulation_steps=config.gradient_accumulation_steps,
             learning_rate=config.learning_rate,
             seed=config.seed,
+            logging_steps=config.logging_steps,
+            eval_steps=config.eval_steps,
+            save_steps=config.save_steps,
+            save_total_limit=config.save_total_limit,
         )
         training_args = TrainingArguments(**training_args_kwargs)
 
@@ -1582,20 +1678,47 @@ def run_smoke_or_raise(config_input: SmokeRunConfig | argparse.Namespace | Mappi
     return result
 
 
-def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run a minimal WorldSim QLoRA smoke training job.")
-    parser.add_argument("--model-name", default=DEFAULT_MODEL_NAME, help="Base model to adapt. Defaults to a small public Qwen instruct model for smoke validation.")
-    parser.add_argument("--train-file", type=Path, default=Path("data/training/worldsim-v31-mix-v1/train_converted.jsonl"))
-    parser.add_argument("--dev-file", type=Path, default=Path("data/training/worldsim-v31-mix-v1/dev_converted.jsonl"))
-    parser.add_argument("--output-dir", type=Path, default=None, help="Optional explicit output directory. Defaults to outputs/smoke/worldsim-v31-mix-v1/<timestamp>.")
-    parser.add_argument("--max-steps", type=int, default=5)
-    parser.add_argument("--max-train-samples", type=int, default=32)
-    parser.add_argument("--max-eval-samples", type=int, default=16)
+def run_baseline(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, Any]) -> SmokeRunResult:
+    result = run_smoke(coerce_smoke_config(config_input, default_run_mode="baseline"))
+    return result
+
+
+def run_baseline_or_raise(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, Any]) -> SmokeRunResult:
+    result = run_baseline(config_input)
+    if not result.success:
+        raise SmokeRunBlockedError(result.blocker_reason or "Baseline run failed")
+    return result
+
+
+def _build_arg_parser(*, run_mode: str) -> argparse.ArgumentParser:
+    defaults = _run_mode_defaults(run_mode)
+    if run_mode == "baseline":
+        description = "Run a reusable WorldSim QLoRA baseline training job."
+        model_help = "Base model to adapt. Defaults to the WorldSim baseline target Qwen3.5 0.8B base model."
+        output_help = "Optional explicit output directory. Defaults to outputs/baseline/worldsim-v31-mix-v1/<timestamp>."
+    else:
+        description = "Run a minimal WorldSim QLoRA smoke training job."
+        model_help = "Base model to adapt. Defaults to a small public Qwen instruct model for smoke validation."
+        output_help = "Optional explicit output directory. Defaults to outputs/smoke/worldsim-v31-mix-v1/<timestamp>."
+
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--run-mode", default=run_mode, choices=sorted(RUN_MODE_DEFAULTS), help=argparse.SUPPRESS)
+    parser.add_argument("--model-name", default=defaults["model_name"], help=model_help)
+    parser.add_argument("--train-file", type=Path, default=DEFAULT_TRAIN_FILE)
+    parser.add_argument("--dev-file", type=Path, default=DEFAULT_DEV_FILE)
+    parser.add_argument("--output-dir", type=Path, default=None, help=output_help)
+    parser.add_argument("--max-steps", type=int, default=defaults["max_steps"])
+    parser.add_argument("--max-train-samples", type=int, default=defaults["max_train_samples"], help="0 means use the full training split.")
+    parser.add_argument("--max-eval-samples", type=int, default=defaults["max_eval_samples"], help="0 means use the full eval split.")
     parser.add_argument("--max-length", type=int, default=512)
-    parser.add_argument("--per-device-train-batch-size", type=int, default=1)
-    parser.add_argument("--per-device-eval-batch-size", type=int, default=1)
-    parser.add_argument("--gradient-accumulation-steps", type=int, default=1)
-    parser.add_argument("--learning-rate", type=float, default=2e-4)
+    parser.add_argument("--per-device-train-batch-size", type=int, default=defaults["per_device_train_batch_size"])
+    parser.add_argument("--per-device-eval-batch-size", type=int, default=defaults["per_device_eval_batch_size"])
+    parser.add_argument("--gradient-accumulation-steps", type=int, default=defaults["gradient_accumulation_steps"])
+    parser.add_argument("--learning-rate", type=float, default=defaults["learning_rate"])
+    parser.add_argument("--logging-steps", type=int, default=defaults["logging_steps"])
+    parser.add_argument("--eval-steps", type=int, default=defaults["eval_steps"], help="0 disables periodic evaluation.")
+    parser.add_argument("--save-steps", type=int, default=defaults["save_steps"], help="0 disables periodic checkpoint saves.")
+    parser.add_argument("--save-total-limit", type=int, default=defaults["save_total_limit"])
     parser.add_argument("--lora-r", type=int, default=16)
     parser.add_argument("--lora-alpha", type=int, default=32)
     parser.add_argument("--lora-dropout", type=float, default=0.05)
@@ -1605,10 +1728,26 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--disable-qlora", action="store_true", help="Force plain LoRA even if CUDA + bitsandbytes are available.")
     parser.add_argument("--require-qlora", action="store_true", help="Fail instead of falling back when true 4-bit QLoRA is unavailable.")
     parser.add_argument("--dry-run", action="store_true", help="Validate dataset and runtime selection without loading model weights.")
+    return parser
+
+
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    parser = _build_arg_parser(run_mode="smoke")
+    return parser.parse_args(argv)
+
+
+def parse_baseline_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    parser = _build_arg_parser(run_mode="baseline")
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     result = run_smoke(parse_args(argv))
+    print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+    return 0 if result.success else 1
+
+
+def main_baseline(argv: Sequence[str] | None = None) -> int:
+    result = run_baseline(parse_baseline_args(argv))
     print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
     return 0 if result.success else 1
