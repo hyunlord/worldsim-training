@@ -1226,6 +1226,8 @@ def test_baseline_notebook_uses_shared_training_module() -> None:
     assert "'require_qlora': True" in source or '"require_qlora": True' in source
     assert "PASS_BASELINE_CANDIDATE" in source
     assert "FAIL_BLOCKED_RUNTIME" in source
+    assert "GUARDRAIL IMPACT SUMMARY" in source
+    assert "structured_metrics" in source
 
 
 def test_generate_structured_retries_on_malformed_json() -> None:
