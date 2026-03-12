@@ -299,6 +299,14 @@ def test_resolve_baseline_notebook_config_uses_real_baseline_defaults() -> None:
     assert config["output_dir"] == Path("outputs/baseline/worldsim-v31-mix-v1/run-123")
 
 
+def test_resolve_baseline_notebook_config_accepts_explicit_output_override() -> None:
+    from training.lib.qlora_smoke import resolve_baseline_notebook_config
+
+    config = resolve_baseline_notebook_config("run-123", output_dir_override="outputs/custom/run-123")
+
+    assert config["output_dir"] == Path("outputs/custom/run-123")
+
+
 def test_parse_baseline_args_uses_baseline_defaults() -> None:
     from training.lib.qlora_smoke import BASELINE_MODEL_NAME, parse_baseline_args
 
@@ -448,8 +456,12 @@ def test_update_best_adapter_pointer_does_not_overwrite_when_no_candidate(tmp_pa
     assert pointer_path.read_text(encoding="utf-8") == "/existing/adapter"
 
 
-def test_build_baseline_candidate_judgment_marks_semantic_issue_but_candidate() -> None:
+def test_build_baseline_candidate_judgment_marks_semantic_issue_but_candidate(tmp_path: Path) -> None:
     from training.lib.qlora_smoke import build_baseline_candidate_judgment
+
+    adapter_dir = tmp_path / "adapter"
+    adapter_dir.mkdir()
+    (adapter_dir / "adapter_config.json").write_text("{}", encoding="utf-8")
 
     judgment = build_baseline_candidate_judgment(
         {
@@ -457,8 +469,8 @@ def test_build_baseline_candidate_judgment_marks_semantic_issue_but_candidate() 
             "used_true_qlora": True,
             "runtime": {"device": "cuda"},
             "finite_losses": True,
-            "output_dir": "outputs/baseline/worldsim-v31-mix-v1/run-001",
-            "adapter_dir": "outputs/baseline/worldsim-v31-mix-v1/run-001/adapter",
+            "output_dir": str(tmp_path / "run-001"),
+            "adapter_dir": str(adapter_dir),
             "train_loss": 1.2,
             "eval_loss": 0.9,
         },
@@ -477,10 +489,43 @@ def test_build_baseline_candidate_judgment_marks_semantic_issue_but_candidate() 
 
     assert judgment["used_true_qlora"] is True
     assert judgment["training_completed_successfully"] is True
-    assert judgment["adapter_present"] is True
-    assert judgment["json_structure_stable"] is True
-    assert judgment["semantic_quality_primary_issue"] is True
-    assert judgment["baseline_candidate"] is True
+    assert judgment["adapter_exists"] is True
+    assert judgment["losses_finite"] is True
+    assert judgment["structure_stable"] is True
+    assert judgment["semantic_quality_is_primary_remaining_issue"] is True
+    assert judgment["is_baseline_candidate"] is True
+    assert judgment["verdict"] == "PASS_STRUCTURAL_BUT_SEMANTIC_WEAK"
+
+
+def test_build_baseline_candidate_judgment_rejects_missing_adapter() -> None:
+    from training.lib.qlora_smoke import build_baseline_candidate_judgment
+
+    judgment = build_baseline_candidate_judgment(
+        {
+            "status": "ok",
+            "used_true_qlora": True,
+            "runtime": {"device": "cuda"},
+            "finite_losses": True,
+            "output_dir": "outputs/baseline/worldsim-v31-mix-v1/run-002",
+            "adapter_dir": None,
+            "train_loss": 1.2,
+            "eval_loss": 0.9,
+        },
+        {
+            "overall_status": "structurally_usable",
+            "malformed_json_count": 0,
+            "fenced_json_count": 0,
+            "truncation_count": 0,
+            "enum_drift_count": 0,
+            "semantic_low_quality_count": 0,
+            "semantic_drift_count": 0,
+            "language_drift_count": 0,
+        },
+    )
+
+    assert judgment["adapter_exists"] is False
+    assert judgment["is_baseline_candidate"] is False
+    assert judgment["verdict"] == "FAIL_ARTIFACT_INVALID"
 
 
 def test_true_qlora_preflight_surfaces_blocker(monkeypatch) -> None:
@@ -500,6 +545,14 @@ def test_true_qlora_preflight_surfaces_blocker(monkeypatch) -> None:
     assert report["ok"] is False
     assert report["runtime"] is None
     assert "QLoRA unavailable" in report["blocker_reason"]
+
+
+def test_get_environment_summary_includes_trl_key() -> None:
+    from training.lib.qlora_smoke import get_environment_summary
+
+    summary = get_environment_summary()
+
+    assert "trl" in summary
 
 
 def test_sample_summary_counts_fenced_json_and_enum_drift() -> None:
@@ -1164,9 +1217,14 @@ def test_baseline_notebook_uses_shared_training_module() -> None:
     assert "build_baseline_candidate_judgment" in source
     assert "generate_report" in source
     assert "recommend_next_action" in source
+    assert "OUTPUT_DIR_OVERRIDE" in source
+    assert "CONFIG['output_dir'] =" not in source
+    assert "trl" in source
     assert "RUN_MODE" not in source
     assert "'dry_run': True" not in source
     assert "'require_qlora': True" in source or '"require_qlora": True' in source
+    assert "PASS_BASELINE_CANDIDATE" in source
+    assert "FAIL_BLOCKED_RUNTIME" in source
 
 
 def test_generate_structured_retries_on_malformed_json() -> None:

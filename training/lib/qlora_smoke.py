@@ -421,7 +421,7 @@ def get_environment_summary() -> dict[str, Any]:
     except Exception as exc:  # noqa: BLE001
         summary["torch"] = {"available": False, "error": f"{type(exc).__name__}: {exc}"}
 
-    for module_name in ("transformers", "datasets", "peft", "accelerate", "bitsandbytes"):
+    for module_name in ("transformers", "datasets", "peft", "trl", "accelerate", "bitsandbytes"):
         try:
             module = __import__(module_name)
             summary[module_name] = {
@@ -470,6 +470,7 @@ def resolve_baseline_notebook_config(
     run_id: str | None = None,
     *,
     output_root: Path | str | None = None,
+    output_dir_override: Path | str | None = None,
     overrides: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     defaults = _run_mode_defaults("baseline")
@@ -498,7 +499,10 @@ def resolve_baseline_notebook_config(
     if overrides:
         config.update(dict(overrides))
     resolved_output_root = Path(output_root) if output_root is not None else Path(defaults["output_root"])
-    config["output_dir"] = Path(config.get("output_dir") or resolved_output_root / str(config["run_id"]))
+    if output_dir_override is not None:
+        config["output_dir"] = Path(output_dir_override)
+    else:
+        config["output_dir"] = Path(config.get("output_dir") or resolved_output_root / str(config["run_id"]))
     config["train_file"] = Path(config["train_file"])
     config["dev_file"] = Path(config["dev_file"])
     return config
@@ -1608,38 +1612,54 @@ def build_baseline_candidate_judgment(
     used_true_qlora = bool(result_payload.get("used_true_qlora"))
     training_completed_successfully = str(result_payload.get("status", "")) == "ok"
     finite_losses = bool(result_payload.get("finite_losses"))
-    adapter_present = bool(result_payload.get("adapter_dir"))
-    json_structure_stable = all(count == 0 for count in (malformed_json, fenced_json, truncation, trailing_text, enum_drift))
+    adapter_dir = result_payload.get("adapter_dir")
+    adapter_exists = False
+    if adapter_dir:
+        adapter_path = Path(str(adapter_dir))
+        adapter_exists = adapter_path.exists() and any(adapter_path.iterdir()) if adapter_path.exists() else False
+    structure_stable = all(count == 0 for count in (malformed_json, fenced_json, truncation, trailing_text, enum_drift))
     analyzer_overall_status = str(analysis_payload.get("overall_status", "")) or None
-    semantic_quality_primary_issue = json_structure_stable and (
+    semantic_quality_primary_issue = structure_stable and (
         analyzer_overall_status == "semantic_quality_issue" or any(count > 0 for count in (semantic_low_quality, semantic_drift, language_drift))
     )
-    baseline_candidate = used_true_qlora and training_completed_successfully and finite_losses and adapter_present and json_structure_stable
+    is_baseline_candidate = used_true_qlora and training_completed_successfully and finite_losses and adapter_exists and structure_stable
 
-    if not training_completed_successfully:
+    if not training_completed_successfully and str(result_payload.get("status", "")) == "blocked":
+        verdict = "FAIL_BLOCKED_RUNTIME"
+        recommended_next_action = "Do not register this run as a baseline candidate; inspect the blocker and rerun only after the environment and runtime are healthy."
+    elif not training_completed_successfully:
+        verdict = "FAIL_TRAINING_INCOMPLETE"
         recommended_next_action = "Do not register this run as a baseline candidate; inspect the blocker and rerun only after the environment and runtime are healthy."
     elif not used_true_qlora:
+        verdict = "FAIL_BLOCKED_RUNTIME"
         recommended_next_action = "Reject this run for baseline comparison; true QLoRA was not active."
-    elif not json_structure_stable:
+    elif not adapter_exists or not finite_losses:
+        verdict = "FAIL_ARTIFACT_INVALID"
+        recommended_next_action = "Treat this run as invalid for baseline comparison until adapter artifacts exist and losses are finite."
+    elif not structure_stable:
+        verdict = "FAIL_ARTIFACT_INVALID"
         recommended_next_action = "Treat this run as structurally unstable; inspect malformed/truncation/enum failures before considering it as a baseline candidate."
     elif semantic_quality_primary_issue:
+        verdict = "PASS_STRUCTURAL_BUT_SEMANTIC_WEAK"
         recommended_next_action = "Treat this run as a structurally healthy baseline candidate, but keep semantic quality review on the shortlist before selecting it as best adapter."
     else:
+        verdict = "PASS_BASELINE_CANDIDATE"
         recommended_next_action = "This run is a valid baseline candidate for comparison and possible promotion to best adapter."
 
     return {
         "used_true_qlora": used_true_qlora,
         "training_completed_successfully": training_completed_successfully,
-        "finite_losses": finite_losses,
-        "adapter_present": adapter_present,
-        "json_structure_stable": json_structure_stable,
-        "semantic_quality_primary_issue": semantic_quality_primary_issue,
+        "adapter_exists": adapter_exists,
+        "losses_finite": finite_losses,
+        "structure_stable": structure_stable,
+        "semantic_quality_is_primary_remaining_issue": semantic_quality_primary_issue,
         "analyzer_overall_status": analyzer_overall_status,
-        "baseline_candidate": baseline_candidate,
+        "is_baseline_candidate": is_baseline_candidate,
+        "verdict": verdict,
         "train_loss": result_payload.get("train_loss"),
         "eval_loss": result_payload.get("eval_loss"),
         "output_dir": result_payload.get("output_dir"),
-        "adapter_dir": result_payload.get("adapter_dir"),
+        "adapter_dir": adapter_dir,
         "recommended_next_action": recommended_next_action,
         "blocker_reason": result_payload.get("blocker_reason"),
     }
