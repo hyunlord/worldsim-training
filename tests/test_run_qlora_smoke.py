@@ -277,6 +277,28 @@ def test_resolve_notebook_run_mode_returns_expected_defaults() -> None:
     }
 
 
+def test_resolve_baseline_notebook_config_uses_real_baseline_defaults() -> None:
+    from training.lib.qlora_smoke import BASELINE_MODEL_NAME, resolve_baseline_notebook_config
+
+    config = resolve_baseline_notebook_config("run-123")
+
+    assert config["run_mode"] == "baseline"
+    assert config["run_id"] == "run-123"
+    assert config["model_name"] == BASELINE_MODEL_NAME
+    assert config["dry_run"] is False
+    assert config["require_qlora"] is True
+    assert config["max_train_samples"] == 0
+    assert config["max_eval_samples"] == 0
+    assert config["max_steps"] == 200
+    assert config["gradient_accumulation_steps"] == 8
+    assert config["learning_rate"] == 1e-4
+    assert config["logging_steps"] == 5
+    assert config["eval_steps"] == 25
+    assert config["save_steps"] == 25
+    assert config["save_total_limit"] == 2
+    assert config["output_dir"] == Path("outputs/baseline/worldsim-v31-mix-v1/run-123")
+
+
 def test_parse_baseline_args_uses_baseline_defaults() -> None:
     from training.lib.qlora_smoke import BASELINE_MODEL_NAME, parse_baseline_args
 
@@ -322,6 +344,143 @@ def test_build_operational_judgment_distinguishes_fenced_only_case() -> None:
     assert judgment["operational_issue"] == "markdown_fencing_only"
     assert judgment["raw_json_parse_failed"] is True
     assert "markdown fences" in judgment["recommended_next_action"]
+
+
+def test_register_baseline_run_skips_blocked_runs(tmp_path: Path) -> None:
+    from training.lib.qlora_smoke import register_baseline_run
+
+    registry_path = tmp_path / "model_registry.json"
+    registry_path.write_text(json.dumps({"runs": [{"run_id": "existing", "adapter_dir": "keep"}]}), encoding="utf-8")
+
+    entry = register_baseline_run(
+        registry_path,
+        config={"run_id": "blocked-run", "dataset": "worldsim-v31-mix-v1", "model_name": "Qwen/Base"},
+        result={
+            "status": "blocked",
+            "output_dir": "outputs/baseline/worldsim-v31-mix-v1/blocked-run",
+            "adapter_dir": None,
+            "used_true_qlora": False,
+            "train_loss": None,
+            "eval_loss": None,
+        },
+        analysis_report={"overall_status": "structure_failure", "semantic_low_quality_count": 0},
+        metrics={"retry_rate": 0.0},
+    )
+
+    assert entry is None
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload["runs"] == [{"run_id": "existing", "adapter_dir": "keep"}]
+
+
+def test_register_baseline_run_records_successful_metadata(tmp_path: Path) -> None:
+    from training.lib.qlora_smoke import register_baseline_run
+
+    registry_path = tmp_path / "model_registry.json"
+    entry = register_baseline_run(
+        registry_path,
+        config={"run_id": "run-001", "dataset": "worldsim-v31-mix-v1", "model_name": "Qwen/Base"},
+        result={
+            "status": "ok",
+            "output_dir": "outputs/baseline/worldsim-v31-mix-v1/run-001",
+            "adapter_dir": "outputs/baseline/worldsim-v31-mix-v1/run-001/adapter",
+            "used_true_qlora": True,
+            "train_loss": 1.25,
+            "eval_loss": 0.95,
+        },
+        analysis_report={"overall_status": "semantic_quality_issue", "semantic_low_quality_count": 2},
+        metrics={"retry_rate": 0.125},
+        created_at="2026-03-12T00:00:00Z",
+    )
+
+    assert entry is not None
+    assert entry["run_id"] == "run-001"
+    assert entry["created_at"] == "2026-03-12T00:00:00Z"
+    assert entry["used_true_qlora"] is True
+    assert entry["analyzer_overall_status"] == "semantic_quality_issue"
+    assert entry["metrics"]["semantic_low_quality"] == 2
+    assert entry["metrics"]["retry_rate"] == 0.125
+
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    assert payload["runs"] == [entry]
+
+
+def test_select_best_adapter_run_prefers_semantic_quality_then_eval_loss() -> None:
+    from training.lib.qlora_smoke import select_best_adapter_run
+
+    best_run = select_best_adapter_run(
+        {
+            "runs": [
+                {
+                    "run_id": "run-b",
+                    "status": "ok",
+                    "adapter_dir": "/tmp/run-b/adapter",
+                    "metrics": {"semantic_low_quality": 1, "eval_loss": 0.8},
+                },
+                {
+                    "run_id": "run-a",
+                    "status": "ok",
+                    "adapter_dir": "/tmp/run-a/adapter",
+                    "metrics": {"semantic_low_quality": 0, "eval_loss": 1.2},
+                },
+                {
+                    "run_id": "run-c",
+                    "status": "blocked",
+                    "adapter_dir": "/tmp/run-c/adapter",
+                    "metrics": {"semantic_low_quality": 0, "eval_loss": 0.1},
+                },
+            ]
+        }
+    )
+
+    assert best_run is not None
+    assert best_run["run_id"] == "run-a"
+
+
+def test_update_best_adapter_pointer_does_not_overwrite_when_no_candidate(tmp_path: Path) -> None:
+    from training.lib.qlora_smoke import update_best_adapter_pointer
+
+    pointer_path = tmp_path / "best_adapter.txt"
+    pointer_path.write_text("/existing/adapter", encoding="utf-8")
+
+    selected = update_best_adapter_pointer(pointer_path, None)
+
+    assert selected is None
+    assert pointer_path.read_text(encoding="utf-8") == "/existing/adapter"
+
+
+def test_build_baseline_candidate_judgment_marks_semantic_issue_but_candidate() -> None:
+    from training.lib.qlora_smoke import build_baseline_candidate_judgment
+
+    judgment = build_baseline_candidate_judgment(
+        {
+            "status": "ok",
+            "used_true_qlora": True,
+            "runtime": {"device": "cuda"},
+            "finite_losses": True,
+            "output_dir": "outputs/baseline/worldsim-v31-mix-v1/run-001",
+            "adapter_dir": "outputs/baseline/worldsim-v31-mix-v1/run-001/adapter",
+            "train_loss": 1.2,
+            "eval_loss": 0.9,
+        },
+        {
+            "overall_status": "semantic_quality_issue",
+            "malformed_json_count": 0,
+            "fenced_json_count": 0,
+            "truncation_count": 0,
+            "enum_drift_count": 0,
+            "semantic_valid_count": 6,
+            "semantic_low_quality_count": 1,
+            "semantic_drift_count": 0,
+            "language_drift_count": 0,
+        },
+    )
+
+    assert judgment["used_true_qlora"] is True
+    assert judgment["training_completed_successfully"] is True
+    assert judgment["adapter_present"] is True
+    assert judgment["json_structure_stable"] is True
+    assert judgment["semantic_quality_primary_issue"] is True
+    assert judgment["baseline_candidate"] is True
 
 
 def test_true_qlora_preflight_surfaces_blocker(monkeypatch) -> None:
@@ -993,12 +1152,21 @@ def test_baseline_notebook_uses_shared_training_module() -> None:
         if cell.get("cell_type") == "code"
     )
 
-    assert "from training.lib.qlora_smoke import BASELINE_MODEL_NAME" in source
-    assert "from training.lib.qlora_smoke import SmokeRunConfig, run_baseline_or_raise" in source
-    assert "from training.lib.qlora_smoke import load_sample_generations" in source
-    assert "from tools.generation_analyzer import generate_report, recommend_next_action" in source
-    assert "outputs/model_registry.json" in source
-    assert "outputs/best_adapter.txt" in source
+    assert "get_environment_summary" in source
+    assert "get_true_qlora_preflight" in source
+    assert "resolve_baseline_notebook_config" in source
+    assert "run_baseline_or_raise" in source
+    assert "load_json_artifact" in source
+    assert "load_sample_generations" in source
+    assert "register_baseline_run" in source
+    assert "select_best_adapter_run" in source
+    assert "update_best_adapter_pointer" in source
+    assert "build_baseline_candidate_judgment" in source
+    assert "generate_report" in source
+    assert "recommend_next_action" in source
+    assert "RUN_MODE" not in source
+    assert "'dry_run': True" not in source
+    assert "'require_qlora': True" in source or '"require_qlora": True' in source
 
 
 def test_generate_structured_retries_on_malformed_json() -> None:

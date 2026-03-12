@@ -23,10 +23,13 @@ from training.lib.structured_generation import StructuredGenerationError, genera
 DEFAULT_RUN_MODE = "smoke"
 DEFAULT_MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 BASELINE_MODEL_NAME = "Qwen/Qwen3.5-0.8B-Base"
+BASELINE_DATASET_ID = "worldsim-v31-mix-v1"
 DEFAULT_TRAIN_FILE = Path("data/training/worldsim-v31-mix-v1/train_converted.jsonl")
 DEFAULT_DEV_FILE = Path("data/training/worldsim-v31-mix-v1/dev_converted.jsonl")
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+MODEL_REGISTRY_PATH = Path("outputs") / "model_registry.json"
+BEST_ADAPTER_POINTER_PATH = Path("outputs") / "best_adapter.txt"
 RUN_MODE_DEFAULTS = {
     "smoke": {
         "model_name": DEFAULT_MODEL_NAME,
@@ -461,6 +464,44 @@ def resolve_notebook_run_mode(run_mode: str, *, run_id: str | None = None) -> di
     resolved["run_mode"] = normalized
     resolved["run_id"] = run_id or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     return resolved
+
+
+def resolve_baseline_notebook_config(
+    run_id: str | None = None,
+    *,
+    output_root: Path | str | None = None,
+    overrides: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    defaults = _run_mode_defaults("baseline")
+    config: dict[str, Any] = {
+        "run_mode": "baseline",
+        "run_id": run_id or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"),
+        "dry_run": False,
+        "model_name": defaults["model_name"],
+        "dataset": BASELINE_DATASET_ID,
+        "train_file": DEFAULT_TRAIN_FILE,
+        "dev_file": DEFAULT_DEV_FILE,
+        "max_steps": defaults["max_steps"],
+        "max_train_samples": defaults["max_train_samples"],
+        "max_eval_samples": defaults["max_eval_samples"],
+        "per_device_train_batch_size": defaults["per_device_train_batch_size"],
+        "per_device_eval_batch_size": defaults["per_device_eval_batch_size"],
+        "gradient_accumulation_steps": defaults["gradient_accumulation_steps"],
+        "learning_rate": defaults["learning_rate"],
+        "logging_steps": defaults["logging_steps"],
+        "eval_steps": defaults["eval_steps"],
+        "save_steps": defaults["save_steps"],
+        "save_total_limit": defaults["save_total_limit"],
+        "require_qlora": True,
+        "seed": 42,
+    }
+    if overrides:
+        config.update(dict(overrides))
+    resolved_output_root = Path(output_root) if output_root is not None else Path(defaults["output_root"])
+    config["output_dir"] = Path(config.get("output_dir") or resolved_output_root / str(config["run_id"]))
+    config["train_file"] = Path(config["train_file"])
+    config["dev_file"] = Path(config["dev_file"])
+    return config
 
 
 def _torch_dtype(runtime: RuntimeConfig, torch: Any) -> Any:
@@ -1003,9 +1044,112 @@ def load_json_artifact(output_dir: Path | str, artifact_name: str) -> dict[str, 
     return json.loads(artifact_path.read_text(encoding="utf-8"))
 
 
+def load_optional_json_artifact(output_dir: Path | str, artifact_name: str) -> dict[str, Any] | None:
+    artifact_path = Path(output_dir) / artifact_name
+    if not artifact_path.exists():
+        return None
+    return json.loads(artifact_path.read_text(encoding="utf-8"))
+
+
 def load_sample_generations(output_dir: Path | str) -> list[dict]:
     sample_path = Path(output_dir) / "sample_generations.jsonl"
     return read_jsonl(sample_path) if sample_path.exists() else []
+
+
+def load_model_registry(path: Path | str = MODEL_REGISTRY_PATH) -> dict[str, Any]:
+    registry_path = Path(path)
+    if not registry_path.exists():
+        return {"runs": []}
+    return json.loads(registry_path.read_text(encoding="utf-8"))
+
+
+def register_baseline_run(
+    registry_path: Path | str = MODEL_REGISTRY_PATH,
+    *,
+    config: Mapping[str, Any],
+    result: SmokeRunResult | Mapping[str, Any],
+    analysis_report: Mapping[str, Any] | None,
+    metrics: Mapping[str, Any] | None = None,
+    created_at: str | None = None,
+) -> dict[str, Any] | None:
+    result_payload = result.to_dict() if isinstance(result, SmokeRunResult) else dict(result)
+    if str(result_payload.get("status", "")) != "ok" or not result_payload.get("adapter_dir"):
+        return None
+
+    registry_file = Path(registry_path)
+    registry = load_model_registry(registry_file)
+    entry = {
+        "run_id": str(config.get("run_id", "")),
+        "created_at": created_at or datetime.now(UTC).isoformat(),
+        "mode": "baseline",
+        "status": str(result_payload.get("status", "")),
+        "model_name": str(config.get("model_name", "")),
+        "dataset": str(config.get("dataset", BASELINE_DATASET_ID)),
+        "steps": int(config.get("max_steps", 0) or 0),
+        "output_dir": str(result_payload.get("output_dir", "")),
+        "adapter_dir": str(result_payload.get("adapter_dir", "")),
+        "used_true_qlora": bool(result_payload.get("used_true_qlora")),
+        "train_loss": result_payload.get("train_loss"),
+        "eval_loss": result_payload.get("eval_loss"),
+        "analysis_report_path": str(config.get("analysis_report_path", "")) or None,
+        "sample_path": str(result_payload.get("sample_path", "")) or None,
+        "analyzer_overall_status": str(analysis_report.get("overall_status", "")) if analysis_report else None,
+        "metrics": {
+            "train_loss": result_payload.get("train_loss"),
+            "eval_loss": result_payload.get("eval_loss"),
+            "semantic_low_quality": analysis_report.get("semantic_low_quality_count") if analysis_report else None,
+            "malformed_json": analysis_report.get("malformed_json_count") if analysis_report else None,
+            "retry_rate": metrics.get("retry_rate") if metrics else None,
+        },
+    }
+    registry["runs"] = [run for run in registry.get("runs", []) if run.get("run_id") != entry["run_id"]]
+    registry["runs"].append(entry)
+    registry_file.parent.mkdir(parents=True, exist_ok=True)
+    registry_file.write_text(json.dumps(registry, ensure_ascii=False, indent=2), encoding="utf-8")
+    return entry
+
+
+def select_best_adapter_run(registry: Mapping[str, Any]) -> dict[str, Any] | None:
+    candidates = [
+        run
+        for run in registry.get("runs", [])
+        if str(run.get("status", "")) == "ok" and run.get("adapter_dir")
+    ]
+    if not candidates:
+        return None
+
+    analyzer_priority = {
+        "structurally_usable": 0,
+        "semantic_quality_issue": 1,
+        "enum_instability": 2,
+        "prompt_leakage_issue": 3,
+        "structure_failure": 4,
+    }
+
+    def score(run: Mapping[str, Any]) -> tuple[Any, ...]:
+        metrics = run.get("metrics", {}) if isinstance(run.get("metrics"), Mapping) else {}
+        semantic_low_quality = metrics.get("semantic_low_quality")
+        eval_loss = metrics.get("eval_loss")
+        return (
+            analyzer_priority.get(str(run.get("analyzer_overall_status", "")), 99),
+            semantic_low_quality if semantic_low_quality is not None else math.inf,
+            eval_loss if eval_loss is not None else math.inf,
+            str(run.get("created_at", "")),
+            str(run.get("run_id", "")),
+        )
+
+    return min(candidates, key=score)
+
+
+def update_best_adapter_pointer(pointer_path: Path | str = BEST_ADAPTER_POINTER_PATH, best_run: Mapping[str, Any] | None = None) -> str | None:
+    if best_run is None or not best_run.get("adapter_dir"):
+        return None
+
+    pointer_file = Path(pointer_path)
+    pointer_file.parent.mkdir(parents=True, exist_ok=True)
+    adapter_dir = str(best_run["adapter_dir"])
+    pointer_file.write_text(adapter_dir, encoding="utf-8")
+    return adapter_dir
 
 
 def count_parseable_json_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, int]:
@@ -1442,6 +1586,62 @@ def build_operational_judgment(
         "operational_issue": operational_issue,
         "recommended_next_action": recommended_next_action,
         "output_dir": str(output_dir) if output_dir is not None else None,
+    }
+
+
+def build_baseline_candidate_judgment(
+    result: SmokeRunResult | Mapping[str, Any],
+    analysis_report: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    result_payload = result.to_dict() if isinstance(result, SmokeRunResult) else dict(result)
+    analysis_payload = dict(analysis_report or {})
+
+    malformed_json = int(analysis_payload.get("malformed_json_count", 0) or 0)
+    fenced_json = int(analysis_payload.get("fenced_json_count", 0) or 0)
+    truncation = int(analysis_payload.get("truncation_count", 0) or 0)
+    trailing_text = int(analysis_payload.get("trailing_text_count", 0) or 0)
+    enum_drift = int(analysis_payload.get("enum_drift_count", 0) or 0)
+    semantic_low_quality = int(analysis_payload.get("semantic_low_quality_count", 0) or 0)
+    semantic_drift = int(analysis_payload.get("semantic_drift_count", 0) or 0)
+    language_drift = int(analysis_payload.get("language_drift_count", 0) or 0)
+
+    used_true_qlora = bool(result_payload.get("used_true_qlora"))
+    training_completed_successfully = str(result_payload.get("status", "")) == "ok"
+    finite_losses = bool(result_payload.get("finite_losses"))
+    adapter_present = bool(result_payload.get("adapter_dir"))
+    json_structure_stable = all(count == 0 for count in (malformed_json, fenced_json, truncation, trailing_text, enum_drift))
+    analyzer_overall_status = str(analysis_payload.get("overall_status", "")) or None
+    semantic_quality_primary_issue = json_structure_stable and (
+        analyzer_overall_status == "semantic_quality_issue" or any(count > 0 for count in (semantic_low_quality, semantic_drift, language_drift))
+    )
+    baseline_candidate = used_true_qlora and training_completed_successfully and finite_losses and adapter_present and json_structure_stable
+
+    if not training_completed_successfully:
+        recommended_next_action = "Do not register this run as a baseline candidate; inspect the blocker and rerun only after the environment and runtime are healthy."
+    elif not used_true_qlora:
+        recommended_next_action = "Reject this run for baseline comparison; true QLoRA was not active."
+    elif not json_structure_stable:
+        recommended_next_action = "Treat this run as structurally unstable; inspect malformed/truncation/enum failures before considering it as a baseline candidate."
+    elif semantic_quality_primary_issue:
+        recommended_next_action = "Treat this run as a structurally healthy baseline candidate, but keep semantic quality review on the shortlist before selecting it as best adapter."
+    else:
+        recommended_next_action = "This run is a valid baseline candidate for comparison and possible promotion to best adapter."
+
+    return {
+        "used_true_qlora": used_true_qlora,
+        "training_completed_successfully": training_completed_successfully,
+        "finite_losses": finite_losses,
+        "adapter_present": adapter_present,
+        "json_structure_stable": json_structure_stable,
+        "semantic_quality_primary_issue": semantic_quality_primary_issue,
+        "analyzer_overall_status": analyzer_overall_status,
+        "baseline_candidate": baseline_candidate,
+        "train_loss": result_payload.get("train_loss"),
+        "eval_loss": result_payload.get("eval_loss"),
+        "output_dir": result_payload.get("output_dir"),
+        "adapter_dir": result_payload.get("adapter_dir"),
+        "recommended_next_action": recommended_next_action,
+        "blocker_reason": result_payload.get("blocker_reason"),
     }
 
 
