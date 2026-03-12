@@ -7,7 +7,9 @@ from typing import Any
 
 
 def extract_metrics(output_dir: str) -> dict[str, Any]:
-    base = Path(output_dir)
+    base = Path(output_dir).resolve()
+    if not base.is_dir():
+        return {"error": f"directory not found: {base}"}
 
     metrics_path = base / "metrics.json"
     metrics = json.loads(metrics_path.read_text(encoding="utf-8")) if metrics_path.exists() else {}
@@ -42,6 +44,7 @@ def extract_metrics(output_dir: str) -> dict[str, Any]:
                     keys_removed_all[key_name] = keys_removed_all.get(key_name, 0) + 1
 
     return {
+        "output_dir": str(base),
         "structured_metrics": structured,
         "analysis_report_summary": {
             "overall_status": report.get("overall_status"),
@@ -59,11 +62,16 @@ def extract_metrics(output_dir: str) -> dict[str, Any]:
 
 
 def print_report(data: dict[str, Any]) -> None:
+    if "error" in data:
+        print(f"ERROR: {data['error']}")
+        return
+
     sm = data.get("structured_metrics", {})
     ar = data.get("analysis_report_summary", {})
 
     print("=" * 60)
     print("GUARDRAIL VERIFICATION REPORT")
+    print(f"Output: {data.get('output_dir', 'unknown')}")
     print("=" * 60)
 
     print("\n--- Structured Metrics (from BatchMetrics) ---")
@@ -92,12 +100,20 @@ def print_report(data: dict[str, Any]) -> None:
         print(f"  Task {task_id}: {success}/{total} ({rate})")
 
     print("\n--- Repairs Applied ---")
-    for repair_type, count in sorted(sm.get("repairs_by_type", {}).items(), key=lambda item: (-item[1], item[0])):
-        print(f"  {repair_type}: {count}")
+    repairs = sm.get("repairs_by_type", {})
+    if repairs:
+        for repair_type, count in sorted(repairs.items(), key=lambda item: (-item[1], item[0])):
+            print(f"  {repair_type}: {count}")
+    else:
+        print("  (none)")
 
     print("\n--- Top Removed Keys (Schema Leakage) ---")
-    for key, count in data.get("top_removed_keys", {}).items():
-        print(f"  {key}: {count}")
+    removed = data.get("top_removed_keys", {})
+    if removed:
+        for key, count in removed.items():
+            print(f"  {key}: {count}")
+    else:
+        print("  (none)")
 
     print("\n--- Analysis Report Summary ---")
     for key, val in ar.items():
@@ -109,11 +125,11 @@ def print_report(data: dict[str, Any]) -> None:
         if ssr >= 0.95:
             print("  VERDICT: PASS — guardrails achieved 95%+ structured success")
         elif ssr >= 0.85:
-            print("  VERDICT: PARTIAL — prompt hardening next (85-95%)")
+            print("  VERDICT: PARTIAL — prompt contract hardening recommended (85-95%)")
         else:
-            print("  VERDICT: INSUFFICIENT — constrained decoding needed (<85%)")
+            print("  VERDICT: INSUFFICIENT — constrained decoding or more training data needed (<85%)")
     else:
-        print("  VERDICT: UNKNOWN — could not parse structured_success_rate")
+        print("  VERDICT: UNKNOWN — structured_success_rate not available")
 
     print("=" * 60)
 
@@ -126,9 +142,11 @@ def main(argv: list[str] | None = None) -> int:
 
     data = extract_metrics(args[0])
     print_report(data)
-    json_out = Path(args[0]) / "guardrail_verification_report.json"
-    json_out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\nJSON report saved to: {json_out}")
+    base = Path(args[0]).resolve()
+    if base.is_dir():
+        json_out = base / "guardrail_verification_report.json"
+        json_out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"\nJSON report saved to: {json_out}")
     return 0
 
 

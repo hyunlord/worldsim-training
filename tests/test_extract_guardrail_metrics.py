@@ -81,6 +81,15 @@ def test_extract_metrics_handles_missing_metrics_json(tmp_path: Path) -> None:
     assert payload["repair_breakdown"] == {}
 
 
+def test_extract_metrics_handles_missing_directory() -> None:
+    module = load_module("extract_guardrail_metrics", Path.cwd() / "scripts/extract_guardrail_metrics.py")
+
+    payload = module.extract_metrics("/tmp/definitely-not-a-real-guardrail-dir")
+
+    assert "error" in payload
+    assert "directory not found" in payload["error"]
+
+
 def test_extract_metrics_handles_missing_analysis_report(tmp_path: Path) -> None:
     module = load_module("extract_guardrail_metrics", Path.cwd() / "scripts/extract_guardrail_metrics.py")
     output_dir = tmp_path / "run"
@@ -131,3 +140,21 @@ def test_print_report_does_not_crash(tmp_path: Path, capsys) -> None:
 
     assert "GUARDRAIL VERIFICATION REPORT" in captured.out
     assert "VERDICT: PARTIAL" in captured.out
+
+
+def test_main_writes_json_report(tmp_path: Path) -> None:
+    module = load_module("extract_guardrail_metrics", Path.cwd() / "scripts/extract_guardrail_metrics.py")
+    output_dir = tmp_path / "run"
+    output_dir.mkdir()
+    (output_dir / "metrics.json").write_text(
+        json.dumps({"structured_metrics": {"structured_success_rate": 0.96}}),
+        encoding="utf-8",
+    )
+
+    exit_code = module.main([str(output_dir)])
+
+    assert exit_code == 0
+    report_path = output_dir / "guardrail_verification_report.json"
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["structured_metrics"]["structured_success_rate"] == 0.96

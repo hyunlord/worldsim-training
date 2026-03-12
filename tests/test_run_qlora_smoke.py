@@ -982,9 +982,11 @@ def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules()
     assert "name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers" in prompts["H"]
 
 
-def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
+def test_sample_generation_max_new_tokens_reflects_task_specific_caps() -> None:
     from training.lib.qlora_smoke import _sample_generation_max_new_tokens
 
+    assert _sample_generation_max_new_tokens("B") == 384
+    assert _sample_generation_max_new_tokens("C") == 512
     assert _sample_generation_max_new_tokens("G") == 384
     assert _sample_generation_max_new_tokens("H") == 384
     assert _sample_generation_max_new_tokens("F") == 384
@@ -1228,6 +1230,13 @@ def test_baseline_notebook_uses_shared_training_module() -> None:
     assert "FAIL_BLOCKED_RUNTIME" in source
     assert "GUARDRAIL IMPACT SUMMARY" in source
     assert "structured_metrics" in source
+    assert "extract_metrics" in source
+    assert "print_report" in source
+    assert "## 11. Guardrail Verification Report (Auto)" in "\n".join(
+        "".join(cell.get("source", []))
+        for cell in payload.get("cells", [])
+        if cell.get("cell_type") == "markdown"
+    )
 
 
 def test_generate_structured_retries_on_malformed_json() -> None:

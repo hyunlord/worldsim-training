@@ -32,8 +32,8 @@ STRUCTURED_GENERATION_DEFAULTS = {
 }
 TASK_MAX_NEW_TOKENS: dict[str, int] = {
     "A": 256,
-    "B": 256,
-    "C": 384,
+    "B": 384,
+    "C": 512,
     "E": 256,
     "F": 384,
     "G": 384,

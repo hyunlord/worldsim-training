@@ -35,6 +35,7 @@ DEFAULT_TRAIN_FILE = Path("data/training/worldsim-v31-mix-v1/train_converted.jso
 DEFAULT_DEV_FILE = Path("data/training/worldsim-v31-mix-v1/dev_converted.jsonl")
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+SAMPLES_PER_TASK: int = 5
 MODEL_REGISTRY_PATH = Path("outputs") / "model_registry.json"
 BEST_ADAPTER_POINTER_PATH = Path("outputs") / "best_adapter.txt"
 RUN_MODE_DEFAULTS = {
@@ -767,16 +768,23 @@ def build_trainer_kwargs(
     return kwargs
 
 
-def _select_generation_rows(train_rows: list[dict], eval_rows: list[dict]) -> list[dict]:
+def _select_generation_rows(
+    train_rows: list[dict],
+    eval_rows: list[dict],
+    *,
+    per_task: int = SAMPLES_PER_TASK,
+) -> list[dict]:
     candidates = eval_rows + train_rows
     picked: list[dict] = []
-    seen: set[str] = set()
-    for task in DEFAULT_TASKS:
-        for row in candidates:
-            if row.get("task") == task and task not in seen:
-                picked.append(row)
-                seen.add(task)
-                break
+    task_counts = {task: 0 for task in DEFAULT_TASKS}
+    for row in candidates:
+        task = row.get("task")
+        if task not in task_counts:
+            continue
+        if task_counts[task] >= per_task:
+            continue
+        picked.append(row)
+        task_counts[task] += 1
     return picked
 
 
