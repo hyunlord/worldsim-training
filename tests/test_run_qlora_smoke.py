@@ -678,10 +678,12 @@ def test_build_sample_prompt_messages_appends_generic_generation_rules() -> None
 
     user_content = prompt_messages[-1]["content"]
     assert user_content.startswith("[과제]")
-    assert "JSON object 하나만 출력하라." in user_content
-    assert "첫 글자는 반드시 { 여야 한다." in user_content
-    assert "형식 예시나 placeholder 문구를 복사하지 마라." in user_content
-    assert "모든 key 이름과 문자열 값은 JSON 큰따옴표를 써라." in user_content
+    assert "[SYSTEM ROLE]" in user_content
+    assert "[OUTPUT RULES]" in user_content
+    assert "Output must be a single JSON object." in user_content
+    assert "The first character must be { and the last character must be }." in user_content
+    assert "Do not copy instructions, schema descriptions, examples, enum lists, or placeholder text into the JSON values." in user_content
+    assert "Use double quotes for every JSON key and every string value." in user_content
 
 
 def test_build_sample_prompt_messages_strips_leaky_format_sections() -> None:
@@ -717,9 +719,10 @@ def test_build_sample_prompt_messages_strips_leaky_format_sections() -> None:
     assert "[유효값 다시 보기]" not in user_content
     assert "[어투]" not in user_content
     assert "English 2 sentences" not in user_content
-    assert "emotion_expressed must be exactly one of: joy, sadness" not in user_content
     assert "[규칙]" not in user_content
     assert "JSON만 출력하라" not in user_content
+    assert "[ENUM CONSTRAINTS]" in user_content
+    assert "emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation" in user_content
 
 
 def test_build_sample_prompt_messages_strips_rules_with_copy_prone_placeholders() -> None:
@@ -811,15 +814,18 @@ def test_build_sample_prompt_messages_adds_g_specific_generation_rules() -> None
     )
 
     user_content = prompt_messages[-1]["content"]
-    assert "interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라." in user_content
-    assert 'interpretation_ko는 반드시 "이 말은 ...라고 여긴다" 또는 "이 말은 ...라고 판단한다" 형태로 써라.' in user_content
-    assert "interpretation_en은 interpretation_ko와 같은 뜻의 영어 한 문장만 써라." in user_content
-    assert 'interpretation_ko를 "그는", "그녀는", "이 인물은"으로 시작하지 마라.' in user_content
-    assert "interpretation_ko에는 성격 분석, 기질 설명, 현재 상태 설명, 상황 요약을 쓰지 마라." in user_content
-    assert "interpretation_ko에는 추론 과정, 이유 설명, 메타 설명을 쓰지 마라." in user_content
-    assert "interpretation_ko에는 신탁 자체를 언급하지 말고 해석 결과만 직접 말하라." in user_content
-    assert "action_tendency는 정확히 one of" in user_content
-    assert "misinterpretation_type는 정확히 one of" in user_content
+    assert "[SYSTEM ROLE]" in user_content
+    assert "[OUTPUT RULES]" in user_content
+    assert "[TASK CONTEXT]" in user_content
+    assert "[ALLOWED JSON KEYS]" in user_content
+    assert "[ENUM CONSTRAINTS]" in user_content
+    assert "[TASK RULES]" in user_content
+    assert "[EXAMPLE OUTPUT]" in user_content
+    assert "interpretation_ko, interpretation_en, action_tendency, confidence, register, misinterpretation_type, temperament_bias" in user_content
+    assert "action_tendency must be exactly one of: mobilize, defend, wait, retreat, celebrate, mourn" in user_content
+    assert "misinterpretation_type must be exactly one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction" in user_content
+    assert "interpretation_ko must be exactly one Korean sentence that interprets the oracle meaning only." in user_content
+    assert '{"interpretation_ko":"이 말은 지금은 공격보다 방어를 준비하라고 판단한다."' in user_content
 
 
 def test_semantic_guard_task_g_blocks_personality_meta_reasoning() -> None:
@@ -845,16 +851,11 @@ def test_semantic_guard_task_g_blocks_personality_meta_reasoning() -> None:
     )
 
     user_content = prompt_messages[-1]["content"]
-    assert "성격 분석" in user_content
-    assert "기질 설명" in user_content
-    assert "현재 상태 설명" in user_content
-    assert "상황 요약" in user_content
-    assert "추론 과정" in user_content
-    assert "메타 설명" in user_content
-    assert '"그는", "그녀는", "이 인물은"으로 시작하지 마라.' in user_content
-    assert "신탁 자체를 언급하지 말고 해석 결과만 직접 말하라." in user_content
-    assert "interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라." in user_content
-    assert '"이 말은 ...라고 여긴다" 또는 "이 말은 ...라고 판단한다"' in user_content
+    assert "Do not describe personality, situation summary, reasoning steps, or self-introduction." in user_content
+    assert "Do not copy enum lists or placeholder text into action_tendency or misinterpretation_type." in user_content
+    assert "[기질 이름]" not in user_content
+    assert "[인물 성격]" not in user_content
+    assert "[ORACLE]" in user_content
 
 
 def test_build_sample_prompt_messages_strips_personality_sections_for_g_only() -> None:
@@ -920,13 +921,14 @@ def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -
             ],
         }
     )
-    assert "key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다." in prompt_a[-1]["content"]
+    assert "[ALLOWED JSON KEYS]" in prompt_a[-1]["content"]
+    assert "text_ko, text_en, register, dominant_trait, temperament_expressed" in prompt_a[-1]["content"]
     assert "Human:" not in prompt_a[-1]["content"]
     assert "Assistant:" not in prompt_a[-1]["content"]
-    assert "text_ko와 text_en에는 실제 묘사 문장을 쓰고 형용사 이름만 단독으로 쓰지 마라." in prompt_a[-1]["content"]
-    assert "register는 숫자가 아니라 haera, hao, hae 중 문자열 하나다." in prompt_a[-1]["content"]
-    assert "자기소개나 대화 라벨을 쓰지 마라." in prompt_a[-1]["content"]
-    assert "dominant_trait는 정확히 one of" in prompt_a[-1]["content"]
+    assert "register must be exactly one of: haera, hao, hae" in prompt_a[-1]["content"]
+    assert "dominant_trait must be exactly one of: novelty_seeking, harm_avoidance, reward_dependence, persistence" in prompt_a[-1]["content"]
+    assert "text_ko and text_en must be concrete persona descriptions, not labels or placeholders." in prompt_a[-1]["content"]
+    assert '{"text_ko":"그는 앞장서되 위험을 먼저 헤아린다."' in prompt_a[-1]["content"]
 
     prompt_c = _build_sample_prompt_messages(
         {
@@ -938,13 +940,11 @@ def test_build_sample_prompt_messages_adds_a_and_c_specific_generation_rules() -
             ],
         }
     )
-    assert "key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다." in prompt_c[-1]["content"]
-    assert "emotion_expressed는 정확히 one of" in prompt_c[-1]["content"]
-    assert "emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라." in prompt_c[-1]["content"]
-    assert "emotion_expressed는 JSON 배열이 아니라 문자열 하나다." in prompt_c[-1]["content"]
-    assert "speech_ko와 speech_en에는 자기소개를 쓰지 말고 바로 대사를 써라." in prompt_c[-1]["content"]
-    assert "실제 대사만 쓰고 지시문을 따라 적지 마라." in prompt_c[-1]["content"]
-    assert "speaker_role은 정확히 one of" in prompt_c[-1]["content"]
+    assert "speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone" in prompt_c[-1]["content"]
+    assert "emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation" in prompt_c[-1]["content"]
+    assert "speaker_role must be exactly one of: elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer" in prompt_c[-1]["content"]
+    assert "speech_ko and speech_en must be direct utterances only, not explanations or copied instructions." in prompt_c[-1]["content"]
+    assert '{"speech_ko":"지금은 서두르지 말고 불빛 가까이 모여라."' in prompt_c[-1]["content"]
 
 
 def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules() -> None:
@@ -963,22 +963,23 @@ def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules()
             }
         )[-1]["content"]
 
-    assert "placeholder 문구를 그대로 쓰지 마라." in prompts["B"]
-    assert "text_ko와 text_en에는 길이 설명문이나 schema 문구를 쓰지 마라." in prompts["B"]
-    assert "key 순서는 action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor 이다." in prompts["E"]
-    assert "emotion은 정확히 one of" in prompts["F"]
-    assert "confidence만 숫자이고 나머지 enum field는 문자열이다." in prompts["G"]
-    assert "모든 key 이름은 반드시 JSON 큰따옴표를 써라." in prompts["F"]
-    assert "자기소개를 쓰지 마라." in prompts["G"]
-    assert "interpretation_ko와 interpretation_en에는 placeholder 문구를 쓰지 마라." in prompts["G"]
-    assert "허용 key는 name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers 뿐이다." in prompts["H"]
-    assert "emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라." in prompts["B"]
-    assert "hint_en에는 실제 영어 이유를 써라." in prompts["E"]
-    assert "hint_ko와 hint_en에는 길이 설명문이나 예시 문구를 쓰지 마라." in prompts["E"]
-    assert "action_id와 confidence만 숫자이고 나머지는 문자열이다." in prompts["E"]
-    assert "cause_ko와 cause_en에는 선택지나 규칙 문구를 쓰지 마라." in prompts["F"]
-    assert "emotion과 previous_emotion에는 숫자를 쓰지 마라." in prompts["F"]
-    assert "action_tendency와 misinterpretation_type에는 목록 전체를 쓰지 말고 하나만 써라." in prompts["G"]
+    for task in ("B", "E", "F", "G", "H"):
+        assert "[OUTPUT RULES]" in prompts[task]
+        assert "[ALLOWED JSON KEYS]" in prompts[task]
+        assert "[TASK RULES]" in prompts[task]
+        assert "[EXAMPLE OUTPUT]" in prompts[task]
+
+    assert "text_ko and text_en must be real emotional reactions, not length instructions or schema text." in prompts["B"]
+    assert "emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation" in prompts["B"]
+    assert "action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor" in prompts["E"]
+    assert "personality_reasoning must be exactly one of: high_NS, high_HA, high_RD, high_P" in prompts["E"]
+    assert "Only action_id and confidence are numeric; every other field is a string." in prompts["E"]
+    assert "emotion must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation" in prompts["F"]
+    assert "previous_emotion must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation" in prompts["F"]
+    assert "interpretation_ko and interpretation_en, action_tendency, confidence, register, misinterpretation_type, temperament_bias" not in prompts["G"]
+    assert "interpretation_ko, interpretation_en, action_tendency, confidence, register, misinterpretation_type, temperament_bias" in prompts["G"]
+    assert "Do not describe personality, situation summary, reasoning steps, or self-introduction." in prompts["G"]
+    assert "name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers" in prompts["H"]
 
 
 def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:

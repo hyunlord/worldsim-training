@@ -63,15 +63,19 @@ RUN_MODE_DEFAULTS = {
     },
 }
 SAMPLE_GENERATION_REMINDER = (
-    "\n\n[생성 규칙]\n"
-    "- JSON object 하나만 출력하라.\n"
-    "- markdown fence를 쓰지 마라.\n"
-    "- 설명문을 덧붙이지 마라.\n"
-    "- 첫 글자는 반드시 { 여야 한다.\n"
-    "- 형식 예시나 placeholder 문구를 복사하지 마라.\n"
-    "- 길이 설명문, enum 설명문, schema 설명문을 값으로 쓰지 마라.\n"
-    "- 각 field에는 실제 값만 채워라.\n"
-    "- 모든 key 이름과 문자열 값은 JSON 큰따옴표를 써라.\n"
+    "\n\n[SYSTEM ROLE]\n"
+    "You are filling one WorldSim JSON object from the task context above.\n"
+    "\n[OUTPUT RULES]\n"
+    "- Output must be a single JSON object.\n"
+    "- The first character must be { and the last character must be }.\n"
+    "- Use double quotes for every JSON key and every string value.\n"
+    "- Do not output markdown, code fences, explanations, or extra text.\n"
+    "- Only output the keys listed below.\n"
+    "- Do not add any extra keys.\n"
+    "- Do not copy instructions, schema descriptions, examples, enum lists, or placeholder text into the JSON values.\n"
+    "- Fill every field with concrete values from the task context above.\n"
+    "\n[TASK CONTEXT]\n"
+    "- Use only the task context already provided above.\n"
 )
 LEAKY_GENERATION_SECTION_LABELS = {
     "출력 형식",
@@ -112,6 +116,82 @@ VALID_MISINTERPRETATION_TYPES = {
     "optimistic_expansion",
     "passive_deferral",
     "symbolic_abstraction",
+}
+TASK_ALLOWED_KEYS = {
+    "A": ("text_ko", "text_en", "register", "dominant_trait", "temperament_expressed"),
+    "B": ("text_ko", "text_en", "register", "emotion_expressed", "intensity", "mimetics", "temperament_influence"),
+    "C": ("speech_ko", "speech_en", "register", "emotion_expressed", "speaker_role", "temperament_tone"),
+    "E": ("action_id", "confidence", "hint_ko", "hint_en", "personality_reasoning", "temperament_factor"),
+    "F": ("emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type", "temperament_amplifier"),
+    "G": ("interpretation_ko", "interpretation_en", "action_tendency", "confidence", "register", "misinterpretation_type", "temperament_bias"),
+    "H": ("name", "description_en", "resource_modifiers", "special_zones", "special_resources", "agent_modifiers"),
+}
+TASK_ENUM_CONSTRAINTS = {
+    "A": (
+        "register must be exactly one of: haera, hao, hae",
+        "dominant_trait must be exactly one of: novelty_seeking, harm_avoidance, reward_dependence, persistence",
+    ),
+    "B": (
+        "register must be exactly one of: haera, hao, hae",
+        "emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation",
+    ),
+    "C": (
+        "register must be exactly one of: haera, hao, hae",
+        "emotion_expressed must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation",
+        "speaker_role must be exactly one of: elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer",
+    ),
+    "E": ("personality_reasoning must be exactly one of: high_NS, high_HA, high_RD, high_P",),
+    "F": (
+        "emotion must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation",
+        "previous_emotion must be exactly one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation",
+        "transition_type must be exactly one of: gradual, sudden, sustained",
+    ),
+    "G": (
+        "register must be exactly one of: haera, hao, hae",
+        "action_tendency must be exactly one of: mobilize, defend, wait, retreat, celebrate, mourn",
+        "misinterpretation_type must be exactly one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction",
+    ),
+    "H": (),
+}
+TASK_GENERATION_RULES = {
+    "A": (
+        "text_ko and text_en must be concrete persona descriptions, not labels or placeholders.",
+        "Do not write self-introduction, dialogue labels, or trait names alone.",
+    ),
+    "B": (
+        "text_ko and text_en must be real emotional reactions, not length instructions or schema text.",
+        "emotion_expressed must be one value only, never an enum list.",
+    ),
+    "C": (
+        "speech_ko and speech_en must be direct utterances only, not explanations or copied instructions.",
+        "emotion_expressed must be one string value only, never an array or enum list.",
+    ),
+    "E": (
+        "hint_ko and hint_en must be concrete reasons, not template wording or length instructions.",
+        "Only action_id and confidence are numeric; every other field is a string.",
+    ),
+    "F": (
+        "cause_ko and cause_en must be concrete causes, not copied rule text or choice lists.",
+        "emotion and previous_emotion must be enum strings, never numbers or lists.",
+    ),
+    "G": (
+        "interpretation_ko must be exactly one Korean sentence that interprets the oracle meaning only.",
+        "Do not describe personality, situation summary, reasoning steps, or self-introduction.",
+        "Do not copy enum lists or placeholder text into action_tendency or misinterpretation_type.",
+    ),
+    "H": (
+        "Output only the worldbuilding IR object and use [] for empty lists.",
+        "Do not copy schema descriptions, example prose, or title-case placeholder text into values.",
+    ),
+}
+TASK_OUTPUT_EXAMPLES = {
+    "A": '{"text_ko":"그는 앞장서되 위험을 먼저 헤아린다.","text_en":"They lead from the front while weighing danger first.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
+    "B": '{"text_ko":"숨을 죽이고 주위를 살피며 천천히 뒤로 물러난다.","text_en":"They hold their breath, scan the area, and step back slowly.","register":"haera","emotion_expressed":"fear","intensity":0.72,"mimetics":["숨을 죽이고"],"temperament_influence":"caution sharpens retreat"}',
+    "C": '{"speech_ko":"지금은 서두르지 말고 불빛 가까이 모여라.","speech_en":"Do not rush now; gather near the firelight.","register":"hao","emotion_expressed":"trust","speaker_role":"elder","temperament_tone":"steady guidance"}',
+    "E": '{"action_id":2,"confidence":0.81,"hint_ko":"위협을 정면에서 막는 편이 무리를 지키기 쉽다.","hint_en":"Holding the threat in front protects the group more reliably.","personality_reasoning":"high_NS","temperament_factor":"choleric urgency"}',
+    "F": '{"emotion":"fear","intensity":0.68,"cause_ko":"낯선 그림자가 갑자기 가까워졌다.","cause_en":"An unfamiliar shadow suddenly drew near.","previous_emotion":"trust","transition_type":"sudden","temperament_amplifier":"melancholic vigilance"}',
+    "G": '{"interpretation_ko":"이 말은 지금은 공격보다 방어를 준비하라고 판단한다.","interpretation_en":"This means it is time to prepare a defense rather than attack.","action_tendency":"defend","confidence":0.77,"register":"hao","misinterpretation_type":"cautious_reversal","temperament_bias":"melancholic caution"}',
+    "H": '{"name":"AmberGrove","description_en":"A sheltered grove with rich soil and mild air.","resource_modifiers":[{"target":"berries","multiplier":1.2}],"special_zones":[],"special_resources":[],"agent_modifiers":[]}',
 }
 INTERPRETATION_VERBS = ("해석", "판단", "생각", "느끼", "여기")
 SEMANTIC_HINTS = {
@@ -763,76 +843,27 @@ def _sample_generation_output_schema(task: str) -> Any | None:
 
 
 def _task_specific_generation_reminder(task: str) -> str:
-    if task == "A":
-        return (
-            "- key 순서는 text_ko, text_en, register, dominant_trait, temperament_expressed 이다.\n"
-            "- 모든 문자열 값은 JSON 큰따옴표를 지켜라.\n"
-            "- text_ko와 text_en에는 실제 묘사 문장을 쓰고 형용사 이름만 단독으로 쓰지 마라.\n"
-            "- register는 숫자가 아니라 haera, hao, hae 중 문자열 하나다.\n"
-            "- 자기소개나 대화 라벨을 쓰지 마라.\n"
-            "- dominant_trait는 정확히 one of: novelty_seeking, harm_avoidance, reward_dependence, persistence\n"
+    allowed_keys = TASK_ALLOWED_KEYS.get(task, ())
+    enum_rules = TASK_ENUM_CONSTRAINTS.get(task, ())
+    task_rules = TASK_GENERATION_RULES.get(task, ())
+    example_output = TASK_OUTPUT_EXAMPLES.get(task)
+
+    sections = []
+    if allowed_keys:
+        sections.append(
+            "[ALLOWED JSON KEYS]\n"
+            + ", ".join(allowed_keys)
+            + "\n- Only output the keys listed above.\n- Do not output any other keys.\n"
         )
-    if task == "B":
-        return (
-            "- key 순서는 text_ko, text_en, register, emotion_expressed, intensity, mimetics, temperament_influence 이다.\n"
-            "- placeholder 문구를 그대로 쓰지 마라.\n"
-            "- text_ko와 text_en에는 길이 설명문이나 schema 문구를 쓰지 마라.\n"
-            "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
-            "- emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라.\n"
-        )
-    if task == "C":
-        return (
-            "- key 순서는 speech_ko, speech_en, register, emotion_expressed, speaker_role, temperament_tone 이다.\n"
-            "- register는 정확히 one of: haera, hao, hae\n"
-            "- emotion_expressed는 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
-            "- emotion_expressed에는 enum 목록 전체를 쓰지 말고 하나만 써라.\n"
-            "- emotion_expressed는 JSON 배열이 아니라 문자열 하나다.\n"
-            "- speech_ko와 speech_en에는 자기소개를 쓰지 말고 바로 대사를 써라.\n"
-            "- 실제 대사만 쓰고 지시문을 따라 적지 마라.\n"
-            "- speaker_role은 정확히 one of: elder, hunter, shaman, warrior, healer, gatherer, craftsman, chief, scout, observer\n"
-        )
-    if task == "E":
-        return (
-            "- key 순서는 action_id, confidence, hint_ko, hint_en, personality_reasoning, temperament_factor 이다.\n"
-            "- personality_reasoning은 정확히 one of: high_NS, high_HA, high_RD, high_P\n"
-            "- hint_ko와 hint_en에는 실제 이유를 써라.\n"
-            "- hint_en에는 실제 영어 이유를 써라.\n"
-            "- hint_ko와 hint_en에는 길이 설명문이나 예시 문구를 쓰지 마라.\n"
-            "- action_id와 confidence만 숫자이고 나머지는 문자열이다.\n"
-        )
-    if task == "F":
-        return (
-            "- key 순서는 emotion, intensity, cause_ko, cause_en, previous_emotion, transition_type, temperament_amplifier 이다.\n"
-            "- emotion은 정확히 one of: joy, sadness, fear, anger, trust, disgust, surprise, anticipation\n"
-            "- previous_emotion도 영어 감정 id 하나만 써라.\n"
-            "- transition_type은 정확히 one of: gradual, sudden, sustained\n"
-            "- 모든 key 이름은 반드시 JSON 큰따옴표를 써라.\n"
-            "- cause_ko와 cause_en에는 선택지나 규칙 문구를 쓰지 마라.\n"
-            "- emotion과 previous_emotion에는 숫자를 쓰지 마라.\n"
-        )
-    if task == "G":
-        return (
-            "- interpretation_ko는 신탁의 뜻만 풀이하는 한국어 한 문장만 써라.\n"
-            "- interpretation_ko는 반드시 \"이 말은 ...라고 여긴다\" 또는 \"이 말은 ...라고 판단한다\" 형태로 써라.\n"
-            "- interpretation_en은 interpretation_ko와 같은 뜻의 영어 한 문장만 써라.\n"
-            "- interpretation_ko를 \"그는\", \"그녀는\", \"이 인물은\"으로 시작하지 마라.\n"
-            "- interpretation_ko에는 성격 분석, 기질 설명, 현재 상태 설명, 상황 요약을 쓰지 마라.\n"
-            "- interpretation_ko에는 추론 과정, 이유 설명, 메타 설명을 쓰지 마라.\n"
-            "- interpretation_ko에는 신탁 자체를 언급하지 말고 해석 결과만 직접 말하라.\n"
-            "- interpretation_ko에는 자기소개를 쓰지 마라.\n"
-            "- interpretation_ko와 interpretation_en에는 placeholder 문구를 쓰지 마라.\n"
-            "- action_tendency는 정확히 one of: mobilize, defend, wait, retreat, celebrate, mourn\n"
-            "- misinterpretation_type는 정확히 one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction\n"
-            "- confidence만 숫자이고 나머지 enum field는 문자열이다.\n"
-            "- action_tendency와 misinterpretation_type에는 목록 전체를 쓰지 말고 하나만 써라.\n"
-        )
-    if task == "H":
-        return (
-            "- 허용 key는 name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers 뿐이다.\n"
-            "- 값이 없으면 빈 배열 []를 써라.\n"
-            "- schema 설명문이나 PascalCase example 문구를 복사하지 마라.\n"
-        )
-    return ""
+    if enum_rules:
+        sections.append("[ENUM CONSTRAINTS]\n" + "\n".join(f"- {rule}" for rule in enum_rules) + "\n")
+    if task_rules:
+        sections.append("[TASK RULES]\n" + "\n".join(f"- {rule}" for rule in task_rules) + "\n")
+    if example_output:
+        sections.append("[EXAMPLE OUTPUT]\n" + example_output + "\n")
+    if not sections:
+        return ""
+    return "\n" + "\n".join(section.rstrip() for section in sections)
 
 
 def _json_object_complete(text: str) -> bool:
