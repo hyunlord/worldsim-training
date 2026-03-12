@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Literal
+from enum import Enum
+from typing import Any, Literal, get_args, get_origin
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -120,3 +121,48 @@ TASK_OUTPUT_SCHEMAS = {
     "G": TaskGOutput,
     "H": TaskHOutput,
 }
+
+TASK_A_SCHEMA = TaskAOutput
+TASK_B_SCHEMA = TaskBOutput
+TASK_C_SCHEMA = TaskCOutput
+TASK_E_SCHEMA = TaskEOutput
+TASK_F_SCHEMA = TaskFOutput
+TASK_G_SCHEMA = TaskGOutput
+TASK_H_SCHEMA = TaskHOutput
+
+
+def get_schema_for_task(task_id: str) -> type[BaseModel]:
+    try:
+        return TASK_OUTPUT_SCHEMAS[task_id]
+    except KeyError as exc:  # pragma: no cover - defensive caller error
+        raise ValueError(f"Unknown task_id: {task_id}") from exc
+
+
+def _literal_values(annotation: Any) -> tuple[str, ...]:
+    origin = get_origin(annotation)
+    if origin is None:
+        if isinstance(annotation, type) and issubclass(annotation, Enum):
+            return tuple(str(member.value) for member in annotation)
+        return ()
+    if str(origin).endswith("Literal"):
+        return tuple(str(value) for value in get_args(annotation))
+
+    values: list[str] = []
+    for arg in get_args(annotation):
+        values.extend(_literal_values(arg))
+    return tuple(values)
+
+
+def _build_task_enum_fields() -> dict[str, dict[str, list[str]]]:
+    task_enum_fields: dict[str, dict[str, list[str]]] = {}
+    for task_id, schema in TASK_OUTPUT_SCHEMAS.items():
+        enum_fields: dict[str, list[str]] = {}
+        for field_name, field in schema.model_fields.items():
+            values = _literal_values(field.annotation)
+            if values:
+                enum_fields[field.alias or field_name] = list(values)
+        task_enum_fields[task_id] = enum_fields
+    return task_enum_fields
+
+
+TASK_ENUM_FIELDS: dict[str, dict[str, list[str]]] = _build_task_enum_fields()

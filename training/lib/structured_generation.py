@@ -1,15 +1,14 @@
 """Structured generation guardrails for WorldSim sample generation.
 
-This module implements the generation-time layers that sit between the model
-and downstream analyzers:
+This module keeps the existing generation contract intact while splitting the
+implementation into explicit guardrail layers:
 
 1. prompt contract (handled by caller)
-2. constrained/deterministic decoding (handled by caller/backend)
-3. lightweight JSON repair + schema-aware normalization
-4. validation feedback retries
-
-The goal is to improve structured JSON reliability without changing dataset
-contracts or hiding raw model outputs from inspection.
+2. deterministic decoding configuration (handled by caller/backend)
+3. lightweight JSON repair
+4. schema-aware key sanitization + enum normalization
+5. validation feedback retries
+6. metrics capture
 """
 
 from __future__ import annotations
@@ -20,8 +19,26 @@ from typing import Any, get_args, get_origin
 
 from pydantic import BaseModel, ValidationError
 
+from training.lib.json_repair import repair_json as _repair_json_text
+from training.lib.json_sanitize import TASK_ALLOWED_KEYS_REGISTRY, normalize_enum_values, sanitize_keys
+from training.lib.structured_metrics import BatchMetrics, GenerationAttemptMetrics
+
 
 DEFAULT_MAX_RETRY = 3
+STRUCTURED_GENERATION_DEFAULTS = {
+    "temperature": 0.0,
+    "do_sample": False,
+    "top_p": 1.0,
+}
+TASK_MAX_NEW_TOKENS: dict[str, int] = {
+    "A": 256,
+    "B": 256,
+    "C": 384,
+    "E": 256,
+    "F": 384,
+    "G": 384,
+    "H": 384,
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +77,8 @@ class StructuredGenerationAttempt:
     normalization: str | None = None
     normalization_details: list[dict[str, str]] | None = None
     repair_actions: list[dict[str, Any]] = field(default_factory=list)
+    keys_removed: list[str] = field(default_factory=list)
+    enum_normalizations: list[str] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -75,6 +94,7 @@ class StructuredGenerationResult:
     normalization_details: list[dict[str, str]] | None = None
     repair_actions: list[dict[str, Any]] = field(default_factory=list)
     structured_decoding: dict[str, Any] | None = None
+    attempt_metrics: list[GenerationAttemptMetrics] = field(default_factory=list)
 
 
 class StructuredGenerationError(RuntimeError):
@@ -90,6 +110,7 @@ class StructuredGenerationError(RuntimeError):
         normalization_details: list[dict[str, str]] | None = None,
         repair_actions: list[dict[str, Any]] | None = None,
         structured_decoding: dict[str, Any] | None = None,
+        attempt_metrics: list[GenerationAttemptMetrics] | None = None,
     ) -> None:
         super().__init__(message)
         self.attempts = attempts
@@ -101,6 +122,7 @@ class StructuredGenerationError(RuntimeError):
         self.normalization_details = normalization_details or []
         self.repair_actions = repair_actions or []
         self.structured_decoding = structured_decoding
+        self.attempt_metrics = attempt_metrics or []
 
 
 def _format_validation_error(exc: ValidationError) -> str:
@@ -112,130 +134,12 @@ def _format_validation_error(exc: ValidationError) -> str:
     return ", ".join(parts)
 
 
-def _strip_markdown_fence(text: str) -> tuple[str, dict[str, Any] | None]:
-    stripped = text.strip()
-    if not stripped.startswith("```"):
-        return text, None
-
-    lines = stripped.splitlines()
-    if not lines:
-        return text, None
-    if lines[0].startswith("```"):
-        lines = lines[1:]
-    if lines and lines[-1].strip() == "```":
-        lines = lines[:-1]
-    return "\n".join(lines).strip(), {"kind": "strip_markdown_fence"}
-
-
-def _strip_non_json_prefix(text: str) -> tuple[str, dict[str, Any] | None]:
-    stripped = text.strip()
-    if not stripped:
-        return text, None
-
-    object_index = stripped.find("{")
-    array_index = stripped.find("[")
-    indices = [index for index in (object_index, array_index) if index >= 0]
-    if not indices:
-        return text, None
-    start_index = min(indices)
-    if start_index == 0:
-        return stripped, None
-    return stripped[start_index:].strip(), {"kind": "strip_non_json_prefix"}
-
-
-def _trim_trailing_text(text: str) -> tuple[str, dict[str, Any] | None]:
-    stripped = text.strip()
-    if not stripped:
-        return text, None
-    try:
-        _, end_index = json.JSONDecoder().raw_decode(stripped)
-    except json.JSONDecodeError:
-        return text, None
-
-    trailing = stripped[end_index:].strip()
-    if not trailing:
-        return stripped, None
-    return stripped[:end_index].strip(), {"kind": "trim_trailing_text", "removed_text": trailing}
-
-
-def _closing_suffix_for_unbalanced_json(text: str) -> str:
-    stack: list[str] = []
-    in_string = False
-    escape = False
-
-    for char in text:
-        if in_string:
-            if escape:
-                escape = False
-            elif char == "\\":
-                escape = True
-            elif char == "\"":
-                in_string = False
-            continue
-
-        if char == "\"":
-            in_string = True
-        elif char in "{[":
-            stack.append(char)
-        elif char == "}" and stack and stack[-1] == "{":
-            stack.pop()
-        elif char == "]" and stack and stack[-1] == "[":
-            stack.pop()
-
-    if in_string:
-        return '"' + "".join("}" if opener == "{" else "]" for opener in reversed(stack))
-    return "".join("}" if opener == "{" else "]" for opener in reversed(stack))
-
-
-def _close_unbalanced_json(text: str) -> tuple[str, dict[str, Any] | None]:
-    stripped = text.strip()
-    if not stripped or stripped[0] not in "{[":
-        return text, None
-
-    suffix = _closing_suffix_for_unbalanced_json(stripped)
-    if not suffix:
-        return text, None
-    candidate = stripped + suffix
-    try:
-        json.loads(candidate)
-    except json.JSONDecodeError:
-        return text, None
-    return candidate, {"kind": "close_unbalanced_json", "suffix": suffix}
-
-
-def repair_json(text: str) -> dict[str, Any]:
-    repaired = str(text)
-    actions: list[dict[str, Any]] = []
-
-    for repair in (_strip_markdown_fence, _strip_non_json_prefix, _trim_trailing_text, _close_unbalanced_json, _trim_trailing_text):
-        repaired_next, action = repair(repaired)
-        repaired = repaired_next
-        if action is not None:
-            actions.append(action)
-
-    return {"text": repaired, "repair_actions": actions}
-
-
-def repair_json_candidate(raw_text: str) -> RepairResult:
-    repaired = repair_json(raw_text)
-    return RepairResult(
-        repaired=bool(repaired["repair_actions"]),
-        repair_actions=list(repaired["repair_actions"]),
-        repaired_text=str(repaired["text"]),
-    )
-
-
-def _schema_allowed_keys(schema: type[BaseModel]) -> set[str]:
-    return {field.alias or field_name for field_name, field in schema.model_fields.items()}
-
-
 def _literal_choices(annotation: Any) -> tuple[str, ...]:
     origin = get_origin(annotation)
     if origin is None:
         return ()
     if str(origin).endswith("Literal"):
-        choices = tuple(choice for choice in get_args(annotation) if isinstance(choice, str))
-        return choices
+        return tuple(choice for choice in get_args(annotation) if isinstance(choice, str))
 
     nested_choices: list[str] = []
     for arg in get_args(annotation):
@@ -243,11 +147,8 @@ def _literal_choices(annotation: Any) -> tuple[str, ...]:
     return tuple(nested_choices)
 
 
-def _normalize_enum_candidate(value: str) -> str:
-    normalized = value.strip().lower().replace("-", "_").replace(" ", "_")
-    while "__" in normalized:
-        normalized = normalized.replace("__", "_")
-    return normalized
+def _schema_allowed_keys(schema: type[BaseModel]) -> set[str]:
+    return {field.alias or field_name for field_name, field in schema.model_fields.items()}
 
 
 def _schema_enum_fields(schema: type[BaseModel]) -> dict[str, tuple[str, ...]]:
@@ -257,6 +158,14 @@ def _schema_enum_fields(schema: type[BaseModel]) -> dict[str, tuple[str, ...]]:
         if choices:
             enum_fields[field.alias or field_name] = choices
     return enum_fields
+
+
+def _infer_task_id(schema: type[BaseModel], task_id: str) -> str:
+    if task_id:
+        return task_id
+    if schema.__name__.startswith("Task") and schema.__name__.endswith("Output"):
+        return schema.__name__[4:-6]
+    return schema.__name__
 
 
 def build_structured_constraint(schema: type[BaseModel], *, mode: str = "json_schema") -> StructuredConstraint:
@@ -299,49 +208,41 @@ def resolve_structured_decoding(
     }
 
 
-def _repair_payload(
-    payload: Any,
-    schema: type[BaseModel],
-    *,
-    allow_key_filtering: bool = True,
-    allow_enum_correction: bool = True,
-) -> tuple[Any, list[dict[str, Any]]]:
-    if not isinstance(payload, dict):
-        return payload, []
+def repair_json_candidate(raw_text: str) -> RepairResult:
+    repaired_text, repair_names = _repair_json_text(raw_text)
+    repair_actions = [{"kind": repair_name} for repair_name in repair_names]
+    return RepairResult(
+        repaired=bool(repair_actions),
+        repair_actions=repair_actions,
+        repaired_text=repaired_text,
+    )
 
-    repaired = dict(payload)
-    actions: list[dict[str, Any]] = []
 
-    allowed_keys = _schema_allowed_keys(schema)
-    extra_keys = sorted(key for key in repaired if key not in allowed_keys)
-    if extra_keys and allow_key_filtering:
-        repaired = {key: value for key, value in repaired.items() if key in allowed_keys}
-        actions.append({"kind": "filter_extra_keys", "removed_keys": extra_keys})
+def repair_json_legacy(raw_text: str) -> dict[str, Any]:
+    repaired = repair_json_candidate(raw_text)
+    return {"text": repaired.repaired_text, "repair_actions": repaired.repair_actions}
 
-    if not allow_enum_correction:
-        return repaired, actions
 
-    for field_name, choices in _schema_enum_fields(schema).items():
-        current = repaired.get(field_name)
-        if not isinstance(current, str):
-            continue
-        normalized = _normalize_enum_candidate(current)
-        canonical_by_normalized: dict[str, str] = {}
-        for choice in choices:
-            canonical_by_normalized.setdefault(_normalize_enum_candidate(choice), choice)
-        canonical = canonical_by_normalized.get(normalized)
-        if canonical is not None and canonical != current:
-            repaired[field_name] = canonical
-            actions.append(
-                {
-                    "kind": "correct_enum_value",
-                    "field_name": field_name,
-                    "from": current,
-                    "to": canonical,
-                }
-            )
+# Backward-compatible export for existing tests and callers.
+repair_json = repair_json_legacy
 
-    return repaired, actions
+
+def _categorize_validation_errors(exc: ValidationError) -> list[str]:
+    categories: list[str] = []
+    for error in exc.errors():
+        error_type = str(error.get("type") or "")
+        location = ".".join(str(part) for part in error.get("loc", ())) or "<root>"
+        input_value = error.get("input")
+
+        if error_type == "extra_forbidden":
+            categories.append(f'extra_key: "{location}"')
+        elif "literal" in error_type:
+            categories.append(f'invalid_enum: "{location}" -> {input_value!r}')
+        elif error_type == "missing":
+            categories.append(f'missing_required_field: "{location}"')
+        else:
+            categories.append(f'schema_validation_error: "{location}" -> {error.get("msg")}')
+    return categories
 
 
 def _build_retry_prompt(
@@ -352,22 +253,44 @@ def _build_retry_prompt(
     last_error_kind: str | None,
     detail: str | None,
     bad_output: str,
+    task_id: str,
+    removed_keys: list[str],
+    enum_changes: list[str],
 ) -> str:
-    reason = detail or last_error_kind or "validation_failed"
-    problem_label = "JSON parsing" if last_error_kind == "json" else "schema validation"
-    return (
-        f"{prompt}\n\n"
-        "The JSON you returned failed "
-        f"{problem_label} for {schema_name}.\n\n"
-        "Error:\n"
-        f"{reason}\n\n"
-        "Here is your previous JSON:\n"
-        f"{bad_output}\n\n"
-        "Return ONLY corrected JSON.\n"
-        "Do not add new fields.\n"
-        "Do not copy placeholder or schema text.\n"
-        f"This is retry attempt {attempt_index}.\n"
+    retry_feedback_parts = [
+        "The previous output failed validation.",
+        f"Problem type: {'json_parse_error' if last_error_kind == 'json' else 'schema_validation_error'}",
+    ]
+
+    if detail:
+        retry_feedback_parts.append("Problems:")
+        retry_feedback_parts.extend(f"- {line}" for line in detail.splitlines() if line.strip())
+
+    if removed_keys:
+        retry_feedback_parts.append(
+            f'WARNING: The following keys were found in your output but are NOT allowed: {removed_keys}. '
+            f"Only output these keys: {sorted(TASK_ALLOWED_KEYS_REGISTRY.get(task_id, []))}"
+        )
+
+    if enum_changes:
+        retry_feedback_parts.append(
+            f"WARNING: Some enum values were normalized: {enum_changes}. Use exact enum values from the allowed list."
+        )
+
+    retry_feedback_parts.extend(
+        [
+            "Fix the JSON so it matches the schema exactly.",
+            "Return ONLY corrected JSON.",
+            "Do not add new fields.",
+            "Do not copy instructions, schema descriptions, examples, or rule text into the JSON output.",
+            "All string values must use double quotes.",
+            f"This correction must satisfy schema {schema_name}.",
+            "Here is your previous JSON:",
+            bad_output,
+        ]
     )
+
+    return f"{prompt}\n\n" + "\n".join(retry_feedback_parts)
 
 
 def generate_structured(
@@ -381,8 +304,11 @@ def generate_structured(
     decoding_backend: str = "transformers",
     allow_key_filtering: bool = True,
     allow_enum_correction: bool = True,
+    task_id: str = "",
+    metrics_collector: BatchMetrics | None = None,
 ) -> StructuredGenerationResult:
     attempts: list[StructuredGenerationAttempt] = []
+    attempt_metrics_rows: list[GenerationAttemptMetrics] = []
     last_error_kind: str | None = None
     last_detail: str | None = None
     last_output = ""
@@ -390,7 +316,10 @@ def generate_structured(
     last_normalization: str | None = None
     last_normalization_details: list[dict[str, str]] = []
     last_repair_actions: list[dict[str, Any]] = []
+    last_removed_keys: list[str] = []
+    last_enum_changes: list[str] = []
     structured_decoding = resolve_structured_decoding(structured_constraint, backend=decoding_backend)
+    effective_task_id = _infer_task_id(schema, task_id)
 
     for attempt_index in range(max_retry + 1):
         attempt_prompt = prompt if attempt_index == 0 else _build_retry_prompt(
@@ -400,12 +329,22 @@ def generate_structured(
             last_error_kind=last_error_kind,
             detail=last_detail,
             bad_output=last_output,
+            task_id=effective_task_id,
+            removed_keys=last_removed_keys,
+            enum_changes=last_enum_changes,
         )
         raw_output = str(llm(attempt_prompt))
         candidate_output = raw_output
         normalization: str | None = None
         normalization_details: list[dict[str, str]] = []
         repair_actions: list[dict[str, Any]] = []
+        removed_keys: list[str] = []
+        enum_changes: list[str] = []
+        attempt_metrics = GenerationAttemptMetrics(
+            task_id=effective_task_id,
+            attempt_number=attempt_index + 1,
+            raw_length=len(raw_output),
+        )
 
         if output_normalizer is not None:
             normalized = output_normalizer(raw_output)
@@ -416,6 +355,7 @@ def generate_structured(
         repaired_json = repair_json_candidate(candidate_output)
         candidate_output = repaired_json.repaired_text
         repair_actions.extend(repaired_json.repair_actions)
+        attempt_metrics.repairs_applied = [action["kind"] for action in repaired_json.repair_actions]
 
         last_output = candidate_output
         last_raw_output = raw_output
@@ -425,9 +365,12 @@ def generate_structured(
 
         try:
             payload = json.loads(candidate_output)
+            attempt_metrics.json_parse_success = True
         except json.JSONDecodeError as exc:
             last_error_kind = "json"
-            last_detail = f"{type(exc).__name__}: {exc.msg}"
+            last_detail = f"json_parse_error: {exc.msg}"
+            attempt_metrics.validation_error = last_detail
+            attempt_metrics.retry_exhausted = attempt_index == max_retry
             attempts.append(
                 StructuredGenerationAttempt(
                     attempt_index=attempt_index,
@@ -440,27 +383,64 @@ def generate_structured(
                     normalization=normalization,
                     normalization_details=normalization_details,
                     repair_actions=repair_actions,
+                    keys_removed=removed_keys,
+                    enum_normalizations=enum_changes,
                 )
             )
+            attempt_metrics_rows.append(attempt_metrics)
+            if metrics_collector is not None:
+                metrics_collector.record(attempt_metrics)
             continue
 
-        payload, payload_repairs = _repair_payload(
-            payload,
-            schema,
-            allow_key_filtering=allow_key_filtering,
-            allow_enum_correction=allow_enum_correction,
-        )
+        sanitized_payload, removed_keys = sanitize_keys(payload, effective_task_id)
+        normalized_payload, enum_changes = normalize_enum_values(sanitized_payload, effective_task_id)
+
+        if allow_key_filtering:
+            payload = sanitized_payload
+        else:
+            removed_keys = []
+
+        if allow_enum_correction:
+            payload = normalized_payload if allow_key_filtering else normalize_enum_values(payload, effective_task_id)[0]
+        else:
+            enum_changes = []
+
+        payload_repairs: list[dict[str, Any]] = []
+        if removed_keys:
+            payload_repairs.append({"kind": "filter_extra_keys", "removed_keys": removed_keys})
+        for enum_change in enum_changes:
+            field_name, _, replacement = enum_change.partition(": ")
+            before, _, after = replacement.partition(" -> ")
+            payload_repairs.append(
+                {
+                    "kind": "correct_enum_value",
+                    "field_name": field_name,
+                    "from": before,
+                    "to": after,
+                }
+            )
+
         if payload_repairs:
             repair_actions.extend(payload_repairs)
             candidate_output = json.dumps(payload, ensure_ascii=False)
             last_output = candidate_output
             last_repair_actions = repair_actions
 
+        attempt_metrics.keys_removed = removed_keys
+        attempt_metrics.enums_normalized = enum_changes
+        last_removed_keys = removed_keys
+        last_enum_changes = enum_changes
+
         try:
             model = schema.model_validate(payload)
+            attempt_metrics.schema_validation_success = True
+            attempt_metrics.overall_success = True
         except ValidationError as exc:
             last_error_kind = "validation"
-            last_detail = _format_validation_error(exc)
+            detail_lines = _categorize_validation_errors(exc)
+            last_detail = "\n".join(detail_lines) if detail_lines else _format_validation_error(exc)
+            attempt_metrics.validation_error = _format_validation_error(exc)
+            attempt_metrics.retry_exhausted = attempt_index == max_retry
             attempts.append(
                 StructuredGenerationAttempt(
                     attempt_index=attempt_index,
@@ -473,8 +453,13 @@ def generate_structured(
                     normalization=normalization,
                     normalization_details=normalization_details,
                     repair_actions=repair_actions,
+                    keys_removed=removed_keys,
+                    enum_normalizations=enum_changes,
                 )
             )
+            attempt_metrics_rows.append(attempt_metrics)
+            if metrics_collector is not None:
+                metrics_collector.record(attempt_metrics)
             continue
 
         attempts.append(
@@ -489,13 +474,20 @@ def generate_structured(
                 normalization=normalization,
                 normalization_details=normalization_details,
                 repair_actions=repair_actions,
+                keys_removed=removed_keys,
+                enum_normalizations=enum_changes,
             )
         )
+        attempt_metrics_rows.append(attempt_metrics)
+        if metrics_collector is not None:
+            metrics_collector.record(attempt_metrics)
+        canonical_payload = model.model_dump(mode="json", by_alias=True)
+        canonical_output = json.dumps(canonical_payload, ensure_ascii=False)
         return StructuredGenerationResult(
             model=model,
-            payload=model.model_dump(mode="json", by_alias=True),
+            payload=canonical_payload,
             raw_output=raw_output,
-            candidate_output=candidate_output,
+            candidate_output=canonical_output,
             attempts=attempts,
             attempt_count=len(attempts),
             last_error_kind=None,
@@ -503,6 +495,7 @@ def generate_structured(
             normalization_details=normalization_details,
             repair_actions=repair_actions,
             structured_decoding=structured_decoding,
+            attempt_metrics=attempt_metrics_rows,
         )
 
     raise StructuredGenerationError(
@@ -515,4 +508,5 @@ def generate_structured(
         normalization_details=last_normalization_details,
         repair_actions=last_repair_actions,
         structured_decoding=structured_decoding,
+        attempt_metrics=attempt_metrics_rows,
     )

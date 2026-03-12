@@ -252,6 +252,23 @@ def detect_prompt_leakage(sample: Mapping[str, Any]) -> dict[str, Any] | None:
 
 
 def detect_extra_keys(sample: Mapping[str, Any]) -> dict[str, Any] | None:
+    validation_metadata = sample.get("structured_validation_metadata")
+    if isinstance(validation_metadata, Mapping):
+        removed_keys: list[str] = []
+        for attempt in validation_metadata.get("attempts", []):
+            if not isinstance(attempt, Mapping):
+                continue
+            for key in attempt.get("keys_removed", []) or []:
+                if isinstance(key, str):
+                    removed_keys.append(key)
+        if removed_keys:
+            task = str(sample.get("task", "unknown"))
+            return {
+                "extra_keys": sorted(set(removed_keys)),
+                "allowed_keys": sorted(TASK_ALLOWED_KEYS.get(task, ())),
+                "source": "structured_validation_metadata",
+            }
+
     task = str(sample.get("task", "unknown"))
     allowed_keys = set(TASK_ALLOWED_KEYS.get(task, ()))
     if not allowed_keys:
@@ -357,7 +374,7 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     structured_success_count = sum(
         1
         for analysis in analyses
-        if analysis["primary_category"] not in {"malformed_json", "truncation", "fenced_json", "trailing_text", "enum_drift"}
+        if analysis["primary_category"] not in {"malformed_json", "truncation", "fenced_json", "trailing_text", "enum_drift", "prompt_leakage"}
         and analysis["extra_keys"] is None
     )
 

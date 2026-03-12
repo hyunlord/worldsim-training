@@ -985,9 +985,9 @@ def test_build_sample_prompt_messages_adds_b_e_f_g_h_specific_generation_rules()
 def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
     from training.lib.qlora_smoke import _sample_generation_max_new_tokens
 
-    assert _sample_generation_max_new_tokens("G") == 512
-    assert _sample_generation_max_new_tokens("H") == 512
-    assert _sample_generation_max_new_tokens("F") == 320
+    assert _sample_generation_max_new_tokens("G") == 384
+    assert _sample_generation_max_new_tokens("H") == 384
+    assert _sample_generation_max_new_tokens("F") == 384
 
 
 def test_sample_generation_assistant_prefix_is_task_specific() -> None:
@@ -1316,7 +1316,7 @@ def test_generate_structured_retry_prompt_includes_validation_feedback_and_previ
 
     def fake_llm(prompt: str) -> str:
         seen_prompts.append(prompt)
-        if "temperament_factor:Field required" in prompt and '"personality_reasoning":"high_HA"' in prompt:
+        if 'missing_required_field: "temperament_factor"' in prompt and '"personality_reasoning":"high_HA"' in prompt:
             return '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA","temperament_factor":"harm_avoidance_dominant"}'
         return '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA"}'
 
@@ -1324,8 +1324,8 @@ def test_generate_structured_retry_prompt_includes_validation_feedback_and_previ
 
     assert result.attempt_count == 2
     assert len(seen_prompts) == 2
-    assert "failed schema validation" in seen_prompts[1]
-    assert "temperament_factor:Field required" in seen_prompts[1]
+    assert "The previous output failed validation." in seen_prompts[1]
+    assert 'missing_required_field: "temperament_factor"' in seen_prompts[1]
     assert '"personality_reasoning":"high_HA"' in seen_prompts[1]
     assert "Return ONLY corrected JSON." in seen_prompts[1]
     assert result.attempts[0].attempt_index == 0
@@ -1338,10 +1338,7 @@ def test_repair_json_strips_fences_and_trailing_text() -> None:
     repaired = repair_json('```json\n{"text_ko":"조심스럽다"}\n```\nExplanation')
 
     assert repaired["text"] == '{"text_ko":"조심스럽다"}'
-    assert [action["kind"] for action in repaired["repair_actions"]] == [
-        "strip_markdown_fence",
-        "trim_trailing_text",
-    ]
+    assert [action["kind"] for action in repaired["repair_actions"]] == ["first_json_extract"]
 
 
 def test_repair_json_closes_missing_final_brace() -> None:
@@ -1350,7 +1347,7 @@ def test_repair_json_closes_missing_final_brace() -> None:
     repaired = repair_json('{"text_ko":"조심스럽다"')
 
     assert repaired["text"] == '{"text_ko":"조심스럽다"}'
-    assert repaired["repair_actions"][-1]["kind"] == "close_unbalanced_json"
+    assert repaired["repair_actions"][-1]["kind"] == "missing_closing_brace"
 
 
 def test_generate_structured_filters_extra_keys_without_retry() -> None:
@@ -1395,14 +1392,15 @@ def test_generate_structured_retry_prompt_includes_json_feedback_and_previous_ou
 
     def fake_llm(prompt: str) -> str:
         seen_prompts.append(prompt)
-        if "JSON parsing" in prompt and '{"text_ko":"겁 많지만 빈틈없다",' in prompt:
+        if "json_parse_error" in prompt and '{"text_ko":"겁 많지만 빈틈없다",' in prompt:
             return '{"text_ko":"겁 많지만 빈틈없다","text_en":"Fearful but meticulous.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}'
         return '{"text_ko":"겁 많지만 빈틈없다",'
 
     result = generate_structured(fake_llm, "prompt", TaskAOutput)
 
     assert result.attempt_count == 2
-    assert "failed JSON parsing" in seen_prompts[1]
+    assert "The previous output failed validation." in seen_prompts[1]
+    assert "Problem type: json_parse_error" in seen_prompts[1]
     assert '{"text_ko":"겁 많지만 빈틈없다",' in seen_prompts[1]
 
 
@@ -1444,5 +1442,13 @@ def test_generate_structured_exposes_repair_and_decoding_metadata() -> None:
 
     assert result.repair_actions
     assert result.structured_decoding["enabled"] is False
-    assert any(action["kind"] == "strip_markdown_fence" for action in result.repair_actions)
+    assert any(action["kind"] == "fence_strip" for action in result.repair_actions)
     assert any(action["kind"] == "filter_extra_keys" for action in result.repair_actions)
+
+
+def test_output_schema_helpers_expose_task_schema_and_enum_fields() -> None:
+    from training.lib.output_schema import TASK_ENUM_FIELDS, TaskGOutput, get_schema_for_task
+
+    assert get_schema_for_task("G") is TaskGOutput
+    assert "action_tendency" in TASK_ENUM_FIELDS["G"]
+    assert "mobilize" in TASK_ENUM_FIELDS["G"]["action_tendency"]

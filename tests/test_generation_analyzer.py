@@ -211,6 +211,28 @@ def test_generate_report_includes_structured_success_metrics() -> None:
     assert report["constrained_decoding_used_rate"] == 0.0
 
 
+def test_detect_extra_keys_prefers_structured_validation_metadata() -> None:
+    from tools.generation_analyzer import detect_extra_keys
+
+    detected = detect_extra_keys(
+        {
+            "task": "A",
+            "generated_assistant": '{"text_ko":"조심조심 걷는다","text_en":"Walks carefully","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
+            "structured_validation_metadata": {
+                "attempts": [
+                    {
+                        "keys_removed": ["schema_explanation", "emoji"],
+                    }
+                ]
+            },
+        }
+    )
+
+    assert detected is not None
+    assert detected["source"] == "structured_validation_metadata"
+    assert detected["extra_keys"] == ["emoji", "schema_explanation"]
+
+
 def test_cli_writes_analysis_report(tmp_path: Path) -> None:
     sample_path = tmp_path / "sample_generations.jsonl"
     report_path = tmp_path / "analysis_report.json"

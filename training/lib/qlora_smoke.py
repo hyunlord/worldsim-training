@@ -19,9 +19,12 @@ from scripts.prepare_dataset import _validate_messages_row
 from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
 from training.lib.structured_generation import (
     StructuredGenerationError,
+    TASK_MAX_NEW_TOKENS,
+    STRUCTURED_GENERATION_DEFAULTS,
     build_structured_constraint,
     generate_structured,
 )
+from training.lib.structured_metrics import BatchMetrics
 
 
 DEFAULT_RUN_MODE = "smoke"
@@ -817,13 +820,7 @@ def _build_sample_prompt_messages(row: Mapping[str, Any]) -> list[dict[str, Any]
 
 
 def _sample_generation_max_new_tokens(task: str) -> int:
-    if task == "H":
-        return 512
-    if task == "G":
-        return 512
-    if task == "F":
-        return 320
-    return 256
+    return TASK_MAX_NEW_TOKENS.get(task, 384)
 
 
 def _sample_generation_assistant_prefix(task: str) -> str:
@@ -937,9 +934,9 @@ def _generate_sample_once(
         generated = model.generate(
             **encoded,
             max_new_tokens=max_new_tokens,
-            do_sample=False,
-            temperature=0.0,
-            top_p=1.0,
+            do_sample=STRUCTURED_GENERATION_DEFAULTS["do_sample"],
+            temperature=STRUCTURED_GENERATION_DEFAULTS["temperature"],
+            top_p=STRUCTURED_GENERATION_DEFAULTS["top_p"],
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
@@ -948,12 +945,20 @@ def _generate_sample_once(
     return assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
 
 
-def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path: Path, runtime: RuntimeConfig, torch: Any) -> list[dict]:
+def _generate_samples(
+    model: Any,
+    tokenizer: Any,
+    rows: list[dict],
+    output_path: Path,
+    runtime: RuntimeConfig,
+    torch: Any,
+) -> tuple[list[dict], dict[str, Any]]:
     if not rows:
         write_jsonl(output_path, [])
-        return []
+        return [], BatchMetrics().summary()
 
     samples: list[dict] = []
+    metrics_collector = BatchMetrics()
     model.eval()
     model.config.use_cache = True
     device = runtime.device
@@ -1003,6 +1008,8 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     schema,
                     output_normalizer=_normalize_generation_candidate,
                     structured_constraint=build_structured_constraint(schema),
+                    task_id=task,
+                    metrics_collector=metrics_collector,
                 )
                 raw_generated_text = structured.raw_output
                 generated_text = json.dumps(structured.payload, ensure_ascii=False)
@@ -1021,6 +1028,8 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                         "validation_error": attempt.validation_error,
                         "error_kind": attempt.error_kind,
                         "repair_actions": attempt.repair_actions,
+                        "keys_removed": attempt.keys_removed,
+                        "enum_normalizations": attempt.enum_normalizations,
                     }
                     for attempt in structured.attempts
                 ]
@@ -1030,6 +1039,21 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     "attempts": structured_attempts,
                     "repair_actions": structured.repair_actions,
                     "structured_decoding": structured.structured_decoding,
+                    "attempt_metrics": [
+                        {
+                            "task_id": metric.task_id,
+                            "attempt_number": metric.attempt_number,
+                            "raw_length": metric.raw_length,
+                            "repairs_applied": metric.repairs_applied,
+                            "keys_removed": metric.keys_removed,
+                            "enums_normalized": metric.enums_normalized,
+                            "json_parse_success": metric.json_parse_success,
+                            "schema_validation_success": metric.schema_validation_success,
+                            "validation_error": metric.validation_error,
+                            "overall_success": metric.overall_success,
+                        }
+                        for metric in structured.attempt_metrics
+                    ],
                 }
         except StructuredGenerationError as exc:
             raw_generated_text = exc.last_raw_output
@@ -1049,6 +1073,8 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     "validation_error": attempt.validation_error,
                     "error_kind": attempt.error_kind,
                     "repair_actions": attempt.repair_actions,
+                    "keys_removed": attempt.keys_removed,
+                    "enum_normalizations": attempt.enum_normalizations,
                 }
                 for attempt in exc.attempts
             ]
@@ -1058,6 +1084,21 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "attempts": structured_attempts,
                 "repair_actions": exc.repair_actions,
                 "structured_decoding": exc.structured_decoding,
+                "attempt_metrics": [
+                    {
+                        "task_id": metric.task_id,
+                        "attempt_number": metric.attempt_number,
+                        "raw_length": metric.raw_length,
+                        "repairs_applied": metric.repairs_applied,
+                        "keys_removed": metric.keys_removed,
+                        "enums_normalized": metric.enums_normalized,
+                        "json_parse_success": metric.json_parse_success,
+                        "schema_validation_success": metric.schema_validation_success,
+                        "validation_error": metric.validation_error,
+                        "overall_success": metric.overall_success,
+                    }
+                    for metric in exc.attempt_metrics
+                ],
             }
             if exc.last_error_kind == "json":
                 parse_error = "JSONDecodeError"
@@ -1090,7 +1131,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
         )
 
     write_jsonl(output_path, samples)
-    return samples
+    return samples, metrics_collector.summary()
 
 
 def preview_metrics(output_dir: Path | str) -> dict[str, Any]:
@@ -1888,7 +1929,7 @@ def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, A
         tokenizer.save_pretrained(str(adapter_dir))
 
         sample_rows = _select_generation_rows(train_rows, eval_rows)
-        samples = _generate_samples(model, tokenizer, sample_rows, sample_path, runtime, torch)
+        samples, structured_metrics = _generate_samples(model, tokenizer, sample_rows, sample_path, runtime, torch)
         sample_summary = summarize_sample_generations(samples)
 
         train_loss = float(train_result.training_loss)
@@ -1904,6 +1945,7 @@ def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, A
                 "retry_rate": sample_summary["retry_rate"],
                 "repair_applied_rate": sample_summary["repair_applied_rate"],
                 "constrained_decoding_used_rate": sample_summary["constrained_decoding_used_rate"],
+                "structured_metrics": structured_metrics,
             },
         )
 
