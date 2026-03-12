@@ -983,6 +983,24 @@ def test_notebook_uses_shared_training_module() -> None:
     assert "longer_smoke" in source
 
 
+def test_baseline_notebook_uses_shared_training_module() -> None:
+    notebook_path = Path("notebooks/dgx_spark_qlora_train.ipynb")
+    payload = json.loads(notebook_path.read_text(encoding="utf-8"))
+
+    source = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in payload.get("cells", [])
+        if cell.get("cell_type") == "code"
+    )
+
+    assert "from training.lib.qlora_smoke import BASELINE_MODEL_NAME" in source
+    assert "from training.lib.qlora_smoke import SmokeRunConfig, run_baseline_or_raise" in source
+    assert "from training.lib.qlora_smoke import load_sample_generations" in source
+    assert "from tools.generation_analyzer import generate_report, recommend_next_action" in source
+    assert "outputs/model_registry.json" in source
+    assert "outputs/best_adapter.txt" in source
+
+
 def test_generate_structured_retries_on_malformed_json() -> None:
     from training.lib.output_schema import TaskAOutput
     from training.lib.structured_generation import generate_structured
