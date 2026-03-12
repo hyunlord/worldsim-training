@@ -987,7 +987,7 @@ def test_sample_generation_max_new_tokens_g_uses_larger_budget() -> None:
 
     assert _sample_generation_max_new_tokens("G") == 512
     assert _sample_generation_max_new_tokens("H") == 512
-    assert _sample_generation_max_new_tokens("F") == 288
+    assert _sample_generation_max_new_tokens("F") == 320
 
 
 def test_sample_generation_assistant_prefix_is_task_specific() -> None:
@@ -1234,7 +1234,7 @@ def test_generate_structured_retries_on_malformed_json() -> None:
 
     responses = iter(
         [
-            '{"text_ko":"겁 많지만 빈틈없다"',
+            '{"text_ko":"겁 많지만 빈틈없다",',
             '{"text_ko":"겁 많지만 빈틈없다","text_en":"Fearful but meticulous.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
         ]
     )
@@ -1316,7 +1316,7 @@ def test_generate_structured_retry_prompt_includes_validation_feedback_and_previ
 
     def fake_llm(prompt: str) -> str:
         seen_prompts.append(prompt)
-        if "temperament_factor:missing" in prompt and '"personality_reasoning":"high_HA"' in prompt:
+        if "temperament_factor:Field required" in prompt and '"personality_reasoning":"high_HA"' in prompt:
             return '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA","temperament_factor":"harm_avoidance_dominant"}'
         return '{"action_id":0,"confidence":0.7,"hint_ko":"곧장 물러섰다","hint_en":"They stepped back.","personality_reasoning":"high_HA"}'
 
@@ -1325,8 +1325,82 @@ def test_generate_structured_retry_prompt_includes_validation_feedback_and_previ
     assert result.attempt_count == 2
     assert len(seen_prompts) == 2
     assert "failed schema validation" in seen_prompts[1]
-    assert "temperament_factor:missing" in seen_prompts[1]
+    assert "temperament_factor:Field required" in seen_prompts[1]
     assert '"personality_reasoning":"high_HA"' in seen_prompts[1]
     assert "Return ONLY corrected JSON." in seen_prompts[1]
     assert result.attempts[0].attempt_index == 0
     assert result.attempts[0].raw_output.endswith('"personality_reasoning":"high_HA"}')
+
+
+def test_repair_json_strips_fences_and_trailing_text() -> None:
+    from training.lib.structured_generation import repair_json
+
+    repaired = repair_json('```json\n{"text_ko":"조심스럽다"}\n```\nExplanation')
+
+    assert repaired["text"] == '{"text_ko":"조심스럽다"}'
+    assert [action["kind"] for action in repaired["repair_actions"]] == [
+        "strip_markdown_fence",
+        "trim_trailing_text",
+    ]
+
+
+def test_repair_json_closes_missing_final_brace() -> None:
+    from training.lib.structured_generation import repair_json
+
+    repaired = repair_json('{"text_ko":"조심스럽다"')
+
+    assert repaired["text"] == '{"text_ko":"조심스럽다"}'
+    assert repaired["repair_actions"][-1]["kind"] == "close_unbalanced_json"
+
+
+def test_generate_structured_filters_extra_keys_without_retry() -> None:
+    from training.lib.output_schema import TaskAOutput
+    from training.lib.structured_generation import generate_structured
+
+    result = generate_structured(
+        lambda _prompt: '{"text_ko":"겁 많지만 빈틈없다","text_en":"Fearful but meticulous.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic","schema_explanation":"do not copy"}',
+        "prompt",
+        TaskAOutput,
+    )
+
+    assert result.attempt_count == 1
+    assert "schema_explanation" not in result.payload
+    assert result.attempts[0].repair_actions is not None
+    assert any(action["kind"] == "filter_extra_keys" for action in result.attempts[0].repair_actions)
+
+
+def test_generate_structured_corrects_casing_only_enum_without_retry() -> None:
+    from training.lib.output_schema import TaskFOutput
+    from training.lib.structured_generation import generate_structured
+
+    result = generate_structured(
+        lambda _prompt: '{"emotion":"Fear","intensity":0.8,"cause_ko":"겁에 질렸다","cause_en":"Fear struck.","previous_emotion":"Trust","transition_type":"Sudden","temperament_amplifier":"high_HA"}',
+        "prompt",
+        TaskFOutput,
+    )
+
+    assert result.attempt_count == 1
+    assert result.payload["emotion"] == "fear"
+    assert result.payload["previous_emotion"] == "trust"
+    assert result.payload["transition_type"] == "sudden"
+    assert result.attempts[0].repair_actions is not None
+    assert any(action["kind"] == "correct_enum_value" for action in result.attempts[0].repair_actions)
+
+
+def test_generate_structured_retry_prompt_includes_json_feedback_and_previous_output() -> None:
+    from training.lib.output_schema import TaskAOutput
+    from training.lib.structured_generation import generate_structured
+
+    seen_prompts: list[str] = []
+
+    def fake_llm(prompt: str) -> str:
+        seen_prompts.append(prompt)
+        if "JSON parsing" in prompt and '{"text_ko":"겁 많지만 빈틈없다",' in prompt:
+            return '{"text_ko":"겁 많지만 빈틈없다","text_en":"Fearful but meticulous.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}'
+        return '{"text_ko":"겁 많지만 빈틈없다",'
+
+    result = generate_structured(fake_llm, "prompt", TaskAOutput)
+
+    assert result.attempt_count == 2
+    assert "failed JSON parsing" in seen_prompts[1]
+    assert '{"text_ko":"겁 많지만 빈틈없다",' in seen_prompts[1]

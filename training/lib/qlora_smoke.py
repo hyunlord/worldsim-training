@@ -818,8 +818,8 @@ def _sample_generation_max_new_tokens(task: str) -> int:
     if task == "G":
         return 512
     if task == "F":
-        return 288
-    return 224
+        return 320
+    return 256
 
 
 def _sample_generation_assistant_prefix(task: str) -> str:
@@ -934,7 +934,8 @@ def _generate_sample_once(
             **encoded,
             max_new_tokens=max_new_tokens,
             do_sample=False,
-            temperature=None,
+            temperature=0.0,
+            top_p=1.0,
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
@@ -1008,6 +1009,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                         "json_error": attempt.json_error,
                         "validation_error": attempt.validation_error,
                         "error_kind": attempt.error_kind,
+                        "repair_actions": attempt.repair_actions,
                     }
                     for attempt in structured.attempts
                 ]
@@ -1015,6 +1017,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     "attempt_count": structured.attempt_count,
                     "last_error_kind": structured.last_error_kind,
                     "attempts": structured_attempts,
+                    "repair_actions": structured.repair_actions,
                 }
         except StructuredGenerationError as exc:
             raw_generated_text = exc.last_raw_output
@@ -1030,6 +1033,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     "json_error": attempt.json_error,
                     "validation_error": attempt.validation_error,
                     "error_kind": attempt.error_kind,
+                    "repair_actions": attempt.repair_actions,
                 }
                 for attempt in exc.attempts
             ]
@@ -1037,6 +1041,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "attempt_count": exc.attempt_count,
                 "last_error_kind": exc.last_error_kind,
                 "attempts": structured_attempts,
+                "repair_actions": exc.repair_actions,
             }
             if exc.last_error_kind == "json":
                 parse_error = "JSONDecodeError"
@@ -1537,6 +1542,7 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         for analysis in analyses
         if analysis["task"] == "G" and analysis["semantic_status"] is not None
     )
+    retry_count = sum(1 for sample in samples if int(sample.get("structured_attempt_count", 1) or 1) > 1)
 
     for analysis in analyses:
         task = str(analysis["task"])
@@ -1574,6 +1580,7 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         "recoverable_examples": recoverable_examples,
         "classifications": dict(sorted(classifications.items())),
         "failure_categories": dict(sorted(failure_categories.items())),
+        "retry_rate": (retry_count / len(samples)) if samples else 0.0,
         "semantic_valid": semantic_statuses.get("VALID", 0),
         "semantic_low_quality": semantic_statuses.get("LOW_QUALITY", 0),
         "semantic_drift": semantic_statuses.get("SEMANTIC_DRIFT", 0),
@@ -1855,6 +1862,7 @@ def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, A
 
         sample_rows = _select_generation_rows(train_rows, eval_rows)
         samples = _generate_samples(model, tokenizer, sample_rows, sample_path, runtime, torch)
+        sample_summary = summarize_sample_generations(samples)
 
         train_loss = float(train_result.training_loss)
         eval_loss = float(eval_metrics["eval_loss"]) if "eval_loss" in eval_metrics else None
@@ -1866,6 +1874,7 @@ def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, A
                 "train_metrics": train_result.metrics,
                 "eval_metrics": eval_metrics,
                 "finite_losses": finite_losses,
+                "retry_rate": sample_summary["retry_rate"],
             },
         )
 

@@ -177,6 +177,34 @@ def test_summarize_samples_reports_counts() -> None:
     assert summary["counts_by_failure_category"]["enum_drift"] == 1
 
 
+def test_generate_report_includes_structured_success_metrics() -> None:
+    from tools.generation_analyzer import generate_report
+
+    samples = [
+        {
+            "task": "A",
+            "generated_assistant": '{"text_ko":"조심조심 걷는다","text_en":"Walks carefully","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
+            "raw_generated_assistant": '{"text_ko":"조심조심 걷는다","text_en":"Walks carefully","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic","schema_explanation":"do not copy"}',
+            "structured_attempt_count": 2,
+        },
+        {
+            "task": "G",
+            "generated_assistant": '{"interpretation_ko":"이 말은 지금은 물러서라고 판단한다.","interpretation_en":"This means it is time to withdraw.","action_tendency":"retreat","confidence":0.7,"register":"hao","misinterpretation_type":"cautious_reversal","temperament_bias":"melancholic caution"}',
+            "raw_generated_assistant": '{"interpretation_ko":"이 말은 지금은 물러서라고 판단한다.","interpretation_en":"This means it is time to withdraw.","action_tendency":"retreat","confidence":0.7,"register":"hao","misinterpretation_type":"cautious_reversal","temperament_bias":"melancholic caution"}',
+            "structured_attempt_count": 1,
+        },
+    ]
+
+    report = generate_report(samples)
+
+    assert report["extra_key_count"] == 1
+    assert report["json_parse_failure_rate"] == 0.0
+    assert report["retry_rate"] == 0.5
+    assert report["structured_success_rate"] == 0.5
+    assert report["extra_key_rate"] == 0.5
+    assert report["enum_drift_rate"] == 0.0
+
+
 def test_cli_writes_analysis_report(tmp_path: Path) -> None:
     sample_path = tmp_path / "sample_generations.jsonl"
     report_path = tmp_path / "analysis_report.json"

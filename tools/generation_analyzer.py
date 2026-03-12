@@ -13,6 +13,7 @@ if __package__ in {None, ""}:
 
 from scripts.common import read_jsonl
 from training.lib.qlora_smoke import (
+    TASK_ALLOWED_KEYS,
     VALID_ACTION_TENDENCIES,
     VALID_EMOTIONS,
     VALID_MISINTERPRETATION_TYPES,
@@ -250,6 +251,29 @@ def detect_prompt_leakage(sample: Mapping[str, Any]) -> dict[str, Any] | None:
     return None
 
 
+def detect_extra_keys(sample: Mapping[str, Any]) -> dict[str, Any] | None:
+    task = str(sample.get("task", "unknown"))
+    allowed_keys = set(TASK_ALLOWED_KEYS.get(task, ()))
+    if not allowed_keys:
+        return None
+
+    raw_output = sample.get("raw_generated_assistant")
+    candidate_text = str(raw_output if raw_output not in {None, ""} else sample.get("generated_assistant", ""))
+    payload = validate_json_text(candidate_text).get("payload")
+    if not isinstance(payload, Mapping):
+        return None
+
+    extra_keys = sorted(key for key in payload if key not in allowed_keys)
+    if not extra_keys:
+        return None
+
+    return {
+        "extra_keys": extra_keys,
+        "allowed_keys": sorted(allowed_keys),
+        "source": "raw_generated_assistant" if raw_output not in {None, ""} else "generated_assistant",
+    }
+
+
 def analyze_sample(sample: Mapping[str, Any]) -> dict[str, Any]:
     task = str(sample.get("task", "unknown"))
     json_analysis = validate_json_text(str(sample.get("generated_assistant", "")))
@@ -257,6 +281,7 @@ def analyze_sample(sample: Mapping[str, Any]) -> dict[str, Any]:
     base = analyze_sample_generation(sample)
     semantic = validate_g_semantics(sample) if task == "G" else None
     prompt_leakage = detect_prompt_leakage(sample)
+    extra_keys = detect_extra_keys(sample)
 
     primary_category = "ok"
     if json_analysis["json_failure"]["category"] == "fenced_json":
@@ -284,10 +309,12 @@ def analyze_sample(sample: Mapping[str, Any]) -> dict[str, Any]:
         "json_analysis": json_analysis,
         "enum_drift": enum_drift,
         "prompt_leakage": prompt_leakage,
+        "extra_keys": extra_keys,
         "semantic": semantic,
         "base_analysis": base,
         "generated_assistant": str(sample.get("generated_assistant", "")),
         "raw_generated_assistant": sample.get("raw_generated_assistant"),
+        "structured_attempt_count": int(sample.get("structured_attempt_count", 1) or 1),
     }
 
 
@@ -295,16 +322,41 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     analyses = [analyze_sample(sample) for sample in samples]
     counts = Counter(analysis["primary_category"] for analysis in analyses)
     affected_tasks: dict[str, Counter[str]] = defaultdict(Counter)
+    extra_key_examples: list[dict[str, Any]] = []
     for analysis in analyses:
         if analysis["primary_category"] != "ok":
             affected_tasks[analysis["task"]][analysis["primary_category"]] += 1
+        if analysis["extra_keys"] and len(extra_key_examples) < 5:
+            extra_key_examples.append(
+                {
+                    "task": analysis["task"],
+                    "extra_keys": analysis["extra_keys"]["extra_keys"],
+                    "generated_assistant": analysis["generated_assistant"],
+                    "raw_generated_assistant": analysis["raw_generated_assistant"],
+                }
+            )
 
     overall_status = "structurally_usable"
-    if any(counts.get(category, 0) > 0 for category in ("malformed_json", "truncation", "fenced_json", "trailing_text")):
+    extra_key_count = sum(1 for analysis in analyses if analysis["extra_keys"])
+    retry_count = sum(1 for analysis in analyses if analysis["structured_attempt_count"] > 1)
+    structural_failure_count = sum(
+        1
+        for analysis in analyses
+        if analysis["primary_category"] in {"malformed_json", "truncation", "fenced_json", "trailing_text"}
+    )
+    enum_drift_count = counts.get("enum_drift", 0)
+    structured_success_count = sum(
+        1
+        for analysis in analyses
+        if analysis["primary_category"] not in {"malformed_json", "truncation", "fenced_json", "trailing_text", "enum_drift"}
+        and analysis["extra_keys"] is None
+    )
+
+    if structural_failure_count > 0 or extra_key_count > 0:
         overall_status = "structure_failure"
     elif counts.get("prompt_leakage", 0) > 0:
         overall_status = "prompt_leakage_issue"
-    elif counts.get("enum_drift", 0) > 0:
+    elif enum_drift_count > 0:
         overall_status = "enum_instability"
     elif any(counts.get(category, 0) > 0 for category in ("language_drift", "semantic_low_quality", "semantic_drift")):
         overall_status = "semantic_quality_issue"
@@ -317,14 +369,21 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "fenced_json_count": counts.get("fenced_json", 0),
         "trailing_text_count": counts.get("trailing_text", 0),
         "prompt_leakage_count": counts.get("prompt_leakage", 0),
-        "enum_drift_count": counts.get("enum_drift", 0),
+        "enum_drift_count": enum_drift_count,
+        "extra_key_count": extra_key_count,
         "language_drift_count": counts.get("language_drift", 0),
         "semantic_low_quality_count": counts.get("semantic_low_quality", 0),
         "semantic_drift_count": counts.get("semantic_drift", 0),
+        "json_parse_failure_rate": (structural_failure_count / len(samples)) if samples else 0.0,
+        "extra_key_rate": (extra_key_count / len(samples)) if samples else 0.0,
+        "enum_drift_rate": (enum_drift_count / len(samples)) if samples else 0.0,
+        "retry_rate": (retry_count / len(samples)) if samples else 0.0,
+        "structured_success_rate": (structured_success_count / len(samples)) if samples else 0.0,
         "affected_tasks_summary": {
             task: dict(sorted(category_counts.items()))
             for task, category_counts in sorted(affected_tasks.items())
         },
+        "extra_key_examples": extra_key_examples,
         "overall_status": overall_status,
         "analyses": analyses,
     }
@@ -358,10 +417,17 @@ def generate_report(samples: Sequence[Mapping[str, Any]], *, examples_per_catego
         "trailing_text_count": summary["trailing_text_count"],
         "prompt_leakage_count": summary["prompt_leakage_count"],
         "enum_drift_count": summary["enum_drift_count"],
+        "extra_key_count": summary["extra_key_count"],
         "language_drift_count": summary["language_drift_count"],
         "semantic_low_quality_count": summary["semantic_low_quality_count"],
         "semantic_drift_count": summary["semantic_drift_count"],
+        "json_parse_failure_rate": summary["json_parse_failure_rate"],
+        "extra_key_rate": summary["extra_key_rate"],
+        "enum_drift_rate": summary["enum_drift_rate"],
+        "retry_rate": summary["retry_rate"],
+        "structured_success_rate": summary["structured_success_rate"],
         "affected_tasks_summary": summary["affected_tasks_summary"],
+        "extra_key_examples": summary["extra_key_examples"],
         "overall_status": summary["overall_status"],
         "example_failures": dict(sorted(examples.items())),
     }
@@ -371,12 +437,13 @@ def recommend_next_action(report: Mapping[str, Any]) -> dict[str, str]:
     malformed_json_count = int(report.get("malformed_json_count", 0) or 0)
     truncation_count = int(report.get("truncation_count", 0) or 0)
     enum_drift_count = int(report.get("enum_drift_count", 0) or 0)
+    extra_key_count = int(report.get("extra_key_count", 0) or 0)
     prompt_leakage_count = int(report.get("prompt_leakage_count", 0) or 0)
     language_drift_count = int(report.get("language_drift_count", 0) or 0)
     semantic_low_quality_count = int(report.get("semantic_low_quality_count", 0) or 0)
     semantic_drift_count = int(report.get("semantic_drift_count", 0) or 0)
 
-    if malformed_json_count > 0 or truncation_count > 0:
+    if malformed_json_count > 0 or truncation_count > 0 or extra_key_count > 0:
         return {
             "status": "structure_failure",
             "recommended_next_action": "Apply a generation-time fix before a longer smoke run.",
