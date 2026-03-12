@@ -1404,3 +1404,45 @@ def test_generate_structured_retry_prompt_includes_json_feedback_and_previous_ou
     assert result.attempt_count == 2
     assert "failed JSON parsing" in seen_prompts[1]
     assert '{"text_ko":"겁 많지만 빈틈없다",' in seen_prompts[1]
+
+
+def test_build_structured_constraint_exposes_schema_contract() -> None:
+    from training.lib.output_schema import TaskGOutput
+    from training.lib.structured_generation import build_structured_constraint
+
+    constraint = build_structured_constraint(TaskGOutput)
+
+    assert constraint.mode == "json_schema"
+    assert constraint.schema_name == "TaskGOutput"
+    assert "interpretation_ko" in constraint.allowed_keys
+    assert "action_tendency" in constraint.enum_fields
+
+
+def test_resolve_structured_decoding_reports_transformers_fallback() -> None:
+    from training.lib.output_schema import TaskAOutput
+    from training.lib.structured_generation import build_structured_constraint, resolve_structured_decoding
+
+    metadata = resolve_structured_decoding(build_structured_constraint(TaskAOutput), backend="transformers")
+
+    assert metadata["requested_mode"] == "json_schema"
+    assert metadata["enabled"] is False
+    assert metadata["supported"] is False
+    assert metadata["used_mode"] == "none"
+    assert "transformers backend" in metadata["reason"]
+
+
+def test_generate_structured_exposes_repair_and_decoding_metadata() -> None:
+    from training.lib.output_schema import TaskAOutput
+    from training.lib.structured_generation import build_structured_constraint, generate_structured
+
+    result = generate_structured(
+        lambda _prompt: '```json\n{"text_ko":"겁 많지만 빈틈없다","text_en":"Fearful but meticulous.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic","schema_explanation":"do not copy"}\n```',
+        "prompt",
+        TaskAOutput,
+        structured_constraint=build_structured_constraint(TaskAOutput),
+    )
+
+    assert result.repair_actions
+    assert result.structured_decoding["enabled"] is False
+    assert any(action["kind"] == "strip_markdown_fence" for action in result.repair_actions)
+    assert any(action["kind"] == "filter_extra_keys" for action in result.repair_actions)

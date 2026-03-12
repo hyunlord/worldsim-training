@@ -17,7 +17,11 @@ from typing import Any
 from scripts.common import ensure_directory, read_jsonl, write_jsonl
 from scripts.prepare_dataset import _validate_messages_row
 from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
-from training.lib.structured_generation import StructuredGenerationError, generate_structured
+from training.lib.structured_generation import (
+    StructuredGenerationError,
+    build_structured_constraint,
+    generate_structured,
+)
 
 
 DEFAULT_RUN_MODE = "smoke"
@@ -968,6 +972,9 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
         structured_attempt_count = 1
         structured_attempts: list[dict[str, Any]] = []
         structured_validation_metadata: dict[str, Any] | None = None
+        structured_repair_applied = False
+        structured_repair_actions: list[dict[str, Any]] = []
+        structured_decoding: dict[str, Any] | None = None
 
         def llm(generation_prompt: str) -> str:
             return _generate_sample_once(
@@ -995,12 +1002,16 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     prompt_text,
                     schema,
                     output_normalizer=_normalize_generation_candidate,
+                    structured_constraint=build_structured_constraint(schema),
                 )
                 raw_generated_text = structured.raw_output
                 generated_text = json.dumps(structured.payload, ensure_ascii=False)
                 normalization = structured.normalization
                 normalization_details = list(structured.normalization_details)
                 structured_attempt_count = structured.attempt_count
+                structured_repair_actions = list(structured.repair_actions)
+                structured_repair_applied = bool(structured.repair_actions)
+                structured_decoding = structured.structured_decoding
                 structured_attempts = [
                     {
                         "attempt_index": attempt.attempt_index,
@@ -1018,6 +1029,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                     "last_error_kind": structured.last_error_kind,
                     "attempts": structured_attempts,
                     "repair_actions": structured.repair_actions,
+                    "structured_decoding": structured.structured_decoding,
                 }
         except StructuredGenerationError as exc:
             raw_generated_text = exc.last_raw_output
@@ -1025,6 +1037,9 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
             normalization = exc.normalization
             normalization_details = list(exc.normalization_details)
             structured_attempt_count = exc.attempt_count
+            structured_repair_actions = list(exc.repair_actions)
+            structured_repair_applied = bool(exc.repair_actions)
+            structured_decoding = exc.structured_decoding
             structured_attempts = [
                 {
                     "attempt_index": attempt.attempt_index,
@@ -1042,6 +1057,7 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "last_error_kind": exc.last_error_kind,
                 "attempts": structured_attempts,
                 "repair_actions": exc.repair_actions,
+                "structured_decoding": exc.structured_decoding,
             }
             if exc.last_error_kind == "json":
                 parse_error = "JSONDecodeError"
@@ -1067,6 +1083,9 @@ def _generate_samples(model: Any, tokenizer: Any, rows: list[dict], output_path:
                 "generation_max_new_tokens": max_new_tokens,
                 "generation_normalization": normalization,
                 "generation_normalization_details": normalization_details,
+                "structured_repair_applied": structured_repair_applied,
+                "structured_repair_actions": structured_repair_actions,
+                "structured_decoding": structured_decoding,
             }
         )
 
@@ -1543,6 +1562,12 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         if analysis["task"] == "G" and analysis["semantic_status"] is not None
     )
     retry_count = sum(1 for sample in samples if int(sample.get("structured_attempt_count", 1) or 1) > 1)
+    repair_applied_count = sum(1 for sample in samples if bool(sample.get("structured_repair_applied")))
+    constrained_decoding_used_count = sum(
+        1
+        for sample in samples
+        if isinstance(sample.get("structured_decoding"), Mapping) and bool(sample["structured_decoding"].get("enabled"))
+    )
 
     for analysis in analyses:
         task = str(analysis["task"])
@@ -1581,6 +1606,8 @@ def summarize_sample_generations(samples: Sequence[Mapping[str, Any]]) -> dict[s
         "classifications": dict(sorted(classifications.items())),
         "failure_categories": dict(sorted(failure_categories.items())),
         "retry_rate": (retry_count / len(samples)) if samples else 0.0,
+        "repair_applied_rate": (repair_applied_count / len(samples)) if samples else 0.0,
+        "constrained_decoding_used_rate": (constrained_decoding_used_count / len(samples)) if samples else 0.0,
         "semantic_valid": semantic_statuses.get("VALID", 0),
         "semantic_low_quality": semantic_statuses.get("LOW_QUALITY", 0),
         "semantic_drift": semantic_statuses.get("SEMANTIC_DRIFT", 0),
@@ -1875,6 +1902,8 @@ def run_smoke(config_input: SmokeRunConfig | argparse.Namespace | Mapping[str, A
                 "eval_metrics": eval_metrics,
                 "finite_losses": finite_losses,
                 "retry_rate": sample_summary["retry_rate"],
+                "repair_applied_rate": sample_summary["repair_applied_rate"],
+                "constrained_decoding_used_rate": sample_summary["constrained_decoding_used_rate"],
             },
         )
 

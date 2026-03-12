@@ -323,6 +323,8 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     counts = Counter(analysis["primary_category"] for analysis in analyses)
     affected_tasks: dict[str, Counter[str]] = defaultdict(Counter)
     extra_key_examples: list[dict[str, Any]] = []
+    repair_applied_count = 0
+    constrained_decoding_used_count = 0
     for analysis in analyses:
         if analysis["primary_category"] != "ok":
             affected_tasks[analysis["task"]][analysis["primary_category"]] += 1
@@ -335,6 +337,13 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
                     "raw_generated_assistant": analysis["raw_generated_assistant"],
                 }
             )
+
+    for sample in samples:
+        if bool(sample.get("structured_repair_applied")):
+            repair_applied_count += 1
+        decoding = sample.get("structured_decoding")
+        if isinstance(decoding, Mapping) and bool(decoding.get("enabled")):
+            constrained_decoding_used_count += 1
 
     overall_status = "structurally_usable"
     extra_key_count = sum(1 for analysis in analyses if analysis["extra_keys"])
@@ -378,6 +387,8 @@ def summarize_samples(samples: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "extra_key_rate": (extra_key_count / len(samples)) if samples else 0.0,
         "enum_drift_rate": (enum_drift_count / len(samples)) if samples else 0.0,
         "retry_rate": (retry_count / len(samples)) if samples else 0.0,
+        "repair_applied_rate": (repair_applied_count / len(samples)) if samples else 0.0,
+        "constrained_decoding_used_rate": (constrained_decoding_used_count / len(samples)) if samples else 0.0,
         "structured_success_rate": (structured_success_count / len(samples)) if samples else 0.0,
         "affected_tasks_summary": {
             task: dict(sorted(category_counts.items()))
@@ -425,6 +436,8 @@ def generate_report(samples: Sequence[Mapping[str, Any]], *, examples_per_catego
         "extra_key_rate": summary["extra_key_rate"],
         "enum_drift_rate": summary["enum_drift_rate"],
         "retry_rate": summary["retry_rate"],
+        "repair_applied_rate": summary["repair_applied_rate"],
+        "constrained_decoding_used_rate": summary["constrained_decoding_used_rate"],
         "structured_success_rate": summary["structured_success_rate"],
         "affected_tasks_summary": summary["affected_tasks_summary"],
         "extra_key_examples": summary["extra_key_examples"],

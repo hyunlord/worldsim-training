@@ -24,6 +24,30 @@ from pydantic import BaseModel, ValidationError
 DEFAULT_MAX_RETRY = 3
 
 
+@dataclass(frozen=True, slots=True)
+class StructuredConstraint:
+    schema_name: str
+    mode: str
+    allowed_keys: tuple[str, ...]
+    enum_fields: dict[str, tuple[str, ...]]
+
+
+@dataclass(frozen=True, slots=True)
+class RepairResult:
+    repaired: bool
+    repair_actions: list[dict[str, Any]]
+    repaired_text: str
+
+
+@dataclass(frozen=True, slots=True)
+class StructuredDecodingMetadata:
+    requested_mode: str
+    used_mode: str
+    enabled: bool
+    supported: bool
+    reason: str | None = None
+
+
 @dataclass(slots=True)
 class StructuredGenerationAttempt:
     attempt_index: int
@@ -50,6 +74,7 @@ class StructuredGenerationResult:
     normalization: str | None = None
     normalization_details: list[dict[str, str]] | None = None
     repair_actions: list[dict[str, Any]] = field(default_factory=list)
+    structured_decoding: dict[str, Any] | None = None
 
 
 class StructuredGenerationError(RuntimeError):
@@ -64,6 +89,7 @@ class StructuredGenerationError(RuntimeError):
         normalization: str | None = None,
         normalization_details: list[dict[str, str]] | None = None,
         repair_actions: list[dict[str, Any]] | None = None,
+        structured_decoding: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message)
         self.attempts = attempts
@@ -74,6 +100,7 @@ class StructuredGenerationError(RuntimeError):
         self.normalization = normalization
         self.normalization_details = normalization_details or []
         self.repair_actions = repair_actions or []
+        self.structured_decoding = structured_decoding
 
 
 def _format_validation_error(exc: ValidationError) -> str:
@@ -189,6 +216,15 @@ def repair_json(text: str) -> dict[str, Any]:
     return {"text": repaired, "repair_actions": actions}
 
 
+def repair_json_candidate(raw_text: str) -> RepairResult:
+    repaired = repair_json(raw_text)
+    return RepairResult(
+        repaired=bool(repaired["repair_actions"]),
+        repair_actions=list(repaired["repair_actions"]),
+        repaired_text=str(repaired["text"]),
+    )
+
+
 def _schema_allowed_keys(schema: type[BaseModel]) -> set[str]:
     return {field.alias or field_name for field_name, field in schema.model_fields.items()}
 
@@ -223,7 +259,53 @@ def _schema_enum_fields(schema: type[BaseModel]) -> dict[str, tuple[str, ...]]:
     return enum_fields
 
 
-def _repair_payload(payload: Any, schema: type[BaseModel]) -> tuple[Any, list[dict[str, Any]]]:
+def build_structured_constraint(schema: type[BaseModel], *, mode: str = "json_schema") -> StructuredConstraint:
+    return StructuredConstraint(
+        schema_name=schema.__name__,
+        mode=mode,
+        allowed_keys=tuple(sorted(_schema_allowed_keys(schema))),
+        enum_fields=_schema_enum_fields(schema),
+    )
+
+
+def resolve_structured_decoding(
+    constraint: StructuredConstraint | None,
+    *,
+    backend: str = "transformers",
+) -> dict[str, Any]:
+    if constraint is None:
+        metadata = StructuredDecodingMetadata(
+            requested_mode="none",
+            used_mode="none",
+            enabled=False,
+            supported=False,
+            reason="No structured constraint requested.",
+        )
+    else:
+        metadata = StructuredDecodingMetadata(
+            requested_mode=constraint.mode,
+            used_mode="none",
+            enabled=False,
+            supported=False,
+            reason=f"{backend} backend has no native JSON grammar support wired in this repo.",
+        )
+
+    return {
+        "requested_mode": metadata.requested_mode,
+        "used_mode": metadata.used_mode,
+        "enabled": metadata.enabled,
+        "supported": metadata.supported,
+        "reason": metadata.reason,
+    }
+
+
+def _repair_payload(
+    payload: Any,
+    schema: type[BaseModel],
+    *,
+    allow_key_filtering: bool = True,
+    allow_enum_correction: bool = True,
+) -> tuple[Any, list[dict[str, Any]]]:
     if not isinstance(payload, dict):
         return payload, []
 
@@ -232,9 +314,12 @@ def _repair_payload(payload: Any, schema: type[BaseModel]) -> tuple[Any, list[di
 
     allowed_keys = _schema_allowed_keys(schema)
     extra_keys = sorted(key for key in repaired if key not in allowed_keys)
-    if extra_keys:
+    if extra_keys and allow_key_filtering:
         repaired = {key: value for key, value in repaired.items() if key in allowed_keys}
         actions.append({"kind": "filter_extra_keys", "removed_keys": extra_keys})
+
+    if not allow_enum_correction:
+        return repaired, actions
 
     for field_name, choices in _schema_enum_fields(schema).items():
         current = repaired.get(field_name)
@@ -292,6 +377,10 @@ def generate_structured(
     *,
     max_retry: int = DEFAULT_MAX_RETRY,
     output_normalizer: Any | None = None,
+    structured_constraint: StructuredConstraint | None = None,
+    decoding_backend: str = "transformers",
+    allow_key_filtering: bool = True,
+    allow_enum_correction: bool = True,
 ) -> StructuredGenerationResult:
     attempts: list[StructuredGenerationAttempt] = []
     last_error_kind: str | None = None
@@ -301,6 +390,7 @@ def generate_structured(
     last_normalization: str | None = None
     last_normalization_details: list[dict[str, str]] = []
     last_repair_actions: list[dict[str, Any]] = []
+    structured_decoding = resolve_structured_decoding(structured_constraint, backend=decoding_backend)
 
     for attempt_index in range(max_retry + 1):
         attempt_prompt = prompt if attempt_index == 0 else _build_retry_prompt(
@@ -323,9 +413,9 @@ def generate_structured(
             normalization = normalized.get("normalization")
             normalization_details = list(normalized.get("normalization_details") or [])
 
-        repaired_json = repair_json(candidate_output)
-        candidate_output = repaired_json["text"]
-        repair_actions.extend(repaired_json["repair_actions"])
+        repaired_json = repair_json_candidate(candidate_output)
+        candidate_output = repaired_json.repaired_text
+        repair_actions.extend(repaired_json.repair_actions)
 
         last_output = candidate_output
         last_raw_output = raw_output
@@ -354,7 +444,12 @@ def generate_structured(
             )
             continue
 
-        payload, payload_repairs = _repair_payload(payload, schema)
+        payload, payload_repairs = _repair_payload(
+            payload,
+            schema,
+            allow_key_filtering=allow_key_filtering,
+            allow_enum_correction=allow_enum_correction,
+        )
         if payload_repairs:
             repair_actions.extend(payload_repairs)
             candidate_output = json.dumps(payload, ensure_ascii=False)
@@ -407,6 +502,7 @@ def generate_structured(
             normalization=normalization,
             normalization_details=normalization_details,
             repair_actions=repair_actions,
+            structured_decoding=structured_decoding,
         )
 
     raise StructuredGenerationError(
@@ -418,4 +514,5 @@ def generate_structured(
         normalization=last_normalization,
         normalization_details=last_normalization_details,
         repair_actions=last_repair_actions,
+        structured_decoding=structured_decoding,
     )

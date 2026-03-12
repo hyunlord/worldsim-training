@@ -186,12 +186,16 @@ def test_generate_report_includes_structured_success_metrics() -> None:
             "generated_assistant": '{"text_ko":"조심조심 걷는다","text_en":"Walks carefully","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
             "raw_generated_assistant": '{"text_ko":"조심조심 걷는다","text_en":"Walks carefully","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic","schema_explanation":"do not copy"}',
             "structured_attempt_count": 2,
+            "structured_repair_applied": True,
+            "structured_decoding": {"enabled": False, "supported": False, "used_mode": "none"},
         },
         {
             "task": "G",
             "generated_assistant": '{"interpretation_ko":"이 말은 지금은 물러서라고 판단한다.","interpretation_en":"This means it is time to withdraw.","action_tendency":"retreat","confidence":0.7,"register":"hao","misinterpretation_type":"cautious_reversal","temperament_bias":"melancholic caution"}',
             "raw_generated_assistant": '{"interpretation_ko":"이 말은 지금은 물러서라고 판단한다.","interpretation_en":"This means it is time to withdraw.","action_tendency":"retreat","confidence":0.7,"register":"hao","misinterpretation_type":"cautious_reversal","temperament_bias":"melancholic caution"}',
             "structured_attempt_count": 1,
+            "structured_repair_applied": False,
+            "structured_decoding": {"enabled": False, "supported": False, "used_mode": "none"},
         },
     ]
 
@@ -203,6 +207,8 @@ def test_generate_report_includes_structured_success_metrics() -> None:
     assert report["structured_success_rate"] == 0.5
     assert report["extra_key_rate"] == 0.5
     assert report["enum_drift_rate"] == 0.0
+    assert report["repair_applied_rate"] == 0.5
+    assert report["constrained_decoding_used_rate"] == 0.0
 
 
 def test_cli_writes_analysis_report(tmp_path: Path) -> None:
