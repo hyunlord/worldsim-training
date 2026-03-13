@@ -14,6 +14,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from pydantic import BaseModel
+
 from scripts.common import ensure_directory, read_jsonl, write_jsonl
 from scripts.prepare_dataset import _validate_messages_row
 from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
@@ -24,7 +26,15 @@ from training.lib.structured_generation import (
     build_structured_constraint,
     generate_structured,
 )
-from training.lib.structured_metrics import BatchMetrics
+from training.lib.structured_metrics import BatchMetrics, GenerationAttemptMetrics
+
+try:
+    import outlines as _outlines_module
+
+    OUTLINES_AVAILABLE = True
+except ImportError:
+    _outlines_module = None  # type: ignore[assignment]
+    OUTLINES_AVAILABLE = False
 
 
 DEFAULT_RUN_MODE = "smoke"
@@ -100,6 +110,13 @@ LEAKY_GENERATION_SECTION_LABELS = {
     "행동 기울기 선택지",
     "오해 방식 선택지",
     "지배 기질축 선택지",
+    "세계관",
+    "WORLD",
+    "WORLD_DESC",
+    "WORLD_VOCAB",
+    "world",
+    "world_desc",
+    "world_vocab",
 }
 TASK_G_SUPPRESSED_SECTION_LABELS = {
     "기질 이름",
@@ -945,12 +962,59 @@ def _generate_sample_once(
             do_sample=STRUCTURED_GENERATION_DEFAULTS["do_sample"],
             temperature=STRUCTURED_GENERATION_DEFAULTS["temperature"],
             top_p=STRUCTURED_GENERATION_DEFAULTS["top_p"],
+            repetition_penalty=STRUCTURED_GENERATION_DEFAULTS["repetition_penalty"],
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
         )
     generated_tokens = generated[0][encoded["input_ids"].shape[1] :]
     return assistant_prefix + tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
+
+
+def _create_outlines_model(model: Any, tokenizer: Any) -> Any | None:
+    """Wrap a Transformers model for outlines constrained decoding once per run."""
+    if not OUTLINES_AVAILABLE or model is None or tokenizer is None:
+        return None
+    try:
+        from_transformers = getattr(_outlines_module, "from_transformers", None)
+        if from_transformers is None:
+            return None
+        return from_transformers(model, tokenizer)
+    except Exception:
+        return None
+
+
+def _generate_sample_outlines(
+    *,
+    outlines_model: Any,
+    schema: type[BaseModel],
+    prompt_text: str,
+    max_new_tokens: int,
+) -> str:
+    """Generate a single structured JSON sample through outlines constrained decoding."""
+    generator_cls = getattr(_outlines_module, "Generator", None)
+    if generator_cls is None:
+        raise RuntimeError("Outlines Generator API unavailable")
+
+    schema_target: Any = schema
+    json_schema_builder = getattr(_outlines_module, "json_schema", None)
+    if json_schema_builder is not None:
+        try:
+            schema_target = json_schema_builder(schema)
+        except Exception:
+            schema_target = schema
+
+    generator = generator_cls(outlines_model, schema_target)
+    result = generator(
+        prompt_text,
+        max_new_tokens=max_new_tokens,
+        repetition_penalty=STRUCTURED_GENERATION_DEFAULTS["repetition_penalty"],
+    )
+    if isinstance(result, dict):
+        return json.dumps(result, ensure_ascii=False)
+    if isinstance(result, BaseModel):
+        return result.model_dump_json(by_alias=True)
+    return str(result)
 
 
 def _generate_samples(
@@ -970,6 +1034,7 @@ def _generate_samples(
     model.eval()
     model.config.use_cache = True
     device = runtime.device
+    outlines_model = _create_outlines_model(model, tokenizer)
 
     for row in rows:
         task = str(row.get("task", "unknown"))
@@ -988,6 +1053,7 @@ def _generate_samples(
         structured_repair_applied = False
         structured_repair_actions: list[dict[str, Any]] = []
         structured_decoding: dict[str, Any] | None = None
+        outlines_fallback_reason: str | None = None
 
         def llm(generation_prompt: str) -> str:
             return _generate_sample_once(
@@ -1009,6 +1075,128 @@ def _generate_samples(
                 normalization = normalized["normalization"]
                 payload = json.loads(generated_text)
                 generated_text = json.dumps(payload, ensure_ascii=False)
+            elif outlines_model is not None:
+                try:
+                    raw_generated_text = _generate_sample_outlines(
+                        outlines_model=outlines_model,
+                        schema=schema,
+                        prompt_text=prompt_text,
+                        max_new_tokens=max_new_tokens,
+                    )
+                    payload = json.loads(raw_generated_text)
+                    validated = schema.model_validate(payload)
+                    generated_text = json.dumps(validated.model_dump(mode="json", by_alias=True), ensure_ascii=False)
+                    structured_decoding = {
+                        "requested_mode": "outlines_json_schema",
+                        "used_mode": "outlines_json_schema",
+                        "enabled": True,
+                        "supported": True,
+                        "reason": None,
+                    }
+                    outlines_attempt = GenerationAttemptMetrics(
+                        task_id=task,
+                        attempt_number=1,
+                        raw_length=len(raw_generated_text),
+                        json_parse_success=True,
+                        schema_validation_success=True,
+                        overall_success=True,
+                    )
+                    metrics_collector.record(outlines_attempt)
+                    structured_attempts = [
+                        {
+                            "attempt_index": 0,
+                            "raw_output": raw_generated_text,
+                            "candidate_output": generated_text,
+                            "json_error": None,
+                            "validation_error": None,
+                            "error_kind": None,
+                            "repair_actions": [],
+                            "keys_removed": [],
+                            "enum_normalizations": [],
+                        }
+                    ]
+                    structured_validation_metadata = {
+                        "attempt_count": 1,
+                        "last_error_kind": None,
+                        "attempts": structured_attempts,
+                        "repair_actions": [],
+                        "structured_decoding": structured_decoding,
+                        "attempt_metrics": [
+                            {
+                                "task_id": outlines_attempt.task_id,
+                                "attempt_number": outlines_attempt.attempt_number,
+                                "raw_length": outlines_attempt.raw_length,
+                                "repairs_applied": outlines_attempt.repairs_applied,
+                                "keys_removed": outlines_attempt.keys_removed,
+                                "enums_normalized": outlines_attempt.enums_normalized,
+                                "json_parse_success": outlines_attempt.json_parse_success,
+                                "schema_validation_success": outlines_attempt.schema_validation_success,
+                                "validation_error": outlines_attempt.validation_error,
+                                "overall_success": outlines_attempt.overall_success,
+                            }
+                        ],
+                    }
+                except Exception as outlines_exc:  # noqa: BLE001
+                    outlines_fallback_reason = f"outlines generation failed: {outlines_exc}"
+                    structured = generate_structured(
+                        llm,
+                        prompt_text,
+                        schema,
+                        output_normalizer=_normalize_generation_candidate,
+                        structured_constraint=build_structured_constraint(schema),
+                        task_id=task,
+                        metrics_collector=metrics_collector,
+                    )
+                    raw_generated_text = structured.raw_output
+                    generated_text = json.dumps(structured.payload, ensure_ascii=False)
+                    normalization = structured.normalization
+                    normalization_details = list(structured.normalization_details or [])
+                    structured_attempt_count = structured.attempt_count
+                    structured_repair_actions = list(structured.repair_actions)
+                    structured_repair_applied = bool(structured.repair_actions)
+                    structured_attempts = [
+                        {
+                            "attempt_index": attempt.attempt_index,
+                            "raw_output": attempt.raw_output,
+                            "candidate_output": attempt.candidate_output,
+                            "json_error": attempt.json_error,
+                            "validation_error": attempt.validation_error,
+                            "error_kind": attempt.error_kind,
+                            "repair_actions": attempt.repair_actions,
+                            "keys_removed": attempt.keys_removed,
+                            "enum_normalizations": attempt.enum_normalizations,
+                        }
+                        for attempt in structured.attempts
+                    ]
+                    structured_decoding = {
+                        "requested_mode": "outlines_json_schema",
+                        "used_mode": "repair_sanitize_fallback",
+                        "enabled": True,
+                        "supported": True,
+                        "reason": outlines_fallback_reason,
+                    }
+                    structured_validation_metadata = {
+                        "attempt_count": structured.attempt_count,
+                        "last_error_kind": structured.last_error_kind,
+                        "attempts": structured_attempts,
+                        "repair_actions": structured.repair_actions,
+                        "structured_decoding": structured_decoding,
+                        "attempt_metrics": [
+                            {
+                                "task_id": metric.task_id,
+                                "attempt_number": metric.attempt_number,
+                                "raw_length": metric.raw_length,
+                                "repairs_applied": metric.repairs_applied,
+                                "keys_removed": metric.keys_removed,
+                                "enums_normalized": metric.enums_normalized,
+                                "json_parse_success": metric.json_parse_success,
+                                "schema_validation_success": metric.schema_validation_success,
+                                "validation_error": metric.validation_error,
+                                "overall_success": metric.overall_success,
+                            }
+                            for metric in structured.attempt_metrics
+                        ],
+                    }
             else:
                 structured = generate_structured(
                     llm,
@@ -1067,11 +1255,19 @@ def _generate_samples(
             raw_generated_text = exc.last_raw_output
             generated_text = exc.last_output
             normalization = exc.normalization
-            normalization_details = list(exc.normalization_details)
+            normalization_details = list(exc.normalization_details or [])
             structured_attempt_count = exc.attempt_count
             structured_repair_actions = list(exc.repair_actions)
             structured_repair_applied = bool(exc.repair_actions)
             structured_decoding = exc.structured_decoding
+            if outlines_fallback_reason is not None:
+                structured_decoding = {
+                    "requested_mode": "outlines_json_schema",
+                    "used_mode": "repair_sanitize_fallback",
+                    "enabled": True,
+                    "supported": True,
+                    "reason": outlines_fallback_reason,
+                }
             structured_attempts = [
                 {
                     "attempt_index": attempt.attempt_index,
@@ -1091,7 +1287,7 @@ def _generate_samples(
                 "last_error_kind": exc.last_error_kind,
                 "attempts": structured_attempts,
                 "repair_actions": exc.repair_actions,
-                "structured_decoding": exc.structured_decoding,
+                "structured_decoding": structured_decoding,
                 "attempt_metrics": [
                     {
                         "task_id": metric.task_id,

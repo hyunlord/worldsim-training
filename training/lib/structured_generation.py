@@ -29,6 +29,7 @@ STRUCTURED_GENERATION_DEFAULTS = {
     "temperature": 0.0,
     "do_sample": False,
     "top_p": 1.0,
+    "repetition_penalty": 1.2,
 }
 TASK_MAX_NEW_TOKENS: dict[str, int] = {
     "A": 256,
