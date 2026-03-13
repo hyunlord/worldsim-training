@@ -197,3 +197,49 @@ prompts:
         assert "missing prompt/output" in str(exc)
     else:
         raise AssertionError("Expected conversion to fail when prompt is missing")
+
+
+def test_convert_mixed_final_to_training_format_supports_task_i_to_n(tmp_path: Path) -> None:
+    repo_root = tmp_path
+    prompts_dir = repo_root / "prompts" / "training"
+    config_dir = repo_root / "config"
+    source_dir = repo_root / "data" / "final" / "worldsim-v2-mix"
+    output_dir = repo_root / "data" / "training" / "worldsim-v2-mix"
+
+    prompts_dir.mkdir(parents=True, exist_ok=True)
+    config_dir.mkdir(parents=True, exist_ok=True)
+    (config_dir / "generation.yaml").write_text(
+        """
+prompts:
+  training:
+    layer3_system: prompts/training/layer3_system.txt
+""".strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    (prompts_dir / "layer3_system.txt").write_text("L3 system", encoding="utf-8")
+
+    write_jsonl(
+        source_dir / "train.jsonl",
+        [
+            {"task": "I", "prompt": "[TASK] I", "output": compact_json({"priority_id": 0, "reasoning_ko": "먼저 먹거리를 찾는다.", "reasoning_en": "Food comes first.", "need_addressed": "hunger", "urgency": 0.9})},
+            {"task": "N", "prompt": "[TASK] N", "output": compact_json({"accept": True, "counter_offer_give": "가죽:1", "counter_offer_want": "불씨:1", "hint_ko": "값이 맞아 손을 잡는다.", "hint_en": "The value matches, so they agree.", "negotiation_stance": "fair", "walk_away_threshold": 0.4})},
+        ],
+    )
+    write_jsonl(source_dir / "dev.jsonl", [])
+
+    from scripts.convert_mixed_final_to_training_format import convert_mixed_final_to_training_format
+
+    result = convert_mixed_final_to_training_format(
+        repo_root=repo_root,
+        input_train=source_dir / "train.jsonl",
+        input_dev=source_dir / "dev.jsonl",
+        source_manifest=None,
+        output_dir=output_dir,
+        dataset_id="worldsim-v2-mix",
+    )
+
+    train_rows = [json.loads(line) for line in result.train_output.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert len(train_rows) == 2
+    assert {row["task"] for row in train_rows} == {"I", "N"}
+    assert all(row["messages"][0]["content"] == "L3 system" for row in train_rows)

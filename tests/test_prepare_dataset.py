@@ -71,6 +71,41 @@ def test_prepare_dataset_builds_final_dataset_and_manifest(tmp_path: Path) -> No
     assert manifest_payload["counts"] == {"validated": 1, "negative": 1, "general": 1, "total": 3}
 
 
+def test_prepare_dataset_supports_task_i_to_n_default_layers(tmp_path: Path) -> None:
+    passed_file = tmp_path / "data" / "validated" / "passed.jsonl"
+    negatives_file = tmp_path / "data" / "samples" / "negative_examples.jsonl"
+    general_file = tmp_path / "data" / "samples" / "general_korean.jsonl"
+    output_file = tmp_path / "data" / "final" / "training_dataset.jsonl"
+    manifest_file = tmp_path / "artifacts" / "manifests" / "training_dataset_manifest.yaml"
+
+    base_rows = {
+        "I": {"priority_id": 0, "reasoning_ko": "먼저 먹거리를 찾는다.", "reasoning_en": "Food comes first.", "need_addressed": "hunger", "urgency": 0.9},
+        "J": {"coping_id": 0, "coping_type": "acceptance", "stress_delta": -0.2, "hint_ko": "숨을 고르며 버틴다.", "hint_en": "They steady their breath and endure.", "side_effect": "none"},
+        "K": {"social_action_id": 0, "trust_delta": 0.2, "hint_ko": "손을 내밀어 도왔다.", "hint_en": "They held out a hand to help.", "relationship_intent": "alliance", "reciprocity_expectation": "gift"},
+        "L": {"response_id": 0, "trust_delta": -0.1, "hint_ko": "지난 일을 떠올리며 물러선다.", "hint_en": "They recall the last event and step back.", "forgiveness_threshold": 0.5, "social_memory": "theft_betrayal"},
+        "M": {"decision_id": 0, "confidence": 0.7, "dissent_risk": 0.2, "reasoning_ko": "먹거리가 먼저라 여긴다.", "reasoning_en": "Food comes first for the group.", "resource_commitment": "labor", "timeline": "immediate"},
+        "N": {"accept": False, "counter_offer_give": "가죽:2", "counter_offer_want": "돌칼:1", "hint_ko": "지금 값이 너무 세다.", "hint_en": "The price is too high right now.", "negotiation_stance": "fair", "walk_away_threshold": 0.6},
+    }
+    write_jsonl(
+        passed_file,
+        [{"task": task, "prompt": f"[TASK] {task}", "output": compact_json(payload)} for task, payload in base_rows.items()],
+    )
+    write_jsonl(negatives_file, [])
+    write_jsonl(general_file, [])
+
+    result = prepare_dataset(
+        passed_file=passed_file,
+        negative_samples_file=negatives_file,
+        general_samples_file=general_file,
+        output_file=output_file,
+        manifest_file=manifest_file,
+    )
+
+    rows = [json.loads(line) for line in result.dataset_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert {row["task"] for row in rows} == set(base_rows)
+    assert all(row["messages"][0]["content"] == "너는 석기시대 서사 도우미다. JSON으로만 답하라." for row in rows)
+
+
 def test_prepare_dataset_honors_dataset_mix_even_with_explicit_paths(tmp_path: Path) -> None:
     config_dir = tmp_path / "config"
     config_dir.mkdir(parents=True, exist_ok=True)

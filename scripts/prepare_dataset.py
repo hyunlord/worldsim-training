@@ -93,8 +93,19 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
     task = row.get("task")
     prompt = row.get("prompt")
     output = row.get("output")
-    if task in {"A", "B", "C", "D", "E", "F", "G", "H"} and prompt and output:
-        default_layers = {"E": "L3", "F": "L3", "G": "L5", "H": "L0"}
+    if task in {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"} and prompt and output:
+        default_layers = {
+            "E": "L3",
+            "F": "L3",
+            "G": "L5",
+            "H": "L0",
+            "I": "L3",
+            "J": "L3",
+            "K": "L3",
+            "L": "L3",
+            "M": "L3",
+            "N": "L3",
+        }
         layer = row.get("layer", default_layers.get(task, "L4"))
         assistant_content = _assistant_content(output, task=task)
         return {
@@ -107,7 +118,7 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
                 {"role": "assistant", "content": assistant_content},
             ],
         }
-    if task in {"A", "B", "C", "D", "E", "F", "G", "H"}:
+    if task in {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"}:
         raise ValueError(f"Unsupported dataset row for task {task}: missing prompt/output")
     if task == "NEG" and output:
         sample_output = _assistant_content(output, task=task)

@@ -16,7 +16,7 @@ from scripts.common import AttrDict, ensure_directory, load_yaml, read_jsonl, re
 from scripts.prepare_dataset import _row_to_training_example, _training_system_prompts, _validate_messages_row
 
 
-SUPPORTED_TASKS = {"A", "B", "C", "D", "E", "F", "G", "H"}
+SUPPORTED_TASKS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"}
 
 
 def _load_rows(path: Path, *, split: str) -> list[dict]:
