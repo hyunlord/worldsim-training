@@ -1,0 +1,39 @@
+[과제] 아래 무리가 어떤 집단 결정을 내릴지 JSON으로만 답하라.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
+
+[인물 성격]
+{personality_keywords}
+
+[무리 처지]
+{group_context}
+
+[벌어진 일]
+{scenario_desc}
+
+[선택지]
+{action_options}
+
+[출력 형식]
+{{"decision_id": 번호, "confidence": 0.0, "dissent_risk": 0.0, "reasoning_ko": "순우리말 한 문장", "reasoning_en": "English 1 sentence", "resource_commitment": "자원 이름", "timeline": "시기 이름"}}
+
+[규칙]
+- decision_id는 위 선택지 번호 중 하나
+- confidence는 0.0~1.0이다
+- dissent_risk는 0.0~1.0이다
+- reasoning_ko는 왜 이 결정을 밀어붙이는지 순우리말 10~35글자로 써라
+- reasoning_ko는 반드시 한국어로만 써라. 영어를 섞지 마라.
+- reasoning_en은 같은 뜻의 영어 1문장으로 써라
+- resource_commitment는 food, tools, labor, weapons, none 중 하나
+- timeline은 immediate, delayed, conditional 중 하나
+- JSON만 출력하고 다른 설명문은 쓰지 마라
+
+[변형번호]
+{variant}

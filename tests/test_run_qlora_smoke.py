@@ -990,6 +990,12 @@ def test_sample_generation_max_new_tokens_reflects_task_specific_caps() -> None:
     assert _sample_generation_max_new_tokens("G") == 384
     assert _sample_generation_max_new_tokens("H") == 384
     assert _sample_generation_max_new_tokens("F") == 384
+    assert _sample_generation_max_new_tokens("I") == 256
+    assert _sample_generation_max_new_tokens("J") == 256
+    assert _sample_generation_max_new_tokens("K") == 256
+    assert _sample_generation_max_new_tokens("L") == 256
+    assert _sample_generation_max_new_tokens("M") == 384
+    assert _sample_generation_max_new_tokens("N") == 384
 
 
 def test_sample_generation_assistant_prefix_is_task_specific() -> None:
@@ -1001,6 +1007,12 @@ def test_sample_generation_assistant_prefix_is_task_specific() -> None:
     assert _sample_generation_assistant_prefix("E") == '{"action_id": '
     assert _sample_generation_assistant_prefix("F") == '{"emotion": "'
     assert _sample_generation_assistant_prefix("G") == '{"interpretation_ko": "이 말은 '
+    assert _sample_generation_assistant_prefix("I") == '{"priority_id": '
+    assert _sample_generation_assistant_prefix("J") == '{"coping_id": '
+    assert _sample_generation_assistant_prefix("K") == '{"social_action_id": '
+    assert _sample_generation_assistant_prefix("L") == '{"response_id": '
+    assert _sample_generation_assistant_prefix("M") == '{"decision_id": '
+    assert _sample_generation_assistant_prefix("N") == '{"accept": '
 
 
 def test_normalize_known_enum_values_only_fixes_case_style() -> None:

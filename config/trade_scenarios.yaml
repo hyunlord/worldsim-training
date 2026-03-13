@@ -1,0 +1,105 @@
+trade_scenarios:
+  - id: fur_for_bone_knife
+    ko: 모피와 뼈칼
+    desc: 추운 밤을 앞두고 모피를 내주고 뼈칼을 더 받을지 따진다
+    trade_offer: "상대 제안: 모피 2장을 주면 뼈칼 2개를 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 더얻어내기
+      - id: 2
+        ko: 모피줄이기
+      - id: 3
+        ko: 거래끊기
+  - id: dried_fish_for_salt
+    ko: 말린고기와 소금
+    desc: 바닷가 무리가 소금을 내밀며 말린 고기를 원한다
+    trade_offer: "상대 제안: 소금 1묶음을 주면 말린고기 3덩이를 달라 한다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 고기줄이기
+      - id: 2
+        ko: 소금더받기
+      - id: 3
+        ko: 돌아서기
+  - id: stone_for_fire_resin
+    ko: 숫돌과 불진
+    desc: 단단한 숫돌을 내주고 불 잘 붙는 진을 받을 기회가 왔다
+    trade_offer: "상대 제안: 숫돌 1개를 주면 불진 2덩이를 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 진더받기
+      - id: 2
+        ko: 숫돌감추기
+      - id: 3
+        ko: 물건바꾸기
+  - id: herbs_for_hide
+    ko: 약풀과 가죽
+    desc: 상처 낫는 풀을 내주고 가죽을 받자는 제안이 들어왔다
+    trade_offer: "상대 제안: 약풀 4줌을 주면 가죽 1장을 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 가죽더받기
+      - id: 2
+        ko: 풀덜주기
+      - id: 3
+        ko: 거래미루기
+  - id: shell_for_beads
+    ko: 조개껍질과 꾸밈돌
+    desc: 꾸밈돌을 많이 가진 무리가 빛나는 조개껍질을 탐낸다
+    trade_offer: "상대 제안: 조개껍질 5개를 주면 꾸밈돌 3개를 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 꾸밈돌더받기
+      - id: 2
+        ko: 껍질덜주기
+      - id: 3
+        ko: 웃으며거절하기
+  - id: spear_for_berries
+    ko: 창과 열매
+    desc: 손질한 창 한 자루를 내주고 말린 열매를 많이 받을 수 있다
+    trade_offer: "상대 제안: 창 1자루를 주면 말린열매 6줌을 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 열매더받기
+      - id: 2
+        ko: 창안주기
+      - id: 3
+        ko: 다른물건묻기
+  - id: raft_help_for_oil
+    ko: 뗏목손질과 기름
+    desc: 뗏목을 손봐주는 대신 등불 기름을 받자는 제안이다
+    trade_offer: "상대 제안: 뗏목손질 하루를 해주면 기름 2항아리를 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 기름더받기
+      - id: 2
+        ko: 손질덜하기
+      - id: 3
+        ko: 바로떠나기
+  - id: labor_for_shelter
+    ko: 품삯과 잠자리
+    desc: 움막을 세워주는 대신 겨울 잠자리를 얻자는 제안이 왔다
+    trade_offer: "상대 제안: 품 하루를 주면 눈바람막이 자리 둘을 준다"
+    options:
+      - id: 0
+        ko: 그대로받기
+      - id: 1
+        ko: 자리더얻기
+      - id: 2
+        ko: 품값낮추기
+      - id: 3
+        ko: 말만듣기

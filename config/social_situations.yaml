@@ -1,0 +1,137 @@
+social_situations:
+  - id: shared_hunt
+    ko: 함께한 사냥
+    desc: 함께 짐승을 몰아 큰 사냥감을 잡은 뒤 몫을 나눌 차례다
+    relationship_context: 함께 목숨을 걸고 짐승을 몰았다
+    social_memory: combat_respect
+    trust_level: 0.66
+    options:
+      - id: 0
+        ko: 먼저나누기
+      - id: 1
+        ko: 몫따지기
+      - id: 2
+        ko: 지켜보기
+      - id: 3
+        ko: 으르기
+      - id: 4
+        ko: 모른척하기
+  - id: stolen_food
+    ko: 먹거리 도둑질
+    desc: 상대가 네 몫의 먹거리를 훔친 일이 드러났다
+    relationship_context: 자주 부딪히는 이웃 무리 사람이다
+    social_memory: theft_betrayal
+    trust_level: 0.18
+    options:
+      - id: 0
+        ko: 되찾기
+      - id: 1
+        ko: 따져묻기
+      - id: 2
+        ko: 멀리두기
+      - id: 3
+        ko: 손잡기
+      - id: 4
+        ko: 우두머리부르기
+  - id: saved_from_beast
+    ko: 짐승에서 구함
+    desc: 상대가 짐승 앞에서 너를 끌어내 살려냈다
+    relationship_context: 한동안 거리를 두던 이였다
+    social_memory: aid_gratitude
+    trust_level: 0.74
+    options:
+      - id: 0
+        ko: 먹거리건네기
+      - id: 1
+        ko: 빚갚기약속
+      - id: 2
+        ko: 조용히보기
+      - id: 3
+        ko: 우두머리세우기
+      - id: 4
+        ko: 손내밀기
+  - id: public_insult
+    ko: 무리 앞 모욕
+    desc: 상대가 무리 앞에서 너를 업신여겨 모두가 웃었다
+    relationship_context: 같은 불가에서 지내는 사이였다
+    social_memory: insult_resentment
+    trust_level: 0.22
+    options:
+      - id: 0
+        ko: 말받기
+      - id: 1
+        ko: 싸움걸기
+      - id: 2
+        ko: 차게보기
+      - id: 3
+        ko: 그냥가기
+      - id: 4
+        ko: 손잡기
+  - id: gift_of_fur
+    ko: 뜻밖의 선물
+    desc: 상대가 추운 밤에 모피를 슬며시 건넸다
+    relationship_context: 아직 깊이 믿지는 못하는 낯선 이다
+    social_memory: gift_goodwill
+    trust_level: 0.49
+    options:
+      - id: 0
+        ko: 선물받기
+      - id: 1
+        ko: 되갚기
+      - id: 2
+        ko: 살펴보기
+      - id: 3
+        ko: 거절하기
+      - id: 4
+        ko: 우두머리알리기
+  - id: abandoned_on_path
+    ko: 길에서 버려짐
+    desc: 험한 길에서 상대가 너를 두고 먼저 떠났다
+    relationship_context: 오래 함께 움직인 동무였다
+    social_memory: abandonment
+    trust_level: 0.11
+    options:
+      - id: 0
+        ko: 다시안믿기
+      - id: 1
+        ko: 따져묻기
+      - id: 2
+        ko: 멀리보기
+      - id: 3
+        ko: 억지손잡기
+      - id: 4
+        ko: 되갚기
+  - id: stranger_trade
+    ko: 낯선 이의 제안
+    desc: 낯선 이가 돌칼과 말린 고기를 바꾸자고 다가왔다
+    relationship_context: 처음 만난 바깥 무리 사람이다
+    social_memory: none
+    trust_level: 0.31
+    options:
+      - id: 0
+        ko: 물건바꾸기
+      - id: 1
+        ko: 눈치보기
+      - id: 2
+        ko: 손잡기
+      - id: 3
+        ko: 몰아내기
+      - id: 4
+        ko: 모른척하기
+  - id: shared_danger
+    ko: 함께 넘긴 위험
+    desc: 함께 급류를 건너며 서로 손을 놓지 않았다
+    relationship_context: 말은 적지만 오래 곁에 있던 사이다
+    social_memory: shared_danger
+    trust_level: 0.71
+    options:
+      - id: 0
+        ko: 손굳게잡기
+      - id: 1
+        ko: 더지켜보기
+      - id: 2
+        ko: 함께가기
+      - id: 3
+        ko: 거리두기
+      - id: 4
+        ko: 먹거리나누기

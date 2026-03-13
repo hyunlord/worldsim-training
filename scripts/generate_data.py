@@ -176,6 +176,13 @@ def load_generation_config(config_dir: Path) -> dict:
     return load_yaml(config_dir / "generation.yaml")
 
 
+def _load_optional_catalog(config_dir: Path, filename: str, root_key: str) -> list[dict]:
+    path = config_dir / filename
+    if not path.exists():
+        return []
+    return load_yaml(path).get(root_key, [])
+
+
 def load_local_env(repo_root: Path) -> None:
     env_file = repo_root / ".env"
     if not env_file.exists():
@@ -194,6 +201,11 @@ def load_catalogs(config_dir: Path) -> dict:
         "situations": load_yaml(config_dir / "situations.yaml").get("situations", []),
         "personalities": load_yaml(config_dir / "personalities.yaml").get("personalities", []),
         "emotions": load_yaml(config_dir / "emotions.yaml").get("emotions", []),
+        "needs_situations": _load_optional_catalog(config_dir, "needs.yaml", "needs_situations"),
+        "stress_situations": _load_optional_catalog(config_dir, "stress_sources.yaml", "stress_situations"),
+        "social_situations": _load_optional_catalog(config_dir, "social_situations.yaml", "social_situations"),
+        "group_situations": _load_optional_catalog(config_dir, "group_situations.yaml", "group_situations"),
+        "trade_scenarios": _load_optional_catalog(config_dir, "trade_scenarios.yaml", "trade_scenarios"),
         "temperaments": settings.get("temperaments", []),
         "worlds": settings.get("worlds", []),
         "oracles": settings.get("oracles", []),
@@ -204,7 +216,7 @@ def load_catalogs(config_dir: Path) -> dict:
 def load_prompt_assets(prompts_dir: Path) -> dict:
     teacher_dir = prompts_dir / "teacher"
     assets = {"system": load_text(teacher_dir / "system.txt"), "tasks": {}}
-    for task in ("A", "B", "C", "D", "E", "F", "G", "H"):
+    for task in ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"):
         path = teacher_dir / f"task_{task.lower()}.txt"
         if path.exists():
             assets["tasks"][task] = load_text(path)
@@ -418,7 +430,7 @@ def _repo_prompt_assets(repo_root: Path, settings: dict) -> dict:
     paths = settings.get("paths", {})
     system_target = prompts.get("teacher_system") or paths.get("teacher_system_prompt") or "prompts/teacher/system.txt"
     assets = {"system": load_text(resolve_path(repo_root, system_target)), "tasks": {}}
-    for task in ("A", "B", "C", "D", "E", "F", "G", "H"):
+    for task in ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"):
         prompt_target = prompts.get(f"task_{task.lower()}")
         if prompt_target is None:
             candidate = repo_root / "prompts" / "teacher" / f"task_{task.lower()}.txt"
@@ -438,6 +450,11 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
     worlds = _catalog_worlds(catalogs)
     oracles = catalogs.get("oracles", [])
     worldbuilding_texts = catalogs.get("worldbuilding_texts", [])
+    needs_situations = catalogs.get("needs_situations", [])
+    stress_situations = catalogs.get("stress_situations", [])
+    social_situations = catalogs.get("social_situations", [])
+    group_situations = catalogs.get("group_situations", [])
+    trade_scenarios = catalogs.get("trade_scenarios", [])
     oracle_temperaments = [temperament for temperament in temperaments if temperament.get("id") != "mixed"] or temperaments
     emotion_ids = _emotion_ids(catalogs)
     names = settings.get("names") or settings.get("generation", {}).get("task_d_names", ["돌이"])
@@ -699,6 +716,237 @@ def _build_jobs_from_catalogs(catalogs: dict, settings: dict, *, system_prompt: 
                 }
             )
 
+    for situation_index, situation in enumerate(needs_situations):
+        action_options = situation.get("options", [])
+        if not action_options:
+            continue
+        options_line = " ".join(f"{option['id']}:{option['ko']}" for option in action_options)
+        for personality_index, personality in enumerate(personalities):
+            for variant in range(_variant_count(settings, "I")):
+                context = _v31_context(
+                    rng=rng,
+                    temperaments=temperaments,
+                    worlds=worlds,
+                    temperament=temperaments[(personality_index + variant) % len(temperaments)],
+                    world=worlds[(situation_index + variant) % len(worlds)],
+                )
+                jobs.append(
+                    {
+                        "task": "I",
+                        "layer": "L3",
+                        "expected_format": "json",
+                        "variant": variant,
+                        "name": names[(personality_index + variant) % len(names)],
+                        "personality_id": personality["id"],
+                        "personality_name": personality.get("ko", personality["id"]),
+                        "personality_desc": personality.get("desc", ""),
+                        "personality_keywords": personality.get("keywords", []),
+                        "keywords": ", ".join(personality.get("keywords", [])),
+                        "needs_state": situation.get("needs_state", ""),
+                        "situation_id": situation["id"],
+                        "scenario_name": situation.get("ko", situation["id"]),
+                        "scenario_desc": situation.get("desc", ""),
+                        "situation": situation.get("ko", situation["id"]),
+                        "action_options": action_options,
+                        "options_line": options_line,
+                        "teacher_model": _task_teacher_model(settings, "I"),
+                        "system_prompt": system_prompt,
+                        **context,
+                    }
+                )
+
+    for situation_index, situation in enumerate(stress_situations):
+        action_options = situation.get("options", [])
+        if not action_options:
+            continue
+        options_line = " ".join(f"{option['id']}:{option['ko']}" for option in action_options)
+        for personality_index, personality in enumerate(personalities):
+            for variant in range(_variant_count(settings, "J")):
+                context = _v31_context(
+                    rng=rng,
+                    temperaments=temperaments,
+                    worlds=worlds,
+                    temperament=temperaments[(personality_index + variant) % len(temperaments)],
+                    world=worlds[(situation_index + variant) % len(worlds)],
+                )
+                context["stress"] = situation.get("stress", context["stress"])
+                jobs.append(
+                    {
+                        "task": "J",
+                        "layer": "L3",
+                        "expected_format": "json",
+                        "variant": variant,
+                        "name": names[(personality_index + variant) % len(names)],
+                        "personality_id": personality["id"],
+                        "personality_name": personality.get("ko", personality["id"]),
+                        "personality_desc": personality.get("desc", ""),
+                        "personality_keywords": personality.get("keywords", []),
+                        "keywords": ", ".join(personality.get("keywords", [])),
+                        "situation_id": situation["id"],
+                        "scenario_name": situation.get("ko", situation["id"]),
+                        "scenario_desc": situation.get("desc", ""),
+                        "situation": situation.get("ko", situation["id"]),
+                        "action_options": action_options,
+                        "options_line": options_line,
+                        "teacher_model": _task_teacher_model(settings, "J"),
+                        "system_prompt": system_prompt,
+                        **context,
+                    }
+                )
+
+    for situation_index, situation in enumerate(social_situations):
+        action_options = situation.get("options", [])
+        if not action_options:
+            continue
+        options_line = " ".join(f"{option['id']}:{option['ko']}" for option in action_options)
+        for personality_index, personality in enumerate(personalities):
+            for variant in range(_variant_count(settings, "K")):
+                context = _v31_context(
+                    rng=rng,
+                    temperaments=temperaments,
+                    worlds=worlds,
+                    temperament=temperaments[(personality_index + variant) % len(temperaments)],
+                    world=worlds[(situation_index + variant) % len(worlds)],
+                )
+                jobs.append(
+                    {
+                        "task": "K",
+                        "layer": "L3",
+                        "expected_format": "json",
+                        "variant": variant,
+                        "name": names[(personality_index + variant) % len(names)],
+                        "personality_id": personality["id"],
+                        "personality_name": personality.get("ko", personality["id"]),
+                        "personality_desc": personality.get("desc", ""),
+                        "personality_keywords": personality.get("keywords", []),
+                        "keywords": ", ".join(personality.get("keywords", [])),
+                        "relationship_context": situation.get("relationship_context", ""),
+                        "social_memory": situation.get("social_memory", "none"),
+                        "trust_level": situation.get("trust_level", 0.5),
+                        "situation_id": situation["id"],
+                        "scenario_name": situation.get("ko", situation["id"]),
+                        "scenario_desc": situation.get("desc", ""),
+                        "situation": situation.get("ko", situation["id"]),
+                        "action_options": action_options,
+                        "options_line": options_line,
+                        "teacher_model": _task_teacher_model(settings, "K"),
+                        "system_prompt": system_prompt,
+                        **context,
+                    }
+                )
+            for variant in range(_variant_count(settings, "L")):
+                context = _v31_context(
+                    rng=rng,
+                    temperaments=temperaments,
+                    worlds=worlds,
+                    temperament=temperaments[(personality_index + situation_index + variant) % len(temperaments)],
+                    world=worlds[(personality_index + variant) % len(worlds)],
+                )
+                jobs.append(
+                    {
+                        "task": "L",
+                        "layer": "L3",
+                        "expected_format": "json",
+                        "variant": variant,
+                        "name": names[(personality_index + variant) % len(names)],
+                        "personality_id": personality["id"],
+                        "personality_name": personality.get("ko", personality["id"]),
+                        "personality_desc": personality.get("desc", ""),
+                        "personality_keywords": personality.get("keywords", []),
+                        "keywords": ", ".join(personality.get("keywords", [])),
+                        "relationship_context": situation.get("relationship_context", ""),
+                        "social_memory": situation.get("social_memory", "none"),
+                        "trust_level": situation.get("trust_level", 0.5),
+                        "situation_id": situation["id"],
+                        "scenario_name": situation.get("ko", situation["id"]),
+                        "scenario_desc": situation.get("desc", ""),
+                        "situation": situation.get("ko", situation["id"]),
+                        "action_options": action_options,
+                        "options_line": options_line,
+                        "teacher_model": _task_teacher_model(settings, "L"),
+                        "system_prompt": system_prompt,
+                        **context,
+                    }
+                )
+
+    for situation_index, situation in enumerate(group_situations):
+        action_options = situation.get("options", [])
+        if not action_options:
+            continue
+        options_line = " ".join(f"{option['id']}:{option['ko']}" for option in action_options)
+        for personality_index, personality in enumerate(personalities):
+            for variant in range(_variant_count(settings, "M")):
+                context = _v31_context(
+                    rng=rng,
+                    temperaments=temperaments,
+                    worlds=worlds,
+                    temperament=temperaments[(personality_index + variant) % len(temperaments)],
+                    world=worlds[(situation_index + variant) % len(worlds)],
+                )
+                jobs.append(
+                    {
+                        "task": "M",
+                        "layer": "L3",
+                        "expected_format": "json",
+                        "variant": variant,
+                        "name": names[(personality_index + variant) % len(names)],
+                        "personality_id": personality["id"],
+                        "personality_name": personality.get("ko", personality["id"]),
+                        "personality_desc": personality.get("desc", ""),
+                        "personality_keywords": personality.get("keywords", []),
+                        "keywords": ", ".join(personality.get("keywords", [])),
+                        "group_context": situation.get("group_context", ""),
+                        "situation_id": situation["id"],
+                        "scenario_name": situation.get("ko", situation["id"]),
+                        "scenario_desc": situation.get("desc", ""),
+                        "situation": situation.get("ko", situation["id"]),
+                        "action_options": action_options,
+                        "options_line": options_line,
+                        "teacher_model": _task_teacher_model(settings, "M"),
+                        "system_prompt": system_prompt,
+                        **context,
+                    }
+                )
+
+    for situation_index, situation in enumerate(trade_scenarios):
+        action_options = situation.get("options", [])
+        if not action_options:
+            continue
+        options_line = " ".join(f"{option['id']}:{option['ko']}" for option in action_options)
+        for personality_index, personality in enumerate(personalities):
+            for variant in range(_variant_count(settings, "N")):
+                context = _v31_context(
+                    rng=rng,
+                    temperaments=temperaments,
+                    worlds=worlds,
+                    temperament=temperaments[(personality_index + variant) % len(temperaments)],
+                    world=worlds[(situation_index + variant) % len(worlds)],
+                )
+                jobs.append(
+                    {
+                        "task": "N",
+                        "layer": "L3",
+                        "expected_format": "json",
+                        "variant": variant,
+                        "name": names[(personality_index + variant) % len(names)],
+                        "personality_id": personality["id"],
+                        "personality_name": personality.get("ko", personality["id"]),
+                        "personality_desc": personality.get("desc", ""),
+                        "personality_keywords": personality.get("keywords", []),
+                        "keywords": ", ".join(personality.get("keywords", [])),
+                        "trade_offer": situation.get("trade_offer", ""),
+                        "situation_id": situation["id"],
+                        "scenario_name": situation.get("ko", situation["id"]),
+                        "scenario_desc": situation.get("desc", ""),
+                        "situation": situation.get("ko", situation["id"]),
+                        "action_options": action_options,
+                        "options_line": options_line,
+                        "teacher_model": _task_teacher_model(settings, "N"),
+                        "system_prompt": system_prompt,
+                        **context,
+                    }
+                )
+
     return jobs
 
 
@@ -783,6 +1031,12 @@ def render_prompt(job: dict, prompt_assets: dict) -> str:
         "worldbuilding_id": job.get("worldbuilding_id", ""),
         "worldbuilding_text": job.get("worldbuilding_text", ""),
         "expected_world_type": job.get("expected_world_type", ""),
+        "needs_state": job.get("needs_state", ""),
+        "relationship_context": job.get("relationship_context", ""),
+        "social_memory": job.get("social_memory", ""),
+        "trust_level": job.get("trust_level", ""),
+        "group_context": job.get("group_context", ""),
+        "trade_offer": job.get("trade_offer", ""),
         "name": job.get("name", ""),
         "variant": job.get("variant", 0),
     }
@@ -1416,6 +1670,117 @@ def build_response_format(job: dict, settings: dict) -> tuple[dict | None, dict 
                         },
                     },
                 },
+            },
+        }
+    elif task == "I":
+        min_chars, max_chars = _task_text_limits(settings, "I")
+        action_options = job.get("action_options", [])
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["priority_id", "reasoning_ko", "reasoning_en", "need_addressed", "urgency"],
+            "properties": {
+                "priority_id": {"type": "integer", "enum": [int(option["id"]) for option in action_options]},
+                "reasoning_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "reasoning_en": {"type": "string", "minLength": 3},
+                "need_addressed": {
+                    "type": "string",
+                    "enum": ["hunger", "thirst", "warmth", "rest", "safety", "belonging", "esteem", "curiosity", "reproduction", "comfort", "purpose", "transcendence", "play"],
+                },
+                "urgency": {"type": "number", "minimum": 0, "maximum": 1},
+            },
+        }
+    elif task == "J":
+        min_chars, max_chars = _task_text_limits(settings, "J")
+        action_options = job.get("action_options", [])
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["coping_id", "coping_type", "stress_delta", "hint_ko", "hint_en", "side_effect"],
+            "properties": {
+                "coping_id": {"type": "integer", "enum": [int(option["id"]) for option in action_options]},
+                "coping_type": {
+                    "type": "string",
+                    "enum": ["active_avoidance", "emotional_release", "social_support", "ritualistic", "substance", "acceptance", "aggression"],
+                },
+                "stress_delta": {"type": "number", "minimum": -1.0, "maximum": 0.0},
+                "hint_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "hint_en": {"type": "string", "minLength": 3},
+                "side_effect": {
+                    "type": "string",
+                    "enum": ["aggression_increase", "isolation", "faith_increase", "trust_decrease", "morale_boost", "exhaustion", "none"],
+                },
+            },
+        }
+    elif task == "K":
+        min_chars, max_chars = _task_text_limits(settings, "K")
+        action_options = job.get("action_options", [])
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["social_action_id", "trust_delta", "hint_ko", "hint_en", "relationship_intent", "reciprocity_expectation"],
+            "properties": {
+                "social_action_id": {"type": "integer", "enum": [int(option["id"]) for option in action_options]},
+                "trust_delta": {"type": "number", "minimum": -0.5, "maximum": 0.5},
+                "hint_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "hint_en": {"type": "string", "minLength": 3},
+                "relationship_intent": {
+                    "type": "string",
+                    "enum": ["alliance", "cautious_observation", "hostile", "submissive", "dominant", "trade_partner", "ignore"],
+                },
+                "reciprocity_expectation": {"type": "string", "enum": ["none", "gift", "service", "alliance"]},
+            },
+        }
+    elif task == "L":
+        min_chars, max_chars = _task_text_limits(settings, "L")
+        action_options = job.get("action_options", [])
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["response_id", "trust_delta", "hint_ko", "hint_en", "forgiveness_threshold", "social_memory"],
+            "properties": {
+                "response_id": {"type": "integer", "enum": [int(option["id"]) for option in action_options]},
+                "trust_delta": {"type": "number", "minimum": -0.5, "maximum": 0.5},
+                "hint_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "hint_en": {"type": "string", "minLength": 3},
+                "forgiveness_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "social_memory": {
+                    "type": "string",
+                    "enum": ["theft_betrayal", "aid_gratitude", "shared_danger", "insult_resentment", "gift_goodwill", "combat_respect", "abandonment", "none"],
+                },
+            },
+        }
+    elif task == "M":
+        min_chars, max_chars = _task_text_limits(settings, "M")
+        action_options = job.get("action_options", [])
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["decision_id", "confidence", "dissent_risk", "reasoning_ko", "reasoning_en", "resource_commitment", "timeline"],
+            "properties": {
+                "decision_id": {"type": "integer", "enum": [int(option["id"]) for option in action_options]},
+                "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "dissent_risk": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "reasoning_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "reasoning_en": {"type": "string", "minLength": 3},
+                "resource_commitment": {"type": "string", "enum": ["food", "tools", "labor", "weapons", "none"]},
+                "timeline": {"type": "string", "enum": ["immediate", "delayed", "conditional"]},
+            },
+        }
+    elif task == "N":
+        min_chars, max_chars = _task_text_limits(settings, "N")
+        schema = {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["accept", "counter_offer_give", "counter_offer_want", "hint_ko", "hint_en", "negotiation_stance", "walk_away_threshold"],
+            "properties": {
+                "accept": {"type": "boolean"},
+                "counter_offer_give": {"type": "string", "minLength": 1},
+                "counter_offer_want": {"type": "string", "minLength": 1},
+                "hint_ko": {"type": "string", "minLength": min_chars, "maxLength": max_chars},
+                "hint_en": {"type": "string", "minLength": 3},
+                "negotiation_stance": {"type": "string", "enum": ["generous", "fair", "hard_bargain", "exploitative"]},
+                "walk_away_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
             },
         }
     else:

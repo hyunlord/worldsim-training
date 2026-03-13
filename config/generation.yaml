@@ -44,6 +44,12 @@ prompts:
       F: prompts/teacher/task_f.txt
       G: prompts/teacher/task_g.txt
       H: prompts/teacher/task_h.txt
+      I: prompts/teacher/task_i.txt
+      J: prompts/teacher/task_j.txt
+      K: prompts/teacher/task_k.txt
+      L: prompts/teacher/task_l.txt
+      M: prompts/teacher/task_m.txt
+      N: prompts/teacher/task_n.txt
   training:
     layer0_system: prompts/training/layer0_system.txt
     layer3_system: prompts/training/layer3_system.txt
@@ -69,6 +75,12 @@ task_variants:
   F: 1
   G: 1
   H: 5
+  I: 2
+  J: 2
+  K: 2
+  L: 2
+  M: 3
+  N: 3
 
 tasks:
   A:
@@ -135,6 +147,54 @@ tasks:
       machine_primary: name
       english_primary: description_en
       required: [name, description_en, resource_modifiers, special_zones, special_resources, agent_modifiers]
+  I:
+    layer: L3
+    expected_format: json
+    description: 욕구 우선순위 판정
+    output_fields:
+      korean_primary: reasoning_ko
+      english_primary: reasoning_en
+      required: [priority_id, reasoning_ko, reasoning_en, need_addressed, urgency]
+  J:
+    layer: L3
+    expected_format: json
+    description: 스트레스 대처 선택
+    output_fields:
+      korean_primary: hint_ko
+      english_primary: hint_en
+      required: [coping_id, coping_type, stress_delta, hint_ko, hint_en, side_effect]
+  K:
+    layer: L3
+    expected_format: json
+    description: 사회적 행동 선택
+    output_fields:
+      korean_primary: hint_ko
+      english_primary: hint_en
+      required: [social_action_id, trust_delta, hint_ko, hint_en, relationship_intent, reciprocity_expectation]
+  L:
+    layer: L3
+    expected_format: json
+    description: 신뢰 재평가
+    output_fields:
+      korean_primary: hint_ko
+      english_primary: hint_en
+      required: [response_id, trust_delta, hint_ko, hint_en, forgiveness_threshold, social_memory]
+  M:
+    layer: L3
+    expected_format: json
+    description: 집단 의사결정
+    output_fields:
+      korean_primary: reasoning_ko
+      english_primary: reasoning_en
+      required: [decision_id, confidence, dissent_risk, reasoning_ko, reasoning_en, resource_commitment, timeline]
+  N:
+    layer: L3
+    expected_format: json
+    description: 교역 판단
+    output_fields:
+      korean_primary: hint_ko
+      english_primary: hint_en
+      required: [accept, counter_offer_give, counter_offer_want, hint_ko, hint_en, negotiation_stance, walk_away_threshold]
 
 names:
   - 돌이
@@ -426,6 +486,12 @@ validation:
     E: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
     F: { korean_field: cause_ko, min_chars: 10, max_chars: 25, sentences: 1 }
     G: { korean_field: interpretation_ko, min_chars: 15, max_chars: 40, sentences: 1 }
+    I: { korean_field: reasoning_ko, min_chars: 10, max_chars: 30, sentences: 1 }
+    J: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
+    K: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
+    L: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
+    M: { korean_field: reasoning_ko, min_chars: 10, max_chars: 35, sentences: 1 }
+    N: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
   structured_json:
     A:
       required_fields: [text_ko, text_en, register, dominant_trait, temperament_expressed]

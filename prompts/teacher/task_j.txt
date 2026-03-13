@@ -1,0 +1,38 @@
+[과제] 아래 인물이 아래 스트레스를 어떻게 다룰지 JSON으로만 답하라.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[기질 이름]
+{temperament_name}
+
+[기질 키워드]
+{temperament_keywords}
+
+[인물 성격]
+{personality_keywords}
+
+[스트레스 정도]
+{stress}
+
+[벌어진 일]
+{scenario_desc}
+
+[선택지]
+{action_options}
+
+[출력 형식]
+{{"coping_id": 번호, "coping_type": "대처 이름", "stress_delta": -0.1, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "side_effect": "여파 이름"}}
+
+[규칙]
+- coping_id는 위 선택지 번호 중 하나
+- coping_type은 active_avoidance, emotional_release, social_support, ritualistic, substance, acceptance, aggression 중 하나
+- stress_delta는 -1.0~0.0이다
+- hint_ko는 왜 이 대처를 고르는지 순우리말 10~30글자로 써라
+- hint_ko는 반드시 한국어로만 써라. 영어를 섞지 마라.
+- hint_en은 같은 뜻의 영어 1문장으로 써라
+- side_effect는 aggression_increase, isolation, faith_increase, trust_decrease, morale_boost, exhaustion, none 중 하나
+- JSON만 출력하고 다른 설명문은 쓰지 마라
+
+[변형번호]
+{variant}

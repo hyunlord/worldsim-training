@@ -1,0 +1,109 @@
+group_situations:
+  - id: winter_store_short
+    ko: 겨울 먹거리 모자람
+    desc: 겨울 저장 먹거리가 모자라 모두가 먼저 할 일을 정해야 한다
+    group_context: 굶주림이 번지고 다툼도 잦아졌다
+    options:
+      - id: 0
+        ko: 사냥대늘리기
+      - id: 1
+        ko: 몫줄이기
+      - id: 2
+        ko: 이웃찾기
+      - id: 3
+        ko: 새터옮기기
+      - id: 4
+        ko: 불씨지키기
+  - id: bridge_or_raid
+    ko: 다리놓기와 습격
+    desc: 강 건너 무리와 손을 잡을지 먼저 덤빌지 갈린다
+    group_context: 젊은 이는 덤비자 하고 어른은 버티자 한다
+    options:
+      - id: 0
+        ko: 손잡기
+      - id: 1
+        ko: 덤비기
+      - id: 2
+        ko: 지켜보기
+      - id: 3
+        ko: 정찰보내기
+      - id: 4
+        ko: 다리끊기
+  - id: cave_settlement
+    ko: 굴 정착 판단
+    desc: 큰 굴을 차지해 머무를지 지나쳐 더 나은 곳을 찾을지 정해야 한다
+    group_context: 아이와 노인이 많아 쉬는 터가 절실하다
+    options:
+      - id: 0
+        ko: 굴차지하기
+      - id: 1
+        ko: 더찾아가기
+      - id: 2
+        ko: 절반남기기
+      - id: 3
+        ko: 입구막기
+  - id: wounded_member
+    ko: 크게 다친 동무
+    desc: 크게 다친 동무를 데리고 갈지 두고 갈지 무리가 갈린다
+    group_context: 먹거리와 시간이 모두 빠듯하다
+    options:
+      - id: 0
+        ko: 함께옮기기
+      - id: 1
+        ko: 머물러돌보기
+      - id: 2
+        ko: 두고가되먹거리남기기
+      - id: 3
+        ko: 빨리움직이기
+  - id: first_fire
+    ko: 첫 불씨 다루기
+    desc: 처음 얻은 큰 불씨를 어떻게 쓸지 무리가 정해야 한다
+    group_context: 모두 놀라면서도 욕심을 낸다
+    options:
+      - id: 0
+        ko: 한곳에모으기
+      - id: 1
+        ko: 갈라나누기
+      - id: 2
+        ko: 밤새지키기
+      - id: 3
+        ko: 바로써보기
+  - id: stranger_children
+    ko: 낯선 아이들
+    desc: 길 잃은 낯선 아이 둘이 무리 곁으로 흘러들었다
+    group_context: 불쌍히 여기는 쪽과 경계하는 쪽이 맞선다
+    options:
+      - id: 0
+        ko: 받아들이기
+      - id: 1
+        ko: 곁에재우기
+      - id: 2
+        ko: 이웃에보내기
+      - id: 3
+        ko: 멀리돌려보내기
+  - id: sacred_hunt
+    ko: 신성한 사냥
+    desc: 징조를 따라 큰 사냥을 나설지 말지 무리가 의논한다
+    group_context: 샤먼은 길하다고 하고 사냥꾼은 위험을 본다
+    options:
+      - id: 0
+        ko: 곧나서기
+      - id: 1
+        ko: 징조더보기
+      - id: 2
+        ko: 작은사냥부터하기
+      - id: 3
+        ko: 무리둘로나누기
+  - id: tool_sharing
+    ko: 도구 나눔
+    desc: 새 돌칼을 누구에게 먼저 쥐여줄지 무리가 결정해야 한다
+    group_context: 모두 필요한데 수는 모자란다
+    options:
+      - id: 0
+        ko: 사냥꾼주기
+      - id: 1
+        ko: 어른주기
+      - id: 2
+        ko: 돌아가며쓰기
+      - id: 3
+        ko: 숨겨두기

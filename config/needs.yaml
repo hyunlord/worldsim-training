@@ -1,0 +1,118 @@
+needs_situations:
+  - id: storm_and_hunger
+    ko: 비바람과 허기
+    desc: 비바람이 거세고 먹거리도 떨어져 한가지만 먼저 챙겨야 한다
+    needs_state: "hunger:0.82 safety:0.91 warmth:0.76 belonging:0.28 esteem:0.12 curiosity:0.08"
+    options:
+      - id: 0
+        ko: 먹거리찾기
+      - id: 1
+        ko: 움막보강
+      - id: 2
+        ko: 불씨지키기
+      - id: 3
+        ko: 무리모으기
+  - id: thirst_or_rest
+    ko: 갈증과 탈진
+    desc: 긴 추적 끝에 목도 마르고 다리도 풀려 물과 쉼 가운데 먼저 고를 길을 재야 한다
+    needs_state: "thirst:0.9 rest:0.78 safety:0.33 comfort:0.21 purpose:0.18"
+    options:
+      - id: 0
+        ko: 물길찾기
+      - id: 1
+        ko: 그늘눕기
+      - id: 2
+        ko: 불씨피우기
+      - id: 3
+        ko: 길흔적남기기
+  - id: kin_or_fire
+    ko: 무리와 불씨
+    desc: 흩어진 무리를 먼저 모을지 꺼져가는 불씨를 먼저 살릴지 갈린다
+    needs_state: "belonging:0.84 warmth:0.73 safety:0.69 purpose:0.31 play:0.02"
+    options:
+      - id: 0
+        ko: 무리찾기
+      - id: 1
+        ko: 불씨살리기
+      - id: 2
+        ko: 짐챙기기
+      - id: 3
+        ko: 기다리기
+  - id: esteem_or_hunger
+    ko: 체면과 허기
+    desc: 사냥감 앞에서 체면을 세울 기회가 왔지만 배도 몹시 고프다
+    needs_state: "esteem:0.74 hunger:0.88 safety:0.4 belonging:0.45 purpose:0.33"
+    options:
+      - id: 0
+        ko: 사냥앞서기
+      - id: 1
+        ko: 먹거리숨기기
+      - id: 2
+        ko: 먹거리나누기
+      - id: 3
+        ko: 무기다듬기
+  - id: curiosity_or_safety
+    ko: 호기심과 아슬함
+    desc: 낯선 굴에서 빛이 새어 나오지만 짐승 자취도 뚜렷하다
+    needs_state: "curiosity:0.79 safety:0.92 esteem:0.22 purpose:0.36 transcendence:0.12"
+    options:
+      - id: 0
+        ko: 굴살피기
+      - id: 1
+        ko: 발자국지우기
+      - id: 2
+        ko: 무리부르기
+      - id: 3
+        ko: 돌아서기
+  - id: reproduction_or_shelter
+    ko: 짝짓기와 머묾
+    desc: 짝을 맺을 기회가 왔지만 밤을 견딜 자리도 아직 없다
+    needs_state: "reproduction:0.71 safety:0.87 comfort:0.62 belonging:0.39 esteem:0.26"
+    options:
+      - id: 0
+        ko: 짝부르기
+      - id: 1
+        ko: 잠자리엮기
+      - id: 2
+        ko: 가지모으기
+      - id: 3
+        ko: 불씨옮기기
+  - id: purpose_or_play
+    ko: 뜻과 놀이
+    desc: 아이들이 놀자고 조르지만 긴 겨울을 버틸 일을 미리 해둬야 한다
+    needs_state: "purpose:0.68 play:0.63 rest:0.34 belonging:0.41 esteem:0.27"
+    options:
+      - id: 0
+        ko: 먹거리말리기
+      - id: 1
+        ko: 아이놀리기
+      - id: 2
+        ko: 그물손보기
+      - id: 3
+        ko: 노래부르기
+  - id: comfort_or_transcendence
+    ko: 안온함과 뜻찾기
+    desc: 몸을 쉬게 할 곳은 있지만 꿈에서 본 징조를 바로 좇고 싶다
+    needs_state: "comfort:0.57 transcendence:0.76 rest:0.49 curiosity:0.43 safety:0.38"
+    options:
+      - id: 0
+        ko: 굴잠들기
+      - id: 1
+        ko: 징조좇기
+      - id: 2
+        ko: 물건정리
+      - id: 3
+        ko: 불빛보기
+  - id: safety_or_belonging
+    ko: 아슬함과 손잡기
+    desc: 낯선 무리가 손을 내밀지만 함정일지도 몰라 망설인다
+    needs_state: "safety:0.86 belonging:0.77 esteem:0.19 trust:0.0 purpose:0.22"
+    options:
+      - id: 0
+        ko: 숨을곳찾기
+      - id: 1
+        ko: 손내밀기
+      - id: 2
+        ko: 멀리살피기
+      - id: 3
+        ko: 우두머리부르기

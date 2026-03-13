@@ -1,0 +1,123 @@
+stress_situations:
+  - id: kin_death
+    ko: 가까운 이의 죽음
+    desc: 가까운 이가 숨을 거두어 마음이 크게 흔들린다
+    stress: 0.88
+    options:
+      - id: 0
+        ko: 울분터뜨리기
+      - id: 1
+        ko: 홀로울기
+      - id: 2
+        ko: 어른붙들기
+      - id: 3
+        ko: 제삿불지키기
+      - id: 4
+        ko: 술취하기
+      - id: 5
+        ko: 받아들이기
+  - id: crop_failure
+    ko: 열매 흉년
+    desc: 모아둔 열매가 상해 겨울 먹거리가 모자라게 됐다
+    stress: 0.79
+    options:
+      - id: 0
+        ko: 새터찾기
+      - id: 1
+        ko: 화부터내기
+      - id: 2
+        ko: 무리의논하기
+      - id: 3
+        ko: 굿하기
+      - id: 4
+        ko: 체념하기
+  - id: predator_loss
+    ko: 짐승에게 당함
+    desc: 사냥길에서 짐승에게 크게 쫓긴 뒤 밤마다 가슴이 뛴다
+    stress: 0.84
+    options:
+      - id: 0
+        ko: 창다듬기
+      - id: 1
+        ko: 소리치기
+      - id: 2
+        ko: 곁붙기
+      - id: 3
+        ko: 숨어지내기
+      - id: 4
+        ko: 기도하기
+  - id: shame_before_group
+    ko: 무리 앞 수치
+    desc: 모두 보는 앞에서 실수해 얼굴을 들기 어렵다
+    stress: 0.67
+    options:
+      - id: 0
+        ko: 핑계대기
+      - id: 1
+        ko: 멀리숨기
+      - id: 2
+        ko: 웃어넘기기
+      - id: 3
+        ko: 스스로받기
+      - id: 4
+        ko: 더세게나서기
+  - id: child_missing
+    ko: 아이를 잃음
+    desc: 아이가 숲길에서 보이지 않아 마음이 타들어 간다
+    stress: 0.93
+    options:
+      - id: 0
+        ko: 미친듯찾기
+      - id: 1
+        ko: 무리부르기
+      - id: 2
+        ko: 조용히듣기
+      - id: 3
+        ko: 신께빌기
+      - id: 4
+        ko: 남탓하기
+  - id: famine_wait
+    ko: 굶주린 기다림
+    desc: 사냥대가 돌아오지 않아 기다림이 길어질수록 초조가 심해진다
+    stress: 0.74
+    options:
+      - id: 0
+        ko: 들락거리기
+      - id: 1
+        ko: 혼자먹기
+      - id: 2
+        ko: 노래중얼기
+      - id: 3
+        ko: 서로달래기
+      - id: 4
+        ko: 가만받기
+  - id: betrayal_memory
+    ko: 배신을 떠올림
+    desc: 예전에 뒤통수친 이를 다시 마주쳐 속이 들끓는다
+    stress: 0.81
+    options:
+      - id: 0
+        ko: 당장덤비기
+      - id: 1
+        ko: 차게외면하기
+      - id: 2
+        ko: 어른에게맡기기
+      - id: 3
+        ko: 부적쥐기
+      - id: 4
+        ko: 속으로삭이기
+  - id: storm_night
+    ko: 밤눈보라
+    desc: 눈보라 속에서 밤새 불씨를 잃지 않을까 두려움이 커진다
+    stress: 0.76
+    options:
+      - id: 0
+        ko: 불곁지키기
+      - id: 1
+        ko: 몸떨기
+      - id: 2
+        ko: 곁기대기
+      - id: 3
+        ko: 주문외기
+      - id: 4
+        ko: 체념하기

@@ -19,6 +19,62 @@ MisinterpretationTypeLiteral = Literal[
     "passive_deferral",
     "symbolic_abstraction",
 ]
+NeedLiteral = Literal[
+    "hunger",
+    "thirst",
+    "warmth",
+    "rest",
+    "safety",
+    "belonging",
+    "esteem",
+    "curiosity",
+    "reproduction",
+    "comfort",
+    "purpose",
+    "transcendence",
+    "play",
+]
+CopingTypeLiteral = Literal[
+    "active_avoidance",
+    "emotional_release",
+    "social_support",
+    "ritualistic",
+    "substance",
+    "acceptance",
+    "aggression",
+]
+SideEffectLiteral = Literal[
+    "aggression_increase",
+    "isolation",
+    "faith_increase",
+    "trust_decrease",
+    "morale_boost",
+    "exhaustion",
+    "none",
+]
+RelationshipIntentLiteral = Literal[
+    "alliance",
+    "cautious_observation",
+    "hostile",
+    "submissive",
+    "dominant",
+    "trade_partner",
+    "ignore",
+]
+ReciprocityExpectationLiteral = Literal["none", "gift", "service", "alliance"]
+SocialMemoryLiteral = Literal[
+    "theft_betrayal",
+    "aid_gratitude",
+    "shared_danger",
+    "insult_resentment",
+    "gift_goodwill",
+    "combat_respect",
+    "abandonment",
+    "none",
+]
+NegotiationStanceLiteral = Literal["generous", "fair", "hard_bargain", "exploitative"]
+TimelineLiteral = Literal["immediate", "delayed", "conditional"]
+ResourceCommitmentLiteral = Literal["food", "tools", "labor", "weapons", "none"]
 
 
 class StrictWorldSimModel(BaseModel):
@@ -112,6 +168,61 @@ class TaskHOutput(StrictWorldSimModel):
     agent_modifiers: list[AgentModifier]
 
 
+class TaskIOutput(StrictWorldSimModel):
+    priority_id: int = Field(ge=0, le=9)
+    reasoning_ko: str = Field(min_length=5)
+    reasoning_en: str = Field(min_length=5)
+    need_addressed: NeedLiteral
+    urgency: float = Field(ge=0.0, le=1.0)
+
+
+class TaskJOutput(StrictWorldSimModel):
+    coping_id: int = Field(ge=0, le=9)
+    coping_type: CopingTypeLiteral
+    stress_delta: float = Field(ge=-1.0, le=0.0)
+    hint_ko: str = Field(min_length=5)
+    hint_en: str = Field(min_length=5)
+    side_effect: SideEffectLiteral
+
+
+class TaskKOutput(StrictWorldSimModel):
+    social_action_id: int = Field(ge=0, le=9)
+    trust_delta: float = Field(ge=-0.5, le=0.5)
+    hint_ko: str = Field(min_length=5)
+    hint_en: str = Field(min_length=5)
+    relationship_intent: RelationshipIntentLiteral
+    reciprocity_expectation: ReciprocityExpectationLiteral
+
+
+class TaskLOutput(StrictWorldSimModel):
+    response_id: int = Field(ge=0, le=9)
+    trust_delta: float = Field(ge=-0.5, le=0.5)
+    hint_ko: str = Field(min_length=5)
+    hint_en: str = Field(min_length=5)
+    forgiveness_threshold: float = Field(ge=0.0, le=1.0)
+    social_memory: SocialMemoryLiteral
+
+
+class TaskMOutput(StrictWorldSimModel):
+    decision_id: int = Field(ge=0, le=9)
+    confidence: float = Field(ge=0.0, le=1.0)
+    dissent_risk: float = Field(ge=0.0, le=1.0)
+    reasoning_ko: str = Field(min_length=5)
+    reasoning_en: str = Field(min_length=5)
+    resource_commitment: ResourceCommitmentLiteral
+    timeline: TimelineLiteral
+
+
+class TaskNOutput(StrictWorldSimModel):
+    accept: bool
+    counter_offer_give: str = Field(min_length=1)
+    counter_offer_want: str = Field(min_length=1)
+    hint_ko: str = Field(min_length=5)
+    hint_en: str = Field(min_length=5)
+    negotiation_stance: NegotiationStanceLiteral
+    walk_away_threshold: float = Field(ge=0.0, le=1.0)
+
+
 TASK_OUTPUT_SCHEMAS = {
     "A": TaskAOutput,
     "B": TaskBOutput,
@@ -120,6 +231,12 @@ TASK_OUTPUT_SCHEMAS = {
     "F": TaskFOutput,
     "G": TaskGOutput,
     "H": TaskHOutput,
+    "I": TaskIOutput,
+    "J": TaskJOutput,
+    "K": TaskKOutput,
+    "L": TaskLOutput,
+    "M": TaskMOutput,
+    "N": TaskNOutput,
 }
 
 TASK_A_SCHEMA = TaskAOutput
@@ -129,6 +246,12 @@ TASK_E_SCHEMA = TaskEOutput
 TASK_F_SCHEMA = TaskFOutput
 TASK_G_SCHEMA = TaskGOutput
 TASK_H_SCHEMA = TaskHOutput
+TASK_I_SCHEMA = TaskIOutput
+TASK_J_SCHEMA = TaskJOutput
+TASK_K_SCHEMA = TaskKOutput
+TASK_L_SCHEMA = TaskLOutput
+TASK_M_SCHEMA = TaskMOutput
+TASK_N_SCHEMA = TaskNOutput
 
 
 def get_schema_for_task(task_id: str) -> type[BaseModel]:

@@ -45,7 +45,7 @@ BASELINE_DATASET_ID = "worldsim-v31-mix-v1"
 DEFAULT_TRAIN_FILE = Path("data/training/worldsim-v31-mix-v1/train_converted.jsonl")
 DEFAULT_DEV_FILE = Path("data/training/worldsim-v31-mix-v1/dev_converted.jsonl")
 DEFAULT_TARGET_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
-DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H")
+DEFAULT_TASKS = ("A", "B", "C", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N")
 SAMPLES_PER_TASK: int = 5
 MODEL_REGISTRY_PATH = Path("outputs") / "model_registry.json"
 BEST_ADAPTER_POINTER_PATH = Path("outputs") / "best_adapter.txt"
@@ -151,6 +151,12 @@ TASK_ALLOWED_KEYS = {
     "F": ("emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type", "temperament_amplifier"),
     "G": ("interpretation_ko", "interpretation_en", "action_tendency", "confidence", "register", "misinterpretation_type", "temperament_bias"),
     "H": ("name", "description_en", "resource_modifiers", "special_zones", "special_resources", "agent_modifiers"),
+    "I": ("priority_id", "reasoning_ko", "reasoning_en", "need_addressed", "urgency"),
+    "J": ("coping_id", "coping_type", "stress_delta", "hint_ko", "hint_en", "side_effect"),
+    "K": ("social_action_id", "trust_delta", "hint_ko", "hint_en", "relationship_intent", "reciprocity_expectation"),
+    "L": ("response_id", "trust_delta", "hint_ko", "hint_en", "forgiveness_threshold", "social_memory"),
+    "M": ("decision_id", "confidence", "dissent_risk", "reasoning_ko", "reasoning_en", "resource_commitment", "timeline"),
+    "N": ("accept", "counter_offer_give", "counter_offer_want", "hint_ko", "hint_en", "negotiation_stance", "walk_away_threshold"),
 }
 TASK_ENUM_CONSTRAINTS = {
     "A": (
@@ -178,6 +184,28 @@ TASK_ENUM_CONSTRAINTS = {
         "misinterpretation_type must be exactly one of: overconfident_literal, cautious_reversal, optimistic_expansion, passive_deferral, symbolic_abstraction",
     ),
     "H": (),
+    "I": (
+        "need_addressed must be exactly one of: hunger, thirst, warmth, rest, safety, belonging, esteem, curiosity, reproduction, comfort, purpose, transcendence, play",
+    ),
+    "J": (
+        "coping_type must be exactly one of: active_avoidance, emotional_release, social_support, ritualistic, substance, acceptance, aggression",
+        "side_effect must be exactly one of: aggression_increase, isolation, faith_increase, trust_decrease, morale_boost, exhaustion, none",
+    ),
+    "K": (
+        "relationship_intent must be exactly one of: alliance, cautious_observation, hostile, submissive, dominant, trade_partner, ignore",
+        "reciprocity_expectation must be exactly one of: none, gift, service, alliance",
+    ),
+    "L": (
+        "social_memory must be exactly one of: theft_betrayal, aid_gratitude, shared_danger, insult_resentment, gift_goodwill, combat_respect, abandonment, none",
+    ),
+    "M": (
+        "resource_commitment must be exactly one of: food, tools, labor, weapons, none",
+        "timeline must be exactly one of: immediate, delayed, conditional",
+    ),
+    "N": (
+        "negotiation_stance must be exactly one of: generous, fair, hard_bargain, exploitative",
+        "accept must be true or false",
+    ),
 }
 TASK_GENERATION_RULES = {
     "A": (
@@ -209,6 +237,30 @@ TASK_GENERATION_RULES = {
         "Output only the worldbuilding IR object and use [] for empty lists.",
         "Do not copy schema descriptions, example prose, or title-case placeholder text into values.",
     ),
+    "I": (
+        "reasoning_ko must be pure Korean only with no English words or placeholders.",
+        "need_addressed must be one allowed need name and urgency must stay between 0.0 and 1.0.",
+    ),
+    "J": (
+        "hint_ko must be pure Korean only with no English words or copied rules.",
+        "stress_delta must be between -1.0 and 0.0 and side_effect must be one allowed enum value.",
+    ),
+    "K": (
+        "hint_ko must be pure Korean only with no English words or copied schema text.",
+        "trust_delta must stay between -0.5 and 0.5 and relationship_intent must be one enum value.",
+    ),
+    "L": (
+        "hint_ko must be pure Korean only with no English words or copied schema text.",
+        "forgiveness_threshold must stay between 0.0 and 1.0 and social_memory must be one enum value.",
+    ),
+    "M": (
+        "reasoning_ko must be pure Korean only with no English words or placeholders.",
+        "resource_commitment and timeline must each be one allowed enum value only.",
+    ),
+    "N": (
+        "hint_ko must be pure Korean only with no English words or copied rules.",
+        "counter_offer_give and counter_offer_want must be compact item:count strings such as fur:2.",
+    ),
 }
 TASK_OUTPUT_EXAMPLES = {
     "A": '{"text_ko":"그는 앞장서되 위험을 먼저 헤아린다.","text_en":"They lead from the front while weighing danger first.","register":"haera","dominant_trait":"harm_avoidance","temperament_expressed":"melancholic"}',
@@ -218,6 +270,12 @@ TASK_OUTPUT_EXAMPLES = {
     "F": '{"emotion":"fear","intensity":0.68,"cause_ko":"낯선 그림자가 갑자기 가까워졌다.","cause_en":"An unfamiliar shadow suddenly drew near.","previous_emotion":"trust","transition_type":"sudden","temperament_amplifier":"melancholic vigilance"}',
     "G": '{"interpretation_ko":"이 말은 지금은 공격보다 방어를 준비하라고 판단한다.","interpretation_en":"This means it is time to prepare a defense rather than attack.","action_tendency":"defend","confidence":0.77,"register":"hao","misinterpretation_type":"cautious_reversal","temperament_bias":"melancholic caution"}',
     "H": '{"name":"AmberGrove","description_en":"A sheltered grove with rich soil and mild air.","resource_modifiers":[{"target":"berries","multiplier":1.2}],"special_zones":[],"special_resources":[],"agent_modifiers":[]}',
+    "I": '{"priority_id":1,"reasoning_ko":"비바람부터 막아야 온몸이 산다.","reasoning_en":"Securing shelter comes first if the whole body is to endure.","need_addressed":"safety","urgency":0.93}',
+    "J": '{"coping_id":2,"coping_type":"social_support","stress_delta":-0.34,"hint_ko":"가까운 이를 붙들면 마음이 덜 흔들린다.","hint_en":"Holding close to trusted people steadies the mind.","side_effect":"morale_boost"}',
+    "K": '{"social_action_id":3,"trust_delta":0.21,"hint_ko":"먼저 먹거리를 나누면 손잡을 틈이 열린다.","hint_en":"Sharing food first opens a path toward cooperation.","relationship_intent":"alliance","reciprocity_expectation":"gift"}',
+    "L": '{"response_id":4,"trust_delta":-0.28,"hint_ko":"한번 버린 이는 다시 등을 돌릴 수 있다.","hint_en":"Someone who abandoned us once may turn away again.","forgiveness_threshold":0.62,"social_memory":"abandonment"}',
+    "M": '{"decision_id":2,"confidence":0.71,"dissent_risk":0.24,"reasoning_ko":"먹거리를 먼저 모아야 무리가 오래 버틴다.","reasoning_en":"Gathering food first gives the band its best chance to endure.","resource_commitment":"labor","timeline":"immediate"}',
+    "N": '{"accept":false,"counter_offer_give":"모피:2","counter_offer_want":"뼈칼:3","hint_ko":"이 값이면 우리 몫이 너무 적다.","hint_en":"At this price our side gets too little.","negotiation_stance":"hard_bargain","walk_away_threshold":0.58}',
 }
 INTERPRETATION_VERBS = ("해석", "판단", "생각", "느끼", "여기")
 SEMANTIC_HINTS = {
@@ -862,6 +920,18 @@ def _sample_generation_assistant_prefix(task: str) -> str:
         return "{\"emotion\": \""
     if task == "G":
         return "{\"interpretation_ko\": \"이 말은 "
+    if task == "I":
+        return "{\"priority_id\": "
+    if task == "J":
+        return "{\"coping_id\": "
+    if task == "K":
+        return "{\"social_action_id\": "
+    if task == "L":
+        return "{\"response_id\": "
+    if task == "M":
+        return "{\"decision_id\": "
+    if task == "N":
+        return "{\"accept\": "
     return "{"
 
 
