@@ -116,3 +116,16 @@ needs_situations:
         ko: 멀리살피기
       - id: 3
         ko: 우두머리부르기
+  - id: thirst_or_belonging
+    ko: 갈증과 손길
+    desc: 먼 길 끝에 물길 소리가 들리지만 뒤처진 식구의 울음도 가까워진다
+    needs_state: "thirst:0.87 belonging:0.81 safety:0.42 comfort:0.18 purpose:0.21"
+    options:
+      - id: 0
+        ko: 물길로달리기
+      - id: 1
+        ko: 식구안기
+      - id: 2
+        ko: 불씨감싸기
+      - id: 3
+        ko: 짐덜기

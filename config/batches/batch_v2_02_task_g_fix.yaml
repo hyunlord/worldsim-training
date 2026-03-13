@@ -1,0 +1,21 @@
+batch_id: batch_v2_02_task_g_fix
+description: >
+  WorldSim v2 batch 2: Task G Korean quality reinforcement with strict
+  interpretation_ko language enforcement.
+
+task_counts:
+  G: 200
+
+task_variant_overrides:
+  G: 1
+
+reporting:
+  progress_every: 10
+
+output:
+  raw_dir: data/raw/batch_v2_02_task_g_fix
+  generated_file: generated.jsonl
+  skipped_file: skipped.jsonl
+  progress_file: progress.json
+  summary_file: summary.json
+  log_file: generate.log

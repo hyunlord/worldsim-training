@@ -135,3 +135,37 @@ social_situations:
         ko: 거리두기
       - id: 4
         ko: 먹거리나누기
+  - id: failed_watch
+    ko: 망보기 실패
+    desc: 함께 망을 보다가 상대가 졸아 짐승을 놓칠 뻔했다
+    relationship_context: 밤마다 번갈아 망을 보던 사이였다
+    social_memory: shared_danger
+    trust_level: 0.36
+    options:
+      - id: 0
+        ko: 꾸짖기
+      - id: 1
+        ko: 다시맡기기
+      - id: 2
+        ko: 곁에두기
+      - id: 3
+        ko: 멀리두기
+      - id: 4
+        ko: 손잡기
+  - id: child_helped
+    ko: 아이를 도와줌
+    desc: 상대가 네 아이를 급한 물가에서 붙잡아 살려냈다
+    relationship_context: 늘 퉁명스러웠지만 곁을 지켜주던 이였다
+    social_memory: aid_gratitude
+    trust_level: 0.79
+    options:
+      - id: 0
+        ko: 크게고맙다하기
+      - id: 1
+        ko: 먹거리건네기
+      - id: 2
+        ko: 더지켜보기
+      - id: 3
+        ko: 무리앞세우기
+      - id: 4
+        ko: 함께걷기

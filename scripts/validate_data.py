@@ -59,6 +59,62 @@ DEFAULT_ORACLE_MISINTERPRETATIONS = {
     "passive_deferral",
     "symbolic_abstraction",
 }
+DEFAULT_NEEDS = {
+    "hunger",
+    "thirst",
+    "warmth",
+    "rest",
+    "safety",
+    "belonging",
+    "esteem",
+    "curiosity",
+    "reproduction",
+    "comfort",
+    "purpose",
+    "transcendence",
+    "play",
+}
+DEFAULT_COPING_TYPES = {
+    "active_avoidance",
+    "emotional_release",
+    "social_support",
+    "ritualistic",
+    "substance",
+    "acceptance",
+    "aggression",
+}
+DEFAULT_SIDE_EFFECTS = {
+    "aggression_increase",
+    "isolation",
+    "faith_increase",
+    "trust_decrease",
+    "morale_boost",
+    "exhaustion",
+    "none",
+}
+DEFAULT_RELATIONSHIP_INTENTS = {
+    "alliance",
+    "cautious_observation",
+    "hostile",
+    "submissive",
+    "dominant",
+    "trade_partner",
+    "ignore",
+}
+DEFAULT_RECIPROCITY_EXPECTATIONS = {"none", "gift", "service", "alliance"}
+DEFAULT_SOCIAL_MEMORIES = {
+    "theft_betrayal",
+    "aid_gratitude",
+    "shared_danger",
+    "insult_resentment",
+    "gift_goodwill",
+    "combat_respect",
+    "abandonment",
+    "none",
+}
+DEFAULT_RESOURCE_COMMITMENTS = {"food", "tools", "labor", "weapons", "none"}
+DEFAULT_TIMELINES = {"immediate", "delayed", "conditional"}
+DEFAULT_NEGOTIATION_STANCES = {"generous", "fair", "hard_bargain", "exploitative"}
 TASK_REQUIRED_FIELDS = {
     "A": ["text_ko", "text_en", "register", "dominant_trait", "temperament_expressed"],
     "B": ["text_ko", "text_en", "register", "emotion_expressed", "intensity", "mimetics", "temperament_influence"],
@@ -68,6 +124,12 @@ TASK_REQUIRED_FIELDS = {
     "F": ["emotion", "intensity", "cause_ko", "cause_en", "previous_emotion", "transition_type", "temperament_amplifier"],
     "G": ["interpretation_ko", "interpretation_en", "action_tendency", "confidence", "register", "misinterpretation_type", "temperament_bias"],
     "H": ["name", "description_en", "resource_modifiers", "special_zones", "special_resources", "agent_modifiers"],
+    "I": ["priority_id", "reasoning_ko", "reasoning_en", "need_addressed", "urgency"],
+    "J": ["coping_id", "coping_type", "stress_delta", "hint_ko", "hint_en", "side_effect"],
+    "K": ["social_action_id", "trust_delta", "hint_ko", "hint_en", "relationship_intent", "reciprocity_expectation"],
+    "L": ["response_id", "trust_delta", "hint_ko", "hint_en", "forgiveness_threshold", "social_memory"],
+    "M": ["decision_id", "confidence", "dissent_risk", "reasoning_ko", "reasoning_en", "resource_commitment", "timeline"],
+    "N": ["accept", "counter_offer_give", "counter_offer_want", "hint_ko", "hint_en", "negotiation_stance", "walk_away_threshold"],
 }
 TASK_KO_FIELDS = {
     "A": ["text_ko"],
@@ -78,6 +140,12 @@ TASK_KO_FIELDS = {
     "F": ["cause_ko"],
     "G": ["interpretation_ko"],
     "H": [],
+    "I": ["reasoning_ko"],
+    "J": ["hint_ko"],
+    "K": ["hint_ko"],
+    "L": ["hint_ko"],
+    "M": ["reasoning_ko"],
+    "N": ["hint_ko"],
 }
 TASK_EN_FIELDS = {
     "A": ["text_en"],
@@ -88,6 +156,12 @@ TASK_EN_FIELDS = {
     "F": ["cause_en"],
     "G": ["interpretation_en"],
     "H": ["description_en"],
+    "I": ["reasoning_en"],
+    "J": ["hint_en"],
+    "K": ["hint_en"],
+    "L": ["hint_en"],
+    "M": ["reasoning_en"],
+    "N": ["hint_en"],
 }
 TASK_PRIMARY_KO_FIELD = {
     "A": "text_ko",
@@ -97,6 +171,12 @@ TASK_PRIMARY_KO_FIELD = {
     "E": "hint_ko",
     "F": "cause_ko",
     "G": "interpretation_ko",
+    "I": "reasoning_ko",
+    "J": "hint_ko",
+    "K": "hint_ko",
+    "L": "hint_ko",
+    "M": "reasoning_ko",
+    "N": "hint_ko",
 }
 
 
@@ -236,6 +316,15 @@ def _contextual_allowed_values(record: dict, rules: dict) -> dict[str, set[str] 
         "transition_type": _enum_values(rules, "transition_types", DEFAULT_TRANSITION_TYPES),
         "action_tendency": action_tendencies,
         "misinterpretation_type": misinterpretations,
+        "need_addressed": _enum_values(rules, "needs", DEFAULT_NEEDS),
+        "coping_type": _enum_values(rules, "coping_types", DEFAULT_COPING_TYPES),
+        "side_effect": _enum_values(rules, "side_effects", DEFAULT_SIDE_EFFECTS),
+        "relationship_intent": _enum_values(rules, "relationship_intents", DEFAULT_RELATIONSHIP_INTENTS),
+        "reciprocity_expectation": _enum_values(rules, "reciprocity_expectations", DEFAULT_RECIPROCITY_EXPECTATIONS),
+        "social_memory": _enum_values(rules, "social_memories", DEFAULT_SOCIAL_MEMORIES),
+        "resource_commitment": _enum_values(rules, "resource_commitments", DEFAULT_RESOURCE_COMMITMENTS),
+        "timeline": _enum_values(rules, "timelines", DEFAULT_TIMELINES),
+        "negotiation_stance": _enum_values(rules, "negotiation_stances", DEFAULT_NEGOTIATION_STANCES),
     }
     return allowed
 
@@ -293,6 +382,12 @@ def validate_task_h(payload: dict) -> list[str]:
                     violations.append(f"missing_{field}")
 
     return violations
+
+
+def _is_number_in_range(value: object, minimum: float, maximum: float) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    return minimum <= float(value) <= maximum
 
 
 def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, list[str], int]:
@@ -417,6 +512,68 @@ def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, lis
         if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= max_action:
             violations.append("invalid_action_id")
 
+    if task == "I":
+        if isinstance(payload.get("priority_id"), bool) or not isinstance(payload.get("priority_id"), int) or not 0 <= payload["priority_id"] <= 9:
+            violations.append("invalid_priority_id")
+        if payload.get("need_addressed") not in (allowed["need_addressed"] or set()):
+            violations.append("invalid_need_addressed")
+        if not _is_number_in_range(payload.get("urgency"), 0.0, 1.0):
+            violations.append("invalid_urgency")
+
+    if task == "J":
+        if isinstance(payload.get("coping_id"), bool) or not isinstance(payload.get("coping_id"), int) or not 0 <= payload["coping_id"] <= 9:
+            violations.append("invalid_coping_id")
+        if payload.get("coping_type") not in (allowed["coping_type"] or set()):
+            violations.append("invalid_coping_type")
+        if not _is_number_in_range(payload.get("stress_delta"), -1.0, 0.0):
+            violations.append("invalid_stress_delta")
+        if payload.get("side_effect") not in (allowed["side_effect"] or set()):
+            violations.append("invalid_side_effect")
+
+    if task == "K":
+        if isinstance(payload.get("social_action_id"), bool) or not isinstance(payload.get("social_action_id"), int) or not 0 <= payload["social_action_id"] <= 9:
+            violations.append("invalid_social_action_id")
+        if not _is_number_in_range(payload.get("trust_delta"), -0.5, 0.5):
+            violations.append("invalid_trust_delta")
+        if payload.get("relationship_intent") not in (allowed["relationship_intent"] or set()):
+            violations.append("invalid_relationship_intent")
+        if payload.get("reciprocity_expectation") not in (allowed["reciprocity_expectation"] or set()):
+            violations.append("invalid_reciprocity_expectation")
+
+    if task == "L":
+        if isinstance(payload.get("response_id"), bool) or not isinstance(payload.get("response_id"), int) or not 0 <= payload["response_id"] <= 9:
+            violations.append("invalid_response_id")
+        if not _is_number_in_range(payload.get("trust_delta"), -0.5, 0.5):
+            violations.append("invalid_trust_delta")
+        if not _is_number_in_range(payload.get("forgiveness_threshold"), 0.0, 1.0):
+            violations.append("invalid_forgiveness_threshold")
+        if payload.get("social_memory") not in (allowed["social_memory"] or set()):
+            violations.append("invalid_social_memory")
+
+    if task == "M":
+        if isinstance(payload.get("decision_id"), bool) or not isinstance(payload.get("decision_id"), int) or not 0 <= payload["decision_id"] <= 9:
+            violations.append("invalid_decision_id")
+        if not _is_number_in_range(payload.get("confidence"), 0.0, 1.0):
+            violations.append("invalid_confidence")
+        if not _is_number_in_range(payload.get("dissent_risk"), 0.0, 1.0):
+            violations.append("invalid_dissent_risk")
+        if payload.get("resource_commitment") not in (allowed["resource_commitment"] or set()):
+            violations.append("invalid_resource_commitment")
+        if payload.get("timeline") not in (allowed["timeline"] or set()):
+            violations.append("invalid_timeline")
+
+    if task == "N":
+        if not isinstance(payload.get("accept"), bool):
+            violations.append("invalid_accept")
+        for field in ("counter_offer_give", "counter_offer_want"):
+            value = payload.get(field)
+            if not isinstance(value, str) or not value.strip():
+                violations.append(f"invalid_{field}")
+        if payload.get("negotiation_stance") not in (allowed["negotiation_stance"] or set()):
+            violations.append("invalid_negotiation_stance")
+        if not _is_number_in_range(payload.get("walk_away_threshold"), 0.0, 1.0):
+            violations.append("invalid_walk_away_threshold")
+
     if task == "H":
         violations.extend(validate_task_h(payload))
 
@@ -517,7 +674,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--config-dir", default="config")
     parser.add_argument("--input", default=None)
     parser.add_argument("--output-dir", default=None)
+    parser.add_argument("--batch-id", default=None)
     return parser.parse_args()
+
+
+def _load_batch_plan(repo_root: Path, batch_id: str | None) -> dict | None:
+    if not batch_id:
+        return None
+    plan_path = repo_root / "config" / "batches" / f"{batch_id}.yaml"
+    batch_plan = load_yaml(plan_path)
+    batch_plan["_path"] = str(plan_path)
+    return batch_plan
+
+
+def _resolve_batch_paths(repo_root: Path, settings: dict, batch_plan: dict) -> tuple[Path, Path]:
+    raw_dir = resolve_path(repo_root, settings.get("paths", {}).get("raw_dir", "data/raw"))
+    validated_dir = ensure_directory(resolve_path(repo_root, settings.get("paths", {}).get("validated_dir", "data/validated")))
+    batch_id = batch_plan.get("batch_id") or Path(batch_plan.get("_path", "")).stem
+    output = batch_plan.get("output", {})
+    batch_raw_dir = resolve_path(repo_root, output.get("raw_dir", raw_dir / batch_id))
+    input_file = batch_raw_dir / output.get("generated_file", "generated.jsonl")
+    batch_validated_dir = ensure_within_directory(validated_dir, validated_dir / batch_id, label="validated_dir batch_output_dir")
+    return input_file, ensure_directory(batch_validated_dir)
 
 
 def main() -> None:
@@ -525,10 +703,17 @@ def main() -> None:
     repo_root = Path.cwd().resolve()
     config_dir = resolve_path(repo_root, args.config_dir)
     settings = load_yaml(config_dir / "generation.yaml")
+    batch_plan = _load_batch_plan(repo_root, args.batch_id)
 
-    input_value = args.input or latest_raw_file(resolve_path(repo_root, settings["paths"]["raw_dir"]))
-    input_path = resolve_path(repo_root, input_value) if isinstance(input_value, str) else input_value
-    output_dir = _resolve_validated_output_dir(repo_root, settings, args.output_dir)
+    if batch_plan is not None:
+        batch_input_path, batch_output_dir = _resolve_batch_paths(repo_root, settings, batch_plan)
+        input_value = args.input or batch_input_path
+        input_path = resolve_path(repo_root, input_value) if isinstance(input_value, str) else input_value
+        output_dir = _resolve_validated_output_dir(repo_root, settings, args.output_dir or batch_output_dir)
+    else:
+        input_value = args.input or latest_raw_file(resolve_path(repo_root, settings["paths"]["raw_dir"]))
+        input_path = resolve_path(repo_root, input_value) if isinstance(input_value, str) else input_value
+        output_dir = _resolve_validated_output_dir(repo_root, settings, args.output_dir)
 
     try:
         summary = validate_file(input_path=input_path, validated_dir=output_dir, rules=load_validation_rules(config_dir))

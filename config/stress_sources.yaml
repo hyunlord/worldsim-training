@@ -121,3 +121,33 @@ stress_situations:
         ko: 주문외기
       - id: 4
         ko: 체념하기
+  - id: failed_ritual
+    ko: 굿이 빗나감
+    desc: 모두가 지켜보는 굿이 빗나가 우두머리의 눈길이 차갑게 꽂힌다
+    stress: 0.72
+    options:
+      - id: 0
+        ko: 더크게외기
+      - id: 1
+        ko: 홀로숨기
+      - id: 2
+        ko: 어른찾기
+      - id: 3
+        ko: 받아들이기
+      - id: 4
+        ko: 화풀기
+  - id: trade_cheated
+    ko: 바꿔치기 당함
+    desc: 애써 모은 모피를 내줬는데 상대가 못 쓰는 돌만 남기고 갔다
+    stress: 0.77
+    options:
+      - id: 0
+        ko: 되쫓아가기
+      - id: 1
+        ko: 욕퍼붓기
+      - id: 2
+        ko: 곁사람찾기
+      - id: 3
+        ko: 부적쥐기
+      - id: 4
+        ko: 이를악물기

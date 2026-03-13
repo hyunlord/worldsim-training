@@ -1,0 +1,23 @@
+batch_id: batch_v2_01_tasks_in
+description: >
+  WorldSim v2 batch 1: Tasks I-N (needs, stress, social, trust, group, trade).
+  New structured JSON tasks covering the remaining decision-space slices.
+
+task_counts:
+  I: 200
+  J: 200
+  K: 200
+  L: 200
+  M: 150
+  N: 150
+
+reporting:
+  progress_every: 10
+
+output:
+  raw_dir: data/raw/batch_v2_01_tasks_in
+  generated_file: generated.jsonl
+  skipped_file: skipped.jsonl
+  progress_file: progress.json
+  summary_file: summary.json
+  log_file: generate.log

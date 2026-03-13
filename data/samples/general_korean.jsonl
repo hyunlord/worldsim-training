@@ -1,2 +1,300 @@
-{"task":"GEN","label":"retain","output":"강가에 물안개가 내려앉았다."}
-{"task":"GEN","label":"retain","output":"젖은 흙내가 새벽 바람을 타고 번졌다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 짧게 그려줘.", "output": "솔숲 그림자 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 한 문장으로 묘사해.", "output": "새벽 안개 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 짧게 그려줘.", "output": "달빛 강물 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 한 문장으로 묘사해.", "output": "산마루 바람 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 짧게 그려줘.", "output": "멧새 울음 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 한 문장으로 묘사해.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 짧게 그려줘.", "output": "솔숲 그림자 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 짧게 그려줘.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"티끌 모아 태산\"의 뜻을 풀어줘.", "output": "작은 것도 차곡차곡 모이면 크게 불어난다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 순우리말 한 문장으로 적어줘.", "output": "산마루 바람 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 짧게 그려줘.", "output": "달빛 강물에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 짧게 그려줘.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"티끌 모아 태산\"의 뜻을 풀어줘.", "output": "작은 것도 차곡차곡 모이면 크게 불어난다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 순우리말 한 문장으로 적어줘.", "output": "멧새 울음 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 짧게 그려줘.", "output": "가을 하늘 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"티끌 모아 태산\"의 뜻을 풀어줘.", "output": "작은 것도 차곡차곡 모이면 크게 불어난다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 순우리말 한 문장으로 적어줘.", "output": "멧새 울음에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"티끌 모아 태산\"의 뜻을 풀어줘.", "output": "작은 것도 차곡차곡 모이면 크게 불어난다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 짧게 그려줘.", "output": "새벽 안개 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 한 문장으로 묘사해.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 한 문장으로 묘사해.", "output": "산마루 바람에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"티끌 모아 태산\"의 뜻을 풀어줘.", "output": "작은 것도 차곡차곡 모이면 크게 불어난다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 한 문장으로 묘사해.", "output": "산마루 바람 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 한 문장으로 묘사해.", "output": "달빛 강물 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 순우리말 한 문장으로 적어줘.", "output": "솔숲 그림자 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 짧게 그려줘.", "output": "산마루 바람 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 한 문장으로 묘사해.", "output": "멧새 울음 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 한 문장으로 묘사해.", "output": "산마루 바람 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 순우리말 한 문장으로 적어줘.", "output": "새벽 안개 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 짧게 그려줘.", "output": "산마루 바람 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 순우리말 한 문장으로 적어줘.", "output": "산마루 바람 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"티끌 모아 태산\"의 뜻을 풀어줘.", "output": "작은 것도 차곡차곡 모이면 크게 불어난다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 짧게 그려줘.", "output": "달빛 강물 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 짧게 그려줘.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 한 문장으로 묘사해.", "output": "새벽 안개에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 짧게 그려줘.", "output": "새벽 안개에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 한 문장으로 묘사해.", "output": "멧새 울음에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 짧게 그려줘.", "output": "달빛 강물 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 순우리말 한 문장으로 적어줘.", "output": "솔숲 그림자에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 한 문장으로 묘사해.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 짧게 그려줘.", "output": "달빛 강물에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 순우리말 한 문장으로 적어줘.", "output": "솔숲 그림자에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 한 문장으로 묘사해.", "output": "달빛 강물 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 한 문장으로 묘사해.", "output": "멧새 울음 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 한 문장으로 묘사해.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 한 문장으로 묘사해.", "output": "멧새 울음 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 순우리말 한 문장으로 적어줘.", "output": "멧새 울음 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 한 문장으로 묘사해.", "output": "새벽 안개에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 한 문장으로 묘사해.", "output": "멧새 울음 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 짧게 그려줘.", "output": "산마루 바람에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 한 문장으로 묘사해.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 짧게 그려줘.", "output": "멧새 울음 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 순우리말 한 문장으로 적어줘.", "output": "새벽 안개 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 말을 반대로 바꿔줘: 깊은 밤", "output": "밝은 낮"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "새벽 안개을 한 문장으로 묘사해.", "output": "새벽 안개에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"돌다리도 두들겨 보고 건너라\"의 뜻을 풀어줘.", "output": "아무리 익숙한 길도 다시 살펴보고 가라는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 짧게 그려줘.", "output": "솔숲 그림자 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 한 문장으로 묘사해.", "output": "산마루 바람 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 짧게 그려줘.", "output": "산마루 바람에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 짧게 그려줘.", "output": "산마루 바람에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "비 온 뒤 나는 냄새를 한 문장으로 말해줘.", "output": "비 그친 뒤 젖은 흙내가 잔잔히 올라온다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "강가 저녁빛을 한 문장으로 그려줘.", "output": "강가에 붉은 빛이 번지며 물결이 잔잔히 반짝인다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "달빛 강물을 순우리말 한 문장으로 적어줘.", "output": "달빛 강물 둘레에 고운 빛이 어려 마음이 차분히 가라앉는다."}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 짧게 그려줘.", "output": "멧새 울음 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "산마루 바람을 짧게 그려줘.", "output": "산마루 바람에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "가을 하늘을 순우리말 한 문장으로 적어줘.", "output": "가을 하늘에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "멧새 울음을 순우리말 한 문장으로 적어줘.", "output": "멧새 울음 위로 잔잔한 기운이 번지며 숨결이 느릿하게 흐른다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 세 글자로 줄여줘: 가을하늘", "output": "가을빛"}
+{"task": "GEN", "label": "retain", "category": "proverb", "prompt": "\"가는 말이 고와야 오는 말이 곱다\"의 뜻을 풀어줘.", "output": "내가 고운 말을 해야 남도 고운 말로 답한다는 뜻이다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 낱말을 JSON으로 묶어라: 풀, 물, 불", "output": {"풀": "푸른 풀", "물": "맑은 물", "불": "붉은 불"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "creative", "prompt": "솔숲 그림자을 한 문장으로 묘사해.", "output": "솔숲 그림자에 맑은 빛이 어리고 바람이 가볍게 스쳐 간다."}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "겨울 새벽 공기를 한 문장으로 적어줘.", "output": "겨울 새벽 공기는 살을 에듯 차갑고 맑다."}
+{"task": "GEN", "label": "retain", "category": "instruction", "prompt": "다음 낱말을 두 낱말로 나눠줘: 물안개", "output": "물 안개"}
+{"task": "GEN", "label": "retain", "category": "json_formatting", "prompt": "다음 셋을 JSON으로 적어라: 아침, 낮, 밤", "output": {"아침": "해 돋을 무렵", "낮": "해가 높이 뜬 때", "밤": "해가 지고 난 뒤"}}
+{"task": "GEN", "label": "retain", "category": "qa", "prompt": "봄에 피는 꽃 세 가지를 알려줘.", "output": "진달래, 개나리, 벚꽃이 봄에 핀다."}

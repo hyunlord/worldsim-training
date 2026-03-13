@@ -4,7 +4,16 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts.validate_data import _resolve_validated_output_dir, auto_repair, latest_raw_file, load_validation_rules, validate_dataset, validate_file, validate_json_output
+from scripts.validate_data import (
+    _resolve_validated_output_dir,
+    auto_repair,
+    latest_raw_file,
+    load_validation_rules,
+    main as validate_main,
+    validate_dataset,
+    validate_file,
+    validate_json_output,
+)
 
 
 def write_jsonl(path: Path, rows: list[dict]) -> None:
@@ -281,6 +290,95 @@ def test_validate_json_output_supports_v31_task_g_and_h_contracts() -> None:
     assert "invalid_multiplier_range" in invalid_h
 
 
+def test_validate_json_output_supports_tasks_i_through_n() -> None:
+    rules = load_validation_rules_for_inline()
+
+    rows = [
+        {
+            "task": "I",
+            "output": compact_json(
+                {
+                    "priority_id": 2,
+                    "reasoning_ko": "배고픔이 먼저 살을 죈다.",
+                    "reasoning_en": "Hunger presses first.",
+                    "need_addressed": "hunger",
+                    "urgency": 0.8,
+                }
+            ),
+        },
+        {
+            "task": "J",
+            "output": compact_json(
+                {
+                    "coping_id": 3,
+                    "coping_type": "social_support",
+                    "stress_delta": -0.4,
+                    "hint_ko": "곁사람 손을 먼저 잡는다.",
+                    "hint_en": "They reach for nearby help first.",
+                    "side_effect": "morale_boost",
+                }
+            ),
+        },
+        {
+            "task": "K",
+            "output": compact_json(
+                {
+                    "social_action_id": 1,
+                    "trust_delta": 0.2,
+                    "hint_ko": "먼저 작은 먹거리를 내민다.",
+                    "hint_en": "They offer a small portion of food first.",
+                    "relationship_intent": "alliance",
+                    "reciprocity_expectation": "gift",
+                }
+            ),
+        },
+        {
+            "task": "L",
+            "output": compact_json(
+                {
+                    "response_id": 4,
+                    "trust_delta": -0.2,
+                    "hint_ko": "지난 버림을 오래 새긴다.",
+                    "hint_en": "They remember the abandonment for a long time.",
+                    "forgiveness_threshold": 0.6,
+                    "social_memory": "abandonment",
+                }
+            ),
+        },
+        {
+            "task": "M",
+            "output": compact_json(
+                {
+                    "decision_id": 6,
+                    "confidence": 0.7,
+                    "dissent_risk": 0.3,
+                    "reasoning_ko": "먹거리가 모자라니 함께 옮겨간다.",
+                    "reasoning_en": "Food is scarce, so the band moves together.",
+                    "resource_commitment": "labor",
+                    "timeline": "immediate",
+                }
+            ),
+        },
+        {
+            "task": "N",
+            "output": compact_json(
+                {
+                    "accept": False,
+                    "counter_offer_give": "fur:2",
+                    "counter_offer_want": "bone_tools:3",
+                    "hint_ko": "주기와 받기를 다시 맞춘다.",
+                    "hint_en": "They rebalance what is given and received.",
+                    "negotiation_stance": "fair",
+                    "walk_away_threshold": 0.5,
+                }
+            ),
+        },
+    ]
+
+    for row in rows:
+        assert validate_json_output(row, rules) == []
+
+
 def test_validate_dataset_raises_clear_error_when_raw_dir_is_empty(tmp_path: Path) -> None:
     (tmp_path / "config").mkdir()
     (tmp_path / "data" / "raw").mkdir(parents=True)
@@ -377,6 +475,51 @@ paths:
 
     with pytest.raises(ValueError, match="validated_dir"):
         validate_file(input_path=raw_dir / "sample.jsonl", validated_dir=tmp_path / "escape", repo_root=tmp_path)
+
+
+def test_validate_main_supports_batch_id_for_batch_scoped_outputs(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_dir = tmp_path / "config"
+    batch_dir = config_dir / "batches"
+    raw_dir = tmp_path / "data" / "raw" / "batch_v2_test"
+    validated_dir = tmp_path / "data" / "validated"
+    batch_dir.mkdir(parents=True)
+    raw_dir.mkdir(parents=True)
+
+    generation_yaml = bilingual_rules_yaml() + "\npaths:\n  raw_dir: data/raw\n  validated_dir: data/validated\n"
+    (config_dir / "generation.yaml").write_text(generation_yaml, encoding="utf-8")
+    (batch_dir / "batch_v2_test.yaml").write_text(
+        "batch_id: batch_v2_test\noutput:\n  raw_dir: data/raw/batch_v2_test\n  generated_file: generated.jsonl\n",
+        encoding="utf-8",
+    )
+    write_jsonl(
+        raw_dir / "generated.jsonl",
+        [
+            {
+                "task": "I",
+                "output": compact_json(
+                    {
+                        "priority_id": 1,
+                        "reasoning_ko": "먼저 불씨를 살려야 몸이 산다.",
+                        "reasoning_en": "The embers must be saved first.",
+                        "need_addressed": "warmth",
+                        "urgency": 0.7,
+                    }
+                ),
+            }
+        ],
+    )
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.argv", ["validate_data.py", "--batch-id", "batch_v2_test"])
+
+    validate_main()
+
+    report = json.loads((validated_dir / "batch_v2_test" / "report.json").read_text(encoding="utf-8"))
+    assert report["passed"] == 1
+    assert report["failed"] == 0
+    assert "batch_v2_test/generated.jsonl" in report["input_file"]
+    captured = capsys.readouterr()
+    assert '"passed": 1' in captured.out
 
 
 def load_validation_rules_for_inline() -> dict:
