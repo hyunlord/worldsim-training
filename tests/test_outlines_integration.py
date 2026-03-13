@@ -29,6 +29,7 @@ def test_create_outlines_model_returns_none_when_wrapper_unavailable(monkeypatch
 def test_generate_sample_outlines_serializes_dict_result(monkeypatch) -> None:
     from training.lib import qlora_smoke
     from training.lib.output_schema import TaskAOutput
+    from training.lib.structured_generation import OUTLINES_REPETITION_PENALTY
 
     class FakeGenerator:
         def __init__(self, outlines_model, schema_target):
@@ -38,7 +39,7 @@ def test_generate_sample_outlines_serializes_dict_result(monkeypatch) -> None:
         def __call__(self, prompt_text, **kwargs):
             assert prompt_text == "prompt"
             assert kwargs["max_new_tokens"] == 256
-            assert kwargs["repetition_penalty"] == 1.2
+            assert kwargs["repetition_penalty"] == OUTLINES_REPETITION_PENALTY
             return {
                 "text_ko": "앞장선다.",
                 "text_en": "They lead.",
@@ -103,7 +104,7 @@ def test_generate_sample_outlines_serializes_pydantic_model(monkeypatch) -> None
     assert payload["register"] == "hao"
 
 
-def test_generate_samples_falls_back_when_outlines_generation_fails(tmp_path: Path, monkeypatch) -> None:
+def test_generate_samples_falls_back_when_outlines_generation_fails(tmp_path: Path, monkeypatch, capsys) -> None:
     from training.lib import qlora_smoke
     from training.lib.output_schema import TaskAOutput
     from training.lib.qlora_smoke import RuntimeConfig
@@ -181,6 +182,8 @@ def test_generate_samples_falls_back_when_outlines_generation_fails(tmp_path: Pa
     )
 
     assert len(samples) == 1
+    captured = capsys.readouterr()
+    assert "[outlines] Constrained decoding ENABLED" in captured.out
     assert samples[0]["structured_decoding"]["used_mode"] == "repair_sanitize_fallback"
     assert "bad outlines" in samples[0]["structured_decoding"]["reason"]
     assert metrics["total_successes"] == 1
@@ -188,9 +191,10 @@ def test_generate_samples_falls_back_when_outlines_generation_fails(tmp_path: Pa
 
 def test_world_context_labels_are_in_leaky_strip_list() -> None:
     from training.lib.qlora_smoke import LEAKY_GENERATION_SECTION_LABELS
-    from training.lib.structured_generation import STRUCTURED_GENERATION_DEFAULTS
+    from training.lib.structured_generation import OUTLINES_REPETITION_PENALTY, STRUCTURED_GENERATION_DEFAULTS
 
-    assert STRUCTURED_GENERATION_DEFAULTS["repetition_penalty"] == 1.2
+    assert "repetition_penalty" not in STRUCTURED_GENERATION_DEFAULTS
+    assert OUTLINES_REPETITION_PENALTY == 1.2
     assert "세계관" in LEAKY_GENERATION_SECTION_LABELS
     assert "WORLD" in LEAKY_GENERATION_SECTION_LABELS
     assert "WORLD_DESC" in LEAKY_GENERATION_SECTION_LABELS

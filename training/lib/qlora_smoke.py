@@ -20,6 +20,7 @@ from scripts.common import ensure_directory, read_jsonl, write_jsonl
 from scripts.prepare_dataset import _validate_messages_row
 from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
 from training.lib.structured_generation import (
+    OUTLINES_REPETITION_PENALTY,
     StructuredGenerationError,
     TASK_MAX_NEW_TOKENS,
     STRUCTURED_GENERATION_DEFAULTS,
@@ -962,7 +963,6 @@ def _generate_sample_once(
             do_sample=STRUCTURED_GENERATION_DEFAULTS["do_sample"],
             temperature=STRUCTURED_GENERATION_DEFAULTS["temperature"],
             top_p=STRUCTURED_GENERATION_DEFAULTS["top_p"],
-            repetition_penalty=STRUCTURED_GENERATION_DEFAULTS["repetition_penalty"],
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             stopping_criteria=StoppingCriteriaList([JsonObjectStopper()]),
@@ -1008,7 +1008,7 @@ def _generate_sample_outlines(
     result = generator(
         prompt_text,
         max_new_tokens=max_new_tokens,
-        repetition_penalty=STRUCTURED_GENERATION_DEFAULTS["repetition_penalty"],
+        repetition_penalty=OUTLINES_REPETITION_PENALTY,
     )
     if isinstance(result, dict):
         return json.dumps(result, ensure_ascii=False)
@@ -1035,6 +1035,10 @@ def _generate_samples(
     model.config.use_cache = True
     device = runtime.device
     outlines_model = _create_outlines_model(model, tokenizer)
+    if outlines_model is not None:
+        print("[outlines] Constrained decoding ENABLED (model wrapped successfully)")
+    else:
+        print("[outlines] NOT available — using fallback repair/sanitize pipeline")
 
     for row in rows:
         task = str(row.get("task", "unknown"))
