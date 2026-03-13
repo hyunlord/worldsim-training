@@ -51,18 +51,16 @@ omx
 *.ipynb_checkpoints
 notebooks/.ipynb_checkpoints/
 
-# Outputs & Artifacts
+# Outputs — model checkpoints and adapters (large, reproducible)
 outputs/
-data/raw/*
-!data/raw/.gitkeep
-data/validated/*
-!data/validated/.gitkeep
-data/final/*
-!data/final/.gitkeep
+
+# Artifacts — merged models and GGUF exports (large, reproducible)
 artifacts/merged/*
 !artifacts/merged/.gitkeep
 artifacts/gguf/*
 !artifacts/gguf/.gitkeep
+
+# Training data (data/) is tracked — it costs money to regenerate via API
 
 # Logs
 *.log

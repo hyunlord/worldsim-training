@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-03-09T08:44:07.655422+00:00",
+  "git_commit_sha": "fa109d0082aed6e983e40ddd9dfecc3d11ee4f21",
+  "postprocess_version": "worldsim-postprocess-normalize-v2",
+  "validator_version": "worldsim-postprocess-validator-v2",
+  "source_files": {
+    "raw_generated_file": "/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/generated.jsonl",
+    "skipped_file": "/Users/rexxa/github/worldsim-training/data/raw/batch_v31_02_gefhc/skipped.jsonl",
+    "passed_file": null,
+    "failed_file": null,
+    "report_file": null
+  },
+  "snapshot_files": {
+    "raw_generated_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/snapshot/generated.jsonl",
+    "skipped_file": "/Users/rexxa/github/worldsim-training/data/validated/batch_v31_02_gefhc/snapshot/skipped.jsonl",
+    "passed_file": null,
+    "failed_file": null,
+    "report_file": null
+  },
+  "config_version": {
+    "path": "/Users/rexxa/github/worldsim-training/config/generation.yaml",
+    "sha256": "2dcbc307f5af3a4ee5d01cb93a1c34e78b58db3cd2c64c4ea2a014187c5940eb",
+    "size_bytes": 19256,
+    "modified_at": "2026-03-08T13:35:49.886932+00:00"
+  },
+  "prompt_version": {
+    "path": "/Users/rexxa/github/worldsim-training/prompts/teacher/system.txt",
+    "sha256": "d0e6f69d44f1642a7baab78966f729192acd3ff6e8b6c4f13ca015c1936f3006",
+    "size_bytes": 1407,
+    "modified_at": "2026-03-08T13:35:49.887675+00:00"
+  },
+  "environment": {
+    "python_executable": "/Users/rexxa/github/worldsim-training/.venv/bin/python",
+    "python_version": "3.14.3",
+    "platform": "macOS-26.0.1-arm64-arm-64bit-Mach-O",
+    "repo_root": "/Users/rexxa/github/worldsim-training"
+  }
+}
