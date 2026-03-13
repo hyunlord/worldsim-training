@@ -1,0 +1,148 @@
+{
+  "batch_id": "batch_v2_02_task_g_fix",
+  "updated_at": "2026-03-13T08:57:15.606334+00:00",
+  "paths": {
+    "generated_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_02_task_g_fix/generated.jsonl",
+    "skipped_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_02_task_g_fix/skipped.jsonl",
+    "progress_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_02_task_g_fix/progress.json",
+    "summary_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_02_task_g_fix/summary.json"
+  },
+  "total_planned_rows": 200,
+  "processed_rows": 200,
+  "successful_rows": 154,
+  "skipped_rows": 46,
+  "success_rate": 0.77,
+  "current_task": null,
+  "counts_by_task": {
+    "planned": {
+      "G": 200
+    },
+    "successful": {
+      "G": 154
+    },
+    "skipped": {
+      "G": 46
+    }
+  },
+  "failure_reasons_by_task": {
+    "G": {
+      "generation_validation_failed:too_long": 42,
+      "generation_validation_failed:register_mismatch": 2,
+      "generation_validation_failed:register_mismatch,too_long": 1,
+      "'NoneType' object is not subscriptable": 1
+    }
+  },
+  "recent_failures": [
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "oracle_id": "oracle_05",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "oracle_id": "oracle_05",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "oracle_id": "oracle_05",
+        "temperament_id": "choleric"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "oracle_id": "oracle_05",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "oracle_id": "oracle_05",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "oracle_id": "oracle_05",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "oracle_id": "oracle_05",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "oracle_id": "oracle_05",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "paranoid_scout",
+        "oracle_id": "oracle_05",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "G",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "paranoid_scout",
+        "oracle_id": "oracle_05",
+        "temperament_id": "phlegmatic"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 523900,
+    "completion_tokens": 45926,
+    "total_tokens": 569826,
+    "estimated_cost_usd": 2.26059
+  },
+  "throughput": {
+    "rows_per_second": 0.120071,
+    "tokens_per_second": 342.099112
+  },
+  "eta_seconds": 0.0
+}

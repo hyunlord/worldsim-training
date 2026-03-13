@@ -1,0 +1,180 @@
+{
+  "batch_id": "batch_v2_01_tasks_in",
+  "updated_at": "2026-03-13T08:29:29.787039+00:00",
+  "paths": {
+    "generated_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_01_tasks_in/generated.jsonl",
+    "skipped_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_01_tasks_in/skipped.jsonl",
+    "progress_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_01_tasks_in/progress.json",
+    "summary_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v2_01_tasks_in/summary.json"
+  },
+  "total_planned_rows": 1100,
+  "processed_rows": 1100,
+  "successful_rows": 1031,
+  "skipped_rows": 69,
+  "success_rate": 0.937273,
+  "current_task": null,
+  "counts_by_task": {
+    "planned": {
+      "I": 200,
+      "J": 200,
+      "K": 200,
+      "L": 200,
+      "M": 150,
+      "N": 150
+    },
+    "successful": {
+      "I": 176,
+      "J": 185,
+      "K": 188,
+      "L": 191,
+      "M": 148,
+      "N": 143
+    },
+    "skipped": {
+      "I": 24,
+      "J": 15,
+      "K": 12,
+      "L": 9,
+      "M": 2,
+      "N": 7
+    }
+  },
+  "failure_reasons_by_task": {
+    "I": {
+      "generation_validation_failed:too_long": 22,
+      "generation_validation_failed:forbidden_in_reasoning_ko,too_long": 2
+    },
+    "J": {
+      "generation_validation_failed:too_long": 13,
+      "generation_validation_failed:forbidden_in_hint_ko,too_long": 2
+    },
+    "K": {
+      "generation_validation_failed:too_long": 9,
+      "generation_validation_failed:forbidden_in_hint_ko": 3
+    },
+    "L": {
+      "generation_validation_failed:too_long": 9
+    },
+    "M": {
+      "generation_validation_failed:too_long": 2
+    },
+    "N": {
+      "generation_validation_failed:too_long": 5,
+      "generation_validation_failed:forbidden_in_hint_ko,too_long": 1,
+      "generation_validation_failed:forbidden_in_hint_ko": 1
+    }
+  },
+  "recent_failures": [
+    {
+      "task": "J",
+      "variant": 1,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "vengeful_warrior",
+        "situation_id": "failed_ritual",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "I",
+      "variant": 1,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "safety_or_belonging",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "J",
+      "variant": 1,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "failed_ritual",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "I",
+      "variant": 0,
+      "reason": "generation_validation_failed:forbidden_in_reasoning_ko,too_long",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "situation_id": "safety_or_belonging",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "K",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "reckless_hunter",
+        "situation_id": "child_helped",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "K",
+      "variant": 0,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "visionary_shaman",
+        "situation_id": "child_helped",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "K",
+      "variant": 1,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "visionary_shaman",
+        "situation_id": "child_helped",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "I",
+      "variant": 1,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "empathetic_healer",
+        "situation_id": "thirst_or_belonging",
+        "temperament_id": "choleric"
+      }
+    },
+    {
+      "task": "J",
+      "variant": 1,
+      "reason": "generation_validation_failed:forbidden_in_hint_ko,too_long",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "trade_cheated",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "J",
+      "variant": 1,
+      "reason": "generation_validation_failed:too_long",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "situation_id": "trade_cheated",
+        "temperament_id": "phlegmatic"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 1837795,
+    "completion_tokens": 157838,
+    "total_tokens": 1995633,
+    "estimated_cost_usd": 7.880955
+  },
+  "throughput": {
+    "rows_per_second": 0.171923,
+    "tokens_per_second": 311.904102
+  },
+  "eta_seconds": 0.0
+}
