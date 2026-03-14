@@ -1,0 +1,139 @@
+{
+  "dataset_id": "worldsim-v2-mix",
+  "generated_at": "2026-03-13T16:29:19.496464+00:00",
+  "detected_training_format": "messages",
+  "training_contract_source": "/home/hyunlord/github/worldsim-training/scripts/prepare_dataset.py",
+  "source_files": {
+    "input_train": "/home/hyunlord/github/worldsim-training/data/final/worldsim-v2-mix/train.jsonl",
+    "input_dev": "/home/hyunlord/github/worldsim-training/data/final/worldsim-v2-mix/dev.jsonl",
+    "source_manifest": "/home/hyunlord/github/worldsim-training/data/final/worldsim-v2-mix/merge_manifest.json"
+  },
+  "output_files": {
+    "train_converted": "/home/hyunlord/github/worldsim-training/data/training/worldsim-v2-mix/train_converted.jsonl",
+    "dev_converted": "/home/hyunlord/github/worldsim-training/data/training/worldsim-v2-mix/dev_converted.jsonl"
+  },
+  "counts": {
+    "train_source": 3455,
+    "dev_source": 366,
+    "train_converted": 3455,
+    "dev_converted": 366,
+    "excluded_total": 0
+  },
+  "task_counts": {
+    "train": {
+      "A": 88,
+      "B": 800,
+      "C": 389,
+      "E": 133,
+      "F": 233,
+      "G": 662,
+      "GEN": 30,
+      "H": 35,
+      "I": 155,
+      "J": 167,
+      "K": 170,
+      "L": 172,
+      "M": 134,
+      "N": 129,
+      "NEG": 158
+    },
+    "dev": {
+      "A": 12,
+      "B": 96,
+      "C": 40,
+      "E": 17,
+      "F": 17,
+      "G": 83,
+      "H": 1,
+      "I": 17,
+      "J": 18,
+      "K": 18,
+      "L": 19,
+      "M": 14,
+      "N": 14
+    }
+  },
+  "provenance_fields": [
+    "task",
+    "layer",
+    "source_batch",
+    "source_split",
+    "source_dataset_id",
+    "source_task"
+  ],
+  "assumptions": [
+    "The in-repo training contract is the messages schema enforced by scripts/prepare_dataset.py.",
+    "All structured WorldSim tasks keep assistant targets as canonical JSON strings.",
+    "No rows were excluded during conversion; any malformed source row would fail conversion explicitly."
+  ],
+  "source_manifest_payload": {
+    "dataset_id": "worldsim-v2-mix",
+    "generated_at": "2026-03-13T16:29:19.359623+00:00",
+    "dev_ratio": 0.1,
+    "seed": 42,
+    "sources": {
+      "v1_train": 2201,
+      "v1_dev": 251,
+      "batch1_total": 1031,
+      "batch2_total": 154,
+      "negatives": 500,
+      "general": 300
+    },
+    "deduplication": {
+      "removed": 616
+    },
+    "output": {
+      "train": 3455,
+      "dev": 366,
+      "total": 3821
+    },
+    "task_counts": {
+      "train": {
+        "A": 88,
+        "B": 800,
+        "C": 389,
+        "E": 133,
+        "F": 233,
+        "G": 662,
+        "GEN": 30,
+        "H": 35,
+        "I": 155,
+        "J": 167,
+        "K": 170,
+        "L": 172,
+        "M": 134,
+        "N": 129,
+        "NEG": 158
+      },
+      "dev": {
+        "A": 12,
+        "B": 96,
+        "C": 40,
+        "E": 17,
+        "F": 17,
+        "G": 83,
+        "H": 1,
+        "I": 17,
+        "J": 18,
+        "K": 18,
+        "L": 19,
+        "M": 14,
+        "N": 14
+      }
+    },
+    "source_counts": {
+      "train": {
+        "batch_v2_01": 927,
+        "batch_v2_02": 139,
+        "general": 30,
+        "negative": 158,
+        "v1_train": 2201
+      },
+      "dev": {
+        "batch_v2_01": 100,
+        "batch_v2_02": 15,
+        "v1_dev": 251
+      }
+    }
+  }
+}
