@@ -1,22 +1,19 @@
 from __future__ import annotations
 
-from training.lib.output_schema import TASK_ENUM_FIELDS, get_schema_for_task
+from training.lib.output_schema import TASK_ENUM_FIELDS, TASK_OUTPUT_SCHEMAS
 
 
-TASK_ALLOWED_KEYS_REGISTRY: dict[str, set[str]] = {
-    "A": set(),
-    "B": set(),
-    "C": set(),
-    "E": set(),
-    "F": set(),
-    "G": set(),
-    "H": set(),
+TASK_ALLOWED_KEYS_REGISTRY: dict[str, set[str]] = {}
+
+ENUM_VALUE_ALIASES: dict[str, dict[str, str]] = {
+    "emotion_expressed": {
+        "sorrow": "sadness",
+    }
 }
 
 
 def _build_allowed_keys_registry() -> None:
-    for task_id in TASK_ALLOWED_KEYS_REGISTRY:
-        schema = get_schema_for_task(task_id)
+    for task_id, schema in TASK_OUTPUT_SCHEMAS.items():
         TASK_ALLOWED_KEYS_REGISTRY[task_id] = {
             field.alias or field_name
             for field_name, field in schema.model_fields.items()
@@ -38,6 +35,27 @@ def sanitize_keys(parsed_dict: dict, task_id: str) -> tuple[dict, list[str]]:
     return sanitized, removed_keys
 
 
+def _normalize_enum_token(value: str) -> str:
+    return value.strip().lower().replace("_", "").replace("-", "").replace(" ", "")
+
+
+def _fuzzy_match_enum(value: str, allowed_values: list[str]) -> str | None:
+    normalized_value = _normalize_enum_token(value)
+
+    for allowed in allowed_values:
+        if allowed.lower() == value.lower():
+            return allowed
+
+    for allowed in allowed_values:
+        allowed_normalized = _normalize_enum_token(allowed)
+        if normalized_value == allowed_normalized:
+            return allowed
+        if normalized_value in allowed_normalized or allowed_normalized in normalized_value:
+            return allowed
+
+    return None
+
+
 def normalize_enum_values(parsed_dict: dict, task_id: str) -> tuple[dict, list[str]]:
     enum_fields = TASK_ENUM_FIELDS.get(task_id, {})
     normalizations: list[str] = []
@@ -50,13 +68,16 @@ def normalize_enum_values(parsed_dict: dict, task_id: str) -> tuple[dict, list[s
         if not isinstance(current, str):
             continue
 
-        candidate = current.strip().lower()
-        for allowed in allowed_values:
-            if allowed.lower() == candidate:
-                if current != allowed:
-                    normalized_dict[field_name] = allowed
-                    normalizations.append(f"{field_name}: {current} -> {allowed}")
-                break
+        alias_target = ENUM_VALUE_ALIASES.get(field_name, {}).get(current.strip().lower())
+        if alias_target is not None:
+            normalized_dict[field_name] = alias_target
+            normalizations.append(f"{field_name}: {current} -> {alias_target}")
+            continue
+
+        matched = _fuzzy_match_enum(current, allowed_values)
+        if matched is not None and current != matched:
+            normalized_dict[field_name] = matched
+            normalizations.append(f"{field_name}: {current} -> {matched}")
 
     return normalized_dict, normalizations
 

@@ -1391,6 +1391,22 @@ def _generate_samples(
             raw_generated_text = ""
             generated_text = ""
             parse_error = type(exc).__name__
+        # --- Post-sanitize: fix enum drift + extra keys without touching outlines code ---
+        if not sample_success and generated_text and schema is not None:
+            try:
+                from training.lib.json_sanitize import sanitize_json_output
+
+                post_payload = json.loads(generated_text)
+                sanitized_payload, sanitize_actions = sanitize_json_output(post_payload, task)
+                if sanitize_actions:
+                    re_validated = schema.model_validate(sanitized_payload)
+                    generated_text = json.dumps(re_validated.model_dump(mode="json", by_alias=True), ensure_ascii=False)
+                    sample_success = True
+                    validation_error = None
+                    structured_repair_applied = True
+                    structured_repair_actions = list(sanitize_actions)
+            except Exception:  # noqa: BLE001
+                pass
         metrics_collector.record_sample_outcome(sample_success)
         samples.append(
             {

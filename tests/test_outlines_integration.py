@@ -190,6 +190,27 @@ def test_generate_samples_falls_back_when_outlines_generation_fails(tmp_path: Pa
     assert metrics["per_sample_success_rate"] == 1.0
 
 
+def test_post_sanitize_recovers_enum_drift_after_outlines() -> None:
+    from training.lib.json_sanitize import sanitize_json_output
+    from training.lib.output_schema import TaskBOutput
+
+    outlines_output = {
+        "text_ko": "떨리는 손으로 뒤를 살핀다.",
+        "text_en": "With trembling hands, they look behind.",
+        "register": "haera",
+        "emotion_expressed": "sorrow",
+        "intensity": 0.7,
+        "mimetics": ["떨리는"],
+        "temperament_influence": "melancholic caution",
+    }
+
+    sanitized, actions = sanitize_json_output(outlines_output, "B")
+    validated = TaskBOutput.model_validate(sanitized)
+
+    assert validated.emotion_expressed == "sadness"
+    assert len(actions) > 0
+
+
 def test_world_context_labels_are_in_leaky_strip_list() -> None:
     from training.lib.qlora_smoke import LEAKY_GENERATION_SECTION_LABELS
     from training.lib.structured_generation import OUTLINES_REPETITION_PENALTY, STRUCTURED_GENERATION_DEFAULTS
