@@ -50,6 +50,12 @@ def test_normalize_enum_values_leaves_unrecognized_value_unchanged() -> None:
     assert changes == []
 
 
+def test_normalize_enum_values_maps_known_alias_to_allowed_literal() -> None:
+    normalized, changes = normalize_enum_values({"emotion_expressed": "sorrow"}, "B")
+    assert normalized["emotion_expressed"] == "sadness"
+    assert changes == ["emotion_expressed: sorrow -> sadness"]
+
+
 def test_normalize_enum_values_handles_empty_dict() -> None:
     normalized, changes = normalize_enum_values({}, "B")
     assert normalized == {}

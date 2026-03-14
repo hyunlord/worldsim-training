@@ -13,6 +13,12 @@ TASK_ALLOWED_KEYS_REGISTRY: dict[str, set[str]] = {
     "H": set(),
 }
 
+ENUM_VALUE_ALIASES: dict[str, dict[str, str]] = {
+    "emotion_expressed": {
+        "sorrow": "sadness",
+    }
+}
+
 
 def _build_allowed_keys_registry() -> None:
     for task_id in TASK_ALLOWED_KEYS_REGISTRY:
@@ -51,6 +57,9 @@ def normalize_enum_values(parsed_dict: dict, task_id: str) -> tuple[dict, list[s
             continue
 
         candidate = current.strip().lower()
+        alias_target = ENUM_VALUE_ALIASES.get(field_name, {}).get(candidate)
+        if alias_target is not None:
+            candidate = alias_target
         for allowed in allowed_values:
             if allowed.lower() == candidate:
                 if current != allowed:
