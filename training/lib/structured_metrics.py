@@ -37,6 +37,8 @@ class BatchMetrics:
     required_retry: int = 0
     max_retries_exhausted: int = 0
     per_task: dict[str, dict[str, int]] = field(default_factory=dict)
+    _unique_samples: int = field(default=0, repr=False)
+    _unique_successes: int = field(default=0, repr=False)
 
     def record(self, attempt: GenerationAttemptMetrics) -> None:
         self.total_attempts += 1
@@ -80,6 +82,11 @@ class BatchMetrics:
         else:
             task_metrics["failure"] += 1
 
+    def record_sample_outcome(self, success: bool) -> None:
+        self._unique_samples += 1
+        if success:
+            self._unique_successes += 1
+
     @property
     def structured_success_rate(self) -> float:
         return (self.total_successes / self.total_attempts) if self.total_attempts else 0.0
@@ -96,6 +103,10 @@ class BatchMetrics:
     def extra_key_rate(self) -> float:
         return (self.keys_removed_count / self.total_attempts) if self.total_attempts else 0.0
 
+    @property
+    def per_sample_success_rate(self) -> float:
+        return (self._unique_successes / self._unique_samples) if self._unique_samples else 0.0
+
     def summary(self) -> dict:
         return {
             "total_attempts": self.total_attempts,
@@ -111,8 +122,11 @@ class BatchMetrics:
             "first_attempt_success": self.first_attempt_success,
             "required_retry": self.required_retry,
             "max_retries_exhausted": self.max_retries_exhausted,
+            "unique_samples": self._unique_samples,
+            "unique_successes": self._unique_successes,
             "per_task": self.per_task,
             "structured_success_rate": self.structured_success_rate,
+            "per_sample_success_rate": self.per_sample_success_rate,
             "json_parse_failure_rate": self.json_parse_failure_rate,
             "repair_applied_rate": self.repair_applied_rate,
             "extra_key_rate": self.extra_key_rate,
@@ -133,7 +147,10 @@ class BatchMetrics:
             "first_attempt_success",
             "required_retry",
             "max_retries_exhausted",
+            "unique_samples",
+            "unique_successes",
             "structured_success_rate",
+            "per_sample_success_rate",
             "json_parse_failure_rate",
             "repair_applied_rate",
             "extra_key_rate",

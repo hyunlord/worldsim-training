@@ -51,6 +51,7 @@ def test_v2_baseline_train_notebook_has_v2_dataset_references_and_hyperparameter
     assert "curriculum_order" in code_text
     assert "max_steps" in code_text
     assert "1296" in code_text
+    assert "per_sample_success_rate" in code_text
     assert "eval_steps" in code_text
     assert "100" in code_text
     assert "save_steps" in code_text

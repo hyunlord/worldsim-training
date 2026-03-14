@@ -187,6 +187,81 @@ def test_generate_samples_falls_back_when_outlines_generation_fails(tmp_path: Pa
     assert samples[0]["structured_decoding"]["used_mode"] == "repair_sanitize_fallback"
     assert "bad outlines" in samples[0]["structured_decoding"]["reason"]
     assert metrics["total_successes"] == 1
+    assert metrics["per_sample_success_rate"] == 1.0
+
+
+def test_generate_samples_retries_outlines_validation_with_sanitize_before_fallback(tmp_path: Path, monkeypatch, capsys) -> None:
+    from training.lib import qlora_smoke
+    from training.lib.output_schema import TaskBOutput
+    from training.lib.qlora_smoke import RuntimeConfig
+
+    class FakeModel:
+        def __init__(self) -> None:
+            self.config = SimpleNamespace(use_cache=False)
+
+        def eval(self) -> None:
+            return None
+
+    responses = iter(
+        [
+            json.dumps(
+                {
+                    "text_ko": "몸을 낮춘다.",
+                    "text_en": "They crouch low.",
+                    "register": "haera",
+                    "emotion_expressed": "SADNESS",
+                    "intensity": 0.5,
+                    "mimetics": [],
+                    "temperament_influence": "steady caution",
+                    "extra_key": "junk",
+                },
+                ensure_ascii=False,
+            )
+        ]
+    )
+
+    monkeypatch.setattr(qlora_smoke, "_create_outlines_model", lambda model, tokenizer: object())
+    monkeypatch.setattr(qlora_smoke, "_generate_sample_outlines", lambda **kwargs: next(responses))
+    monkeypatch.setattr(qlora_smoke, "_build_sample_prompt_messages", lambda row: [{"role": "user", "content": "prompt"}])
+    monkeypatch.setattr(qlora_smoke, "_sample_generation_assistant_prefix", lambda task: "")
+    monkeypatch.setattr(qlora_smoke, "_sample_generation_output_schema", lambda task: TaskBOutput)
+    monkeypatch.setattr(qlora_smoke, "render_conversation", lambda tokenizer, messages, add_generation_prompt: "prompt")
+    monkeypatch.setattr(qlora_smoke, "write_jsonl", lambda path, rows: None)
+
+    def should_not_fallback(*args, **kwargs):
+        raise AssertionError("generate_structured fallback should not run for outlines validation errors")
+
+    monkeypatch.setattr(qlora_smoke, "generate_structured", should_not_fallback)
+
+    rows = [
+        {
+            "task": "B",
+            "source_split": "eval",
+            "messages": [
+                {"role": "user", "content": "prompt"},
+                {"role": "assistant", "content": "{}"},
+            ],
+        }
+    ]
+
+    samples, metrics = qlora_smoke._generate_samples(
+        FakeModel(),
+        object(),
+        rows,
+        tmp_path / "sample_generations.jsonl",
+        RuntimeConfig(device="cpu", use_qlora=False, fallback_reason=None, torch_dtype="float32"),
+        SimpleNamespace(),
+    )
+
+    assert len(samples) == 1
+    payload = json.loads(samples[0]["generated_assistant"])
+    assert payload["emotion_expressed"] == "sadness"
+    assert "extra_key" not in payload
+    assert samples[0]["structured_decoding"]["used_mode"] == "outlines_json_schema"
+    assert metrics["total_successes"] == 1
+    assert metrics["per_sample_success_rate"] == 1.0
+    captured = capsys.readouterr()
+    assert "[outlines] Constrained decoding ENABLED" in captured.out
 
 
 def test_world_context_labels_are_in_leaky_strip_list() -> None:

@@ -17,10 +17,12 @@ def test_batch_metrics_records_single_success() -> None:
             overall_success=True,
         )
     )
+    metrics.record_sample_outcome(True)
 
     assert metrics.total_attempts == 1
     assert metrics.total_successes == 1
     assert metrics.structured_success_rate == 1.0
+    assert metrics.per_sample_success_rate == 1.0
 
 
 def test_batch_metrics_records_parse_failure() -> None:
@@ -36,9 +38,11 @@ def test_batch_metrics_records_parse_failure() -> None:
             overall_success=False,
         )
     )
+    metrics.record_sample_outcome(False)
 
     assert metrics.json_parse_failures == 1
     assert metrics.total_failures == 1
+    assert metrics.per_sample_success_rate == 0.0
 
 
 def test_batch_metrics_records_validation_failure() -> None:
@@ -54,6 +58,7 @@ def test_batch_metrics_records_validation_failure() -> None:
             overall_success=False,
         )
     )
+    metrics.record_sample_outcome(False)
 
     assert metrics.schema_validation_failures == 1
     assert metrics.total_failures == 1
@@ -86,22 +91,58 @@ def test_batch_metrics_calculates_rates_and_per_task() -> None:
             retry_exhausted=True,
         )
     )
+    metrics.record_sample_outcome(True)
 
     assert metrics.repair_applied_rate == 0.5
     assert metrics.extra_key_rate == 0.5
     assert metrics.per_task["A"] == {"total": 2, "success": 1, "failure": 1}
     assert metrics.max_retries_exhausted == 1
+    assert metrics.per_sample_success_rate == 1.0
 
 
 def test_batch_metrics_summary_is_json_serializable() -> None:
     summary = BatchMetrics().summary()
     json.dumps(summary)
     assert summary["structured_success_rate"] == 0.0
+    assert summary["per_sample_success_rate"] == 0.0
 
 
 def test_batch_metrics_zero_attempt_edge_case() -> None:
     metrics = BatchMetrics()
     assert metrics.structured_success_rate == 0.0
+    assert metrics.per_sample_success_rate == 0.0
     assert metrics.json_parse_failure_rate == 0.0
     assert metrics.repair_applied_rate == 0.0
     assert metrics.extra_key_rate == 0.0
+
+
+def test_batch_metrics_tracks_attempt_and_sample_rates_separately() -> None:
+    metrics = BatchMetrics()
+    metrics.record(
+        GenerationAttemptMetrics(
+            task_id="B",
+            attempt_number=1,
+            raw_length=50,
+            json_parse_success=True,
+            schema_validation_success=False,
+            validation_error="bad enum",
+            overall_success=False,
+        )
+    )
+    metrics.record(
+        GenerationAttemptMetrics(
+            task_id="B",
+            attempt_number=2,
+            raw_length=48,
+            json_parse_success=True,
+            schema_validation_success=True,
+            overall_success=True,
+        )
+    )
+    metrics.record_sample_outcome(True)
+
+    summary = metrics.summary()
+    assert summary["structured_success_rate"] == 0.5
+    assert summary["unique_samples"] == 1
+    assert summary["unique_successes"] == 1
+    assert summary["per_sample_success_rate"] == 1.0

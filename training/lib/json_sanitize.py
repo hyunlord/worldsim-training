@@ -61,4 +61,16 @@ def normalize_enum_values(parsed_dict: dict, task_id: str) -> tuple[dict, list[s
     return normalized_dict, normalizations
 
 
+def sanitize_json_output(parsed_dict: dict, task_id: str) -> tuple[dict, list[dict]]:
+    sanitized, removed_keys = sanitize_keys(parsed_dict, task_id)
+    normalized, normalizations = normalize_enum_values(sanitized, task_id)
+
+    actions: list[dict] = []
+    if removed_keys:
+        actions.append({"kind": "filter_extra_keys", "removed_keys": removed_keys})
+    if normalizations:
+        actions.append({"kind": "normalize_enum_values", "normalized": normalizations})
+    return normalized, actions
+
+
 _build_allowed_keys_registry()
