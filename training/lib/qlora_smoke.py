@@ -14,12 +14,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from scripts.common import ensure_directory, read_jsonl, write_jsonl
 from scripts.prepare_dataset import _validate_messages_row
 from training.lib.output_schema import TASK_OUTPUT_SCHEMAS
-from training.lib.json_sanitize import sanitize_json_output
 from training.lib.structured_generation import (
     OUTLINES_REPETITION_PENALTY,
     StructuredGenerationError,
@@ -1153,236 +1152,129 @@ def _generate_samples(
                 generated_text = json.dumps(payload, ensure_ascii=False)
                 sample_success = True
             elif outlines_model is not None:
-                outlines_last_error: Exception | None = None
-                outlines_attempt_metrics: list[GenerationAttemptMetrics] = []
-                outlines_attempt_records: list[dict[str, Any]] = []
-                for outlines_attempt_idx in range(2):
-                    raw_generated_text = ""
-                    sanitize_actions: list[dict[str, Any]] = []
-                    keys_removed: list[str] = []
-                    enum_normalizations: list[str] = []
-                    try:
-                        raw_generated_text = _generate_sample_outlines(
-                            outlines_model=outlines_model,
-                            schema=schema,
-                            prompt_text=prompt_text,
-                            max_new_tokens=max_new_tokens,
-                        )
-                        payload = json.loads(raw_generated_text)
-                        sanitized_payload, sanitize_actions = sanitize_json_output(payload, task)
-                        keys_removed = [
-                            removed_key
-                            for action in sanitize_actions
-                            if action.get("kind") == "filter_extra_keys"
-                            for removed_key in action.get("removed_keys", [])
-                        ]
-                        enum_normalizations = [
-                            normalized_value
-                            for action in sanitize_actions
-                            if action.get("kind") == "normalize_enum_values"
-                            for normalized_value in action.get("normalized", [])
-                        ]
-                        if sanitize_actions:
-                            structured_repair_applied = True
-                            structured_repair_actions = list(sanitize_actions)
-                        validated = schema.model_validate(sanitized_payload)
-                        generated_text = json.dumps(validated.model_dump(mode="json", by_alias=True), ensure_ascii=False)
-                        structured_decoding = {
-                            "requested_mode": "outlines_json_schema",
-                            "used_mode": "outlines_json_schema",
-                            "enabled": True,
-                            "supported": True,
-                            "reason": None,
+                try:
+                    raw_generated_text = _generate_sample_outlines(
+                        outlines_model=outlines_model,
+                        schema=schema,
+                        prompt_text=prompt_text,
+                        max_new_tokens=max_new_tokens,
+                    )
+                    payload = json.loads(raw_generated_text)
+                    validated = schema.model_validate(payload)
+                    generated_text = json.dumps(validated.model_dump(mode="json", by_alias=True), ensure_ascii=False)
+                    sample_success = True
+                    structured_decoding = {
+                        "requested_mode": "outlines_json_schema",
+                        "used_mode": "outlines_json_schema",
+                        "enabled": True,
+                        "supported": True,
+                        "reason": None,
+                    }
+                    outlines_attempt = GenerationAttemptMetrics(
+                        task_id=task,
+                        attempt_number=1,
+                        raw_length=len(raw_generated_text),
+                        json_parse_success=True,
+                        schema_validation_success=True,
+                        overall_success=True,
+                    )
+                    metrics_collector.record(outlines_attempt)
+                    structured_attempts = [
+                        {
+                            "attempt_index": 0,
+                            "raw_output": raw_generated_text,
+                            "candidate_output": generated_text,
+                            "json_error": None,
+                            "validation_error": None,
+                            "error_kind": None,
+                            "repair_actions": [],
+                            "keys_removed": [],
+                            "enum_normalizations": [],
                         }
-                        outlines_attempt = GenerationAttemptMetrics(
-                            task_id=task,
-                            attempt_number=outlines_attempt_idx + 1,
-                            raw_length=len(raw_generated_text),
-                            repairs_applied=[action.get("kind", "unknown") for action in sanitize_actions],
-                            keys_removed=keys_removed,
-                            enums_normalized=enum_normalizations,
-                            json_parse_success=True,
-                            schema_validation_success=True,
-                            overall_success=True,
-                        )
-                        metrics_collector.record(outlines_attempt)
-                        outlines_attempt_metrics.append(outlines_attempt)
-                        outlines_attempt_records.append(
+                    ]
+                    structured_validation_metadata = {
+                        "attempt_count": 1,
+                        "last_error_kind": None,
+                        "attempts": structured_attempts,
+                        "repair_actions": [],
+                        "structured_decoding": structured_decoding,
+                        "attempt_metrics": [
                             {
-                                "attempt_index": outlines_attempt_idx,
-                                "raw_output": raw_generated_text,
-                                "candidate_output": generated_text,
-                                "json_error": None,
-                                "validation_error": None,
-                                "error_kind": None,
-                                "repair_actions": sanitize_actions,
-                                "keys_removed": keys_removed,
-                                "enum_normalizations": enum_normalizations,
+                                "task_id": outlines_attempt.task_id,
+                                "attempt_number": outlines_attempt.attempt_number,
+                                "raw_length": outlines_attempt.raw_length,
+                                "repairs_applied": outlines_attempt.repairs_applied,
+                                "keys_removed": outlines_attempt.keys_removed,
+                                "enums_normalized": outlines_attempt.enums_normalized,
+                                "json_parse_success": outlines_attempt.json_parse_success,
+                                "schema_validation_success": outlines_attempt.schema_validation_success,
+                                "validation_error": outlines_attempt.validation_error,
+                                "overall_success": outlines_attempt.overall_success,
                             }
-                        )
-                        structured_attempt_count = outlines_attempt_idx + 1
-                        structured_attempts = list(outlines_attempt_records)
-                        structured_validation_metadata = {
-                            "attempt_count": structured_attempt_count,
-                            "last_error_kind": None,
-                            "attempts": structured_attempts,
-                            "repair_actions": structured_repair_actions,
-                            "structured_decoding": structured_decoding,
-                            "attempt_metrics": [
-                                {
-                                    "task_id": metric.task_id,
-                                    "attempt_number": metric.attempt_number,
-                                    "raw_length": metric.raw_length,
-                                    "repairs_applied": metric.repairs_applied,
-                                    "keys_removed": metric.keys_removed,
-                                    "enums_normalized": metric.enums_normalized,
-                                    "json_parse_success": metric.json_parse_success,
-                                    "schema_validation_success": metric.schema_validation_success,
-                                    "validation_error": metric.validation_error,
-                                    "overall_success": metric.overall_success,
-                                }
-                                for metric in outlines_attempt_metrics
-                            ],
+                        ],
+                    }
+                except Exception as outlines_exc:  # noqa: BLE001
+                    outlines_fallback_reason = f"outlines generation failed: {outlines_exc}"
+                    structured = generate_structured(
+                        llm,
+                        prompt_text,
+                        schema,
+                        output_normalizer=_normalize_generation_candidate,
+                        structured_constraint=build_structured_constraint(schema),
+                        task_id=task,
+                        metrics_collector=metrics_collector,
+                    )
+                    raw_generated_text = structured.raw_output
+                    generated_text = json.dumps(structured.payload, ensure_ascii=False)
+                    sample_success = True
+                    normalization = structured.normalization
+                    normalization_details = list(structured.normalization_details or [])
+                    structured_attempt_count = structured.attempt_count
+                    structured_repair_actions = list(structured.repair_actions)
+                    structured_repair_applied = bool(structured.repair_actions)
+                    structured_attempts = [
+                        {
+                            "attempt_index": attempt.attempt_index,
+                            "raw_output": attempt.raw_output,
+                            "candidate_output": attempt.candidate_output,
+                            "json_error": attempt.json_error,
+                            "validation_error": attempt.validation_error,
+                            "error_kind": attempt.error_kind,
+                            "repair_actions": attempt.repair_actions,
+                            "keys_removed": attempt.keys_removed,
+                            "enum_normalizations": attempt.enum_normalizations,
                         }
-                        sample_success = True
-                        break
-                    except (json.JSONDecodeError, ValidationError) as outlines_validation_exc:
-                        outlines_last_error = outlines_validation_exc
-                        validation_text = str(outlines_validation_exc)
-                        outlines_attempt = GenerationAttemptMetrics(
-                            task_id=task,
-                            attempt_number=outlines_attempt_idx + 1,
-                            raw_length=len(raw_generated_text),
-                            repairs_applied=[action.get("kind", "unknown") for action in sanitize_actions],
-                            keys_removed=keys_removed,
-                            enums_normalized=enum_normalizations,
-                            json_parse_success=not isinstance(outlines_validation_exc, json.JSONDecodeError),
-                            schema_validation_success=False,
-                            validation_error=validation_text,
-                            overall_success=False,
-                            retry_exhausted=outlines_attempt_idx == 1,
-                        )
-                        metrics_collector.record(outlines_attempt)
-                        outlines_attempt_metrics.append(outlines_attempt)
-                        outlines_attempt_records.append(
+                        for attempt in structured.attempts
+                    ]
+                    structured_decoding = {
+                        "requested_mode": "outlines_json_schema",
+                        "used_mode": "repair_sanitize_fallback",
+                        "enabled": True,
+                        "supported": True,
+                        "reason": outlines_fallback_reason,
+                    }
+                    structured_validation_metadata = {
+                        "attempt_count": structured.attempt_count,
+                        "last_error_kind": structured.last_error_kind,
+                        "attempts": structured_attempts,
+                        "repair_actions": structured.repair_actions,
+                        "structured_decoding": structured_decoding,
+                        "attempt_metrics": [
                             {
-                                "attempt_index": outlines_attempt_idx,
-                                "raw_output": raw_generated_text,
-                                "candidate_output": raw_generated_text,
-                                "json_error": validation_text if isinstance(outlines_validation_exc, json.JSONDecodeError) else None,
-                                "validation_error": None if isinstance(outlines_validation_exc, json.JSONDecodeError) else validation_text,
-                                "error_kind": "json" if isinstance(outlines_validation_exc, json.JSONDecodeError) else "validation",
-                                "repair_actions": sanitize_actions,
-                                "keys_removed": keys_removed,
-                                "enum_normalizations": enum_normalizations,
+                                "task_id": metric.task_id,
+                                "attempt_number": metric.attempt_number,
+                                "raw_length": metric.raw_length,
+                                "repairs_applied": metric.repairs_applied,
+                                "keys_removed": metric.keys_removed,
+                                "enums_normalized": metric.enums_normalized,
+                                "json_parse_success": metric.json_parse_success,
+                                "schema_validation_success": metric.schema_validation_success,
+                                "validation_error": metric.validation_error,
+                                "overall_success": metric.overall_success,
                             }
-                        )
-                        structured_attempt_count = outlines_attempt_idx + 1
-                        continue
-                    except Exception as outlines_exc:  # noqa: BLE001
-                        outlines_last_error = outlines_exc
-                        outlines_fallback_reason = f"outlines generation failed: {outlines_exc}"
-                        break
-                else:
-                    outlines_last_error = None
-
-                if not sample_success:
-                    if outlines_fallback_reason is not None:
-                        structured = generate_structured(
-                            llm,
-                            prompt_text,
-                            schema,
-                            output_normalizer=_normalize_generation_candidate,
-                            structured_constraint=build_structured_constraint(schema),
-                            task_id=task,
-                            metrics_collector=metrics_collector,
-                        )
-                        raw_generated_text = structured.raw_output
-                        generated_text = json.dumps(structured.payload, ensure_ascii=False)
-                        normalization = structured.normalization
-                        normalization_details = list(structured.normalization_details or [])
-                        structured_attempt_count = structured.attempt_count
-                        structured_repair_actions = list(structured.repair_actions)
-                        structured_repair_applied = bool(structured.repair_actions)
-                        structured_attempts = [
-                            {
-                                "attempt_index": attempt.attempt_index,
-                                "raw_output": attempt.raw_output,
-                                "candidate_output": attempt.candidate_output,
-                                "json_error": attempt.json_error,
-                                "validation_error": attempt.validation_error,
-                                "error_kind": attempt.error_kind,
-                                "repair_actions": attempt.repair_actions,
-                                "keys_removed": attempt.keys_removed,
-                                "enum_normalizations": attempt.enum_normalizations,
-                            }
-                            for attempt in structured.attempts
-                        ]
-                        structured_decoding = {
-                            "requested_mode": "outlines_json_schema",
-                            "used_mode": "repair_sanitize_fallback",
-                            "enabled": True,
-                            "supported": True,
-                            "reason": outlines_fallback_reason,
-                        }
-                        structured_validation_metadata = {
-                            "attempt_count": structured.attempt_count,
-                            "last_error_kind": structured.last_error_kind,
-                            "attempts": structured_attempts,
-                            "repair_actions": structured.repair_actions,
-                            "structured_decoding": structured_decoding,
-                            "attempt_metrics": [
-                                {
-                                    "task_id": metric.task_id,
-                                    "attempt_number": metric.attempt_number,
-                                    "raw_length": metric.raw_length,
-                                    "repairs_applied": metric.repairs_applied,
-                                    "keys_removed": metric.keys_removed,
-                                    "enums_normalized": metric.enums_normalized,
-                                    "json_parse_success": metric.json_parse_success,
-                                    "schema_validation_success": metric.schema_validation_success,
-                                    "validation_error": metric.validation_error,
-                                    "overall_success": metric.overall_success,
-                                }
-                                for metric in structured.attempt_metrics
-                            ],
-                        }
-                        sample_success = True
-                    else:
-                        raw_generated_text = outlines_attempt_records[-1]["raw_output"] if outlines_attempt_records else ""
-                        generated_text = outlines_attempt_records[-1]["candidate_output"] if outlines_attempt_records else ""
-                        structured_attempts = list(outlines_attempt_records)
-                        structured_repair_actions = list(structured_repair_actions)
-                        structured_decoding = {
-                            "requested_mode": "outlines_json_schema",
-                            "used_mode": "outlines_json_schema",
-                            "enabled": True,
-                            "supported": True,
-                            "reason": str(outlines_last_error) if outlines_last_error else None,
-                        }
-                        structured_validation_metadata = {
-                            "attempt_count": structured_attempt_count,
-                            "last_error_kind": "validation" if isinstance(outlines_last_error, ValidationError) else "json",
-                            "attempts": structured_attempts,
-                            "repair_actions": structured_repair_actions,
-                            "structured_decoding": structured_decoding,
-                            "attempt_metrics": [
-                                {
-                                    "task_id": metric.task_id,
-                                    "attempt_number": metric.attempt_number,
-                                    "raw_length": metric.raw_length,
-                                    "repairs_applied": metric.repairs_applied,
-                                    "keys_removed": metric.keys_removed,
-                                    "enums_normalized": metric.enums_normalized,
-                                    "json_parse_success": metric.json_parse_success,
-                                    "schema_validation_success": metric.schema_validation_success,
-                                    "validation_error": metric.validation_error,
-                                    "overall_success": metric.overall_success,
-                                }
-                                for metric in outlines_attempt_metrics
-                            ],
-                        }
-                        validation_error = str(outlines_last_error) if outlines_last_error else "outlines_validation_failed"
+                            for metric in structured.attempt_metrics
+                        ],
+                    }
             else:
                 structured = generate_structured(
                     llm,
@@ -1395,6 +1287,7 @@ def _generate_samples(
                 )
                 raw_generated_text = structured.raw_output
                 generated_text = json.dumps(structured.payload, ensure_ascii=False)
+                sample_success = True
                 normalization = structured.normalization
                 normalization_details = list(structured.normalization_details)
                 structured_attempt_count = structured.attempt_count
@@ -1437,7 +1330,6 @@ def _generate_samples(
                         for metric in structured.attempt_metrics
                     ],
                 }
-                sample_success = True
         except StructuredGenerationError as exc:
             raw_generated_text = exc.last_raw_output
             generated_text = exc.last_output
