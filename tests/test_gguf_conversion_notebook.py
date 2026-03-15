@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
 
@@ -62,6 +63,14 @@ def test_gguf_conversion_notebook_code_cells_have_empty_outputs() -> None:
     for cell in notebook["cells"]:
         if cell["cell_type"] == "code":
             assert cell["outputs"] == []
+
+
+def test_gguf_conversion_notebook_code_cells_parse_as_python() -> None:
+    notebook = _load_notebook()
+
+    for index, cell in enumerate(notebook["cells"]):
+        if cell["cell_type"] == "code":
+            ast.parse("".join(cell.get("source", [])), filename=f"cell_{index}")
 
 
 def test_gguf_conversion_notebook_imports_existing_modules() -> None:
