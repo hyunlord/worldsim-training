@@ -1,0 +1,36 @@
+[TASK] I - Need Prioritization
+Output JSON only. Decide which need this person addresses first.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[CURRENT_NEEDS]
+{needs_state}
+
+[SITUATION]
+{scenario_desc}
+
+[OPTIONS]
+{action_options}
+
+[OUTPUT FORMAT]
+{{"priority_id": number, "reasoning": "one English sentence", "need_addressed": "need_name", "urgency": 0.0}}
+
+[RULES]
+- priority_id: one of the option numbers above
+- reasoning: explain why this need comes first in 10-30 English words
+- need_addressed: one of hunger, thirst, warmth, rest, safety, belonging, esteem, curiosity, reproduction, comfort, purpose, transcendence, play
+- urgency: 0.0 to 1.0
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

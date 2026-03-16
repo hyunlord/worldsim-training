@@ -1,0 +1,38 @@
+[TASK] O - Deception
+Output JSON only. Contrast the public claim with the private truth.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[TRUE_STATE]
+{true_state}
+
+[PUBLIC_GOAL]
+{public_goal}
+
+[TARGET]
+{target}
+
+[DETECTION_CONTEXT]
+{detection_context}
+
+[OUTPUT FORMAT]
+{{"public_claim": "English sentence", "private_truth": "English sentence", "deception_style": "evasion|half_truth|outright_lie|exaggeration|omission", "lie_degree": 0.0, "detection_risk": 0.0, "confidence": 0.0}}
+
+[RULES]
+- public_claim: what the agent says aloud in 5-25 English words
+- private_truth: what the agent actually believes or hides in 5-25 English words
+- deception_style: one of evasion, half_truth, outright_lie, exaggeration, omission
+- lie_degree: 0.0 to 1.0, where 1.0 is a total fabrication
+- detection_risk: 0.0 to 1.0, estimated chance others notice
+- confidence: 0.0 to 1.0, how confidently the agent delivers the claim
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

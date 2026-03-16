@@ -1,0 +1,226 @@
+group_dissent_scenarios:
+  - id: migration_route
+    situation: Winter is closing in and the band must choose between the mountain pass and the long river path.
+    group_context: Food stores are thin, the chief is aging, and younger hunters want a bolder route.
+    options:
+      - id: 0
+        desc: take_the_mountain_pass_now
+      - id: 1
+        desc: wait_three_days_then_pass
+      - id: 2
+        desc: follow_the_river_path
+      - id: 3
+        desc: split_the_group
+      - id: 4
+        desc: stay_put_and_ration
+    faction_hint: young_hunters_push_speed elders_fear_avalanche
+  - id: war_or_peace
+    situation: A neighboring band stole traps but sent a child messenger asking for talks.
+    group_context: Recent raids left tempers high, yet both groups face the same hungry predators.
+    options:
+      - id: 0
+        desc: immediate_retaliation
+      - id: 1
+        desc: demand_reparations
+      - id: 2
+        desc: accept_peace_talks
+      - id: 3
+        desc: send_spies_first
+      - id: 4
+        desc: ignore_and_rebuild
+    faction_hint: warriors_want_revenge healers_push_restraint
+  - id: alliance_offer
+    situation: A stronger clan offers protection if we provide food and scouts.
+    group_context: The band is safe for now but fears being swallowed politically by the stronger clan.
+    options:
+      - id: 0
+        desc: accept_full_alliance
+      - id: 1
+        desc: accept_limited_trial
+      - id: 2
+        desc: counter_for_equal_terms
+      - id: 3
+        desc: reject_and_arm_up
+      - id: 4
+        desc: delay_for_more_information
+    faction_hint: parents_value_safety proud_hunters_resist_subordination
+  - id: leadership_succession
+    situation: The chief is too weak to travel and must name a successor before spring.
+    group_context: Two candidates exist, one respected elder and one charismatic hunter with a loyal circle.
+    options:
+      - id: 0
+        desc: choose_the_elder
+      - id: 1
+        desc: choose_the_hunter
+      - id: 2
+        desc: form_shared_council
+      - id: 3
+        desc: delay_until_spring
+      - id: 4
+        desc: let_families_vote
+    faction_hint: elders_seek_stability younger_families_want_energy
+  - id: resource_allocation
+    situation: There is not enough dried meat for everyone to eat equally through the cold snap.
+    group_context: Hunters want performance-based shares while elders want strict equal rationing.
+    options:
+      - id: 0
+        desc: equal_rations
+      - id: 1
+        desc: hunter_priority
+      - id: 2
+        desc: child_and_healer_priority
+      - id: 3
+        desc: trade_for_more_food
+      - id: 4
+        desc: emergency_foraging_party
+    faction_hint: providers_expect_reward caregivers_fear_morale_collapse
+  - id: exile_proposal
+    situation: A volatile troublemaker struck another band member during a funeral rite.
+    group_context: The offender is skilled in tracking but keeps disrupting fragile peace inside camp.
+    options:
+      - id: 0
+        desc: exile_immediately
+      - id: 1
+        desc: demand_blood_price
+      - id: 2
+        desc: assign_close_watch
+      - id: 3
+        desc: ritual_reconciliation
+      - id: 4
+        desc: ignore_for_now
+    faction_hint: mourners_demand_punishment scouts_value_tracker_skill
+  - id: territory_expansion
+    situation: Scouts found empty meadows beyond the old border with good water and game trails.
+    group_context: Expanding could solve shortages, but it risks provoking a distant clan that sometimes hunts there.
+    options:
+      - id: 0
+        desc: settle_immediately
+      - id: 1
+        desc: scout_secretly_longer
+      - id: 2
+        desc: ask_permission_first
+      - id: 3
+        desc: mark_claim_and_wait
+      - id: 4
+        desc: stay_with_current_land
+    faction_hint: ambitious_families_push_expansion risk_averse_elders_resist
+  - id: religious_reform
+    situation: A new shaman proposes replacing the old moon rite with a stricter fasting ritual.
+    group_context: Recent bad luck makes many people open to change, but old families guard ancestral customs.
+    options:
+      - id: 0
+        desc: adopt_new_rite
+      - id: 1
+        desc: blend_old_and_new
+      - id: 2
+        desc: reject_reform
+      - id: 3
+        desc: trial_for_one_season
+      - id: 4
+        desc: let_families_choose
+    faction_hint: anxious_believers_seek_change lineage_holders_defend_tradition
+  - id: trade_policy
+    situation: Traders from afar offer metal hooks but demand regular access to our riverbank.
+    group_context: Better tools could lift catches, yet outsiders near camp make many people uneasy.
+    options:
+      - id: 0
+        desc: open_trade_fully
+      - id: 1
+        desc: trade_under_guard
+      - id: 2
+        desc: counter_with_seasonal_access
+      - id: 3
+        desc: reject_trade
+      - id: 4
+        desc: spy_before_deciding
+    faction_hint: crafters_want_hooks sentries_fear_outsider_presence
+  - id: construction_priority
+    situation: "Only one major project can be completed before rains begin: granary, palisade, or new boats."
+    group_context: Food is uneven, raids are possible, and the river crossing has become dangerous.
+    options:
+      - id: 0
+        desc: build_granary
+      - id: 1
+        desc: raise_palisade
+      - id: 2
+        desc: build_new_boats
+      - id: 3
+        desc: split_labor
+      - id: 4
+        desc: postpone_all_major_builds
+    faction_hint: planners_favor_granary warriors_push_palisade fishers_need_boats
+  - id: hunting_strategy
+    situation: The mammoth herd changed course, forcing a choice between risky cliffs and a longer chase.
+    group_context: The band needs a large kill soon, but injuries from the last hunt are still healing.
+    options:
+      - id: 0
+        desc: drive_toward_cliffs
+      - id: 1
+        desc: follow_for_long_chase
+      - id: 2
+        desc: target_smaller_game
+      - id: 3
+        desc: set_traps_and_wait
+      - id: 4
+        desc: abort_the_hunt
+    faction_hint: hungry_hunters_seek_big_reward injured_members_favor_caution
+  - id: foreign_contact
+    situation: A lone stranger claims to know a safe route through enemy territory.
+    group_context: The camp is split between curiosity and fear after recent betrayal by outsiders.
+    options:
+      - id: 0
+        desc: trust_and_follow
+      - id: 1
+        desc: guard_and_question
+      - id: 2
+        desc: accept_info_only
+      - id: 3
+        desc: detain_the_stranger
+      - id: 4
+        desc: drive_them_away
+    faction_hint: scouts_value_new_routes bereaved_families_assume_trap
+  - id: taboo_enforcement
+    situation: Several youths violated a sacred hunting taboo and bragged about it afterward.
+    group_context: Elders fear divine punishment while many younger members see the taboo as outdated.
+    options:
+      - id: 0
+        desc: harsh_public_punishment
+      - id: 1
+        desc: symbolic_apology_rite
+      - id: 2
+        desc: private_warning_only
+      - id: 3
+        desc: rewrite_the_rule
+      - id: 4
+        desc: ignore_and_move_on
+    faction_hint: elders_demand_example restless_youths_resist_control
+  - id: seasonal_planning
+    situation: The autumn plan must prioritize either foraging, hunting, or fortifying before storms.
+    group_context: Labor is limited because many adults are exhausted from recent travel.
+    options:
+      - id: 0
+        desc: prioritize_foraging
+      - id: 1
+        desc: prioritize_hunting
+      - id: 2
+        desc: prioritize_fortifying
+      - id: 3
+        desc: rotate_weekly_focus
+      - id: 4
+        desc: send_requests_for_help
+    faction_hint: gatherers_push_storage hunters_push_meat builders_fear_storm_damage
+  - id: emergency_response
+    situation: A child fell into a ravine while smoke rises from the western tree line.
+    group_context: The band must choose between immediate rescue, defending camp, or splitting forces under pressure.
+    options:
+      - id: 0
+        desc: full_rescue_now
+      - id: 1
+        desc: defend_camp_first
+      - id: 2
+        desc: split_forces
+      - id: 3
+        desc: call_allies_for_help
+      - id: 4
+        desc: retreat_everyone
+    faction_hint: family_loyalists_choose_rescue sentries_choose_defense

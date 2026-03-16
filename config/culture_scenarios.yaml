@@ -1,0 +1,76 @@
+culture_scenarios:
+  - id: river_taboo
+    new_practice: No one may fish at dawn because river spirits are believed to be waking then.
+    source: northern_river_clan
+    existing_tradition: Our band fishes whenever the current is calm enough.
+    context: The new group joins camp after helping us cross a flooded ford.
+  - id: fire_ritual
+    new_practice: Every new moon, the eldest child lights the first communal fire.
+    source: ember_keepers
+    existing_tradition: The oldest woman in camp keeps the fire and relights it after storms.
+    context: Families are blending after a winter alliance.
+  - id: naming_rule
+    new_practice: Children are named only after their third sunrise to confuse jealous spirits.
+    source: cliff_echo_band
+    existing_tradition: Newborns receive names immediately from a grandparent.
+    context: A birth is expected within days.
+  - id: burial_practice
+    new_practice: Dead hunters are buried with a polished stone from their favorite trail.
+    source: stone_hollow_people
+    existing_tradition: The dead are wrapped in reeds and placed facing the east ridge.
+    context: A respected tracker has just died.
+  - id: food_restriction
+    new_practice: Pregnant people should not eat eel because it supposedly tangles the child's spirit.
+    source: marsh_dwellers
+    existing_tradition: Eel is valued as rich food during lean months.
+    context: Food stores are low and an expectant parent is weak.
+  - id: dance_ceremony
+    new_practice: A spiral dance must open every peace feast before trading begins.
+    source: reed_valley_traders
+    existing_tradition: Trade starts with direct gift exchange and no formal dance.
+    context: A major gathering is scheduled with several outside groups.
+  - id: weapon_blessing
+    new_practice: Spears are smoked with cedar before every hunt to carry ancestor favor.
+    source: cedar_ridge_hunters
+    existing_tradition: Hunters sharpen weapons in silence before dawn.
+    context: A dangerous mammoth hunt is being planned.
+  - id: seasonal_festival
+    new_practice: The first snowfall is marked by sharing white clay marks on the face.
+    source: high_pass_settlers
+    existing_tradition: Winter begins with a quiet family meal around separate hearths.
+    context: Several households want a stronger shared identity.
+  - id: elder_respect_rule
+    new_practice: No one may speak before an elder during disputes unless invited.
+    source: dune_crossers
+    existing_tradition: Disputes are loud and open, with anyone free to interrupt.
+    context: Camp arguments are getting harder to control.
+  - id: marriage_custom
+    new_practice: New pairs live one season with each family before choosing a permanent camp.
+    source: twin_lake_people
+    existing_tradition: Married pairs move immediately to the stronger provider's family.
+    context: Two young adults from different bands want approval to pair.
+  - id: hunting_prayer
+    new_practice: Hunters whisper an animal's true name before striking to honor its spirit.
+    source: mist_forest_band
+    existing_tradition: Hunters avoid speaking at all once the stalk begins.
+    context: A visiting guide demonstrates the practice after a successful kill.
+  - id: territory_marking
+    new_practice: Boundary stones are painted red each season to warn outsiders.
+    source: red_clay_people
+    existing_tradition: Territory is marked with carved branches and fire scars.
+    context: Strangers keep crossing near the berry flats.
+  - id: star_reading
+    new_practice: Travel decisions are delayed until two specific stars rise together.
+    source: sky_watchers
+    existing_tradition: Routes are chosen at dawn based on weather and animal movement.
+    context: The migration window is short and timing is tense.
+  - id: animal_totem
+    new_practice: Each family adopts one animal sign and avoids harming it whenever possible.
+    source: wide_plain_families
+    existing_tradition: Families share symbols only during war paint rituals.
+    context: Families are trying to reduce conflict between cousins.
+  - id: birth_ritual
+    new_practice: Newborns are touched with warm ash so ancestors know their scent.
+    source: ash_hill_clan
+    existing_tradition: Infants are washed in river water before anyone else holds them.
+    context: A healer from ash hill is staying in camp for the season.

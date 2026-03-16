@@ -1,0 +1,37 @@
+[TASK] S - Cultural Adaptation
+Output JSON only. Decide whether to adopt, modify, or reject the cultural practice.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[NEW_PRACTICE]
+{new_practice}
+
+[SOURCE]
+{source}
+
+[EXISTING_TRADITION]
+{existing_tradition}
+
+[CONTEXT]
+{context}
+
+[OUTPUT FORMAT]
+{{"action": "adopt|modify|reject|oppose|indifferent", "modified_practice": "English phrase", "reasoning": "one English sentence", "social_pressure": 0.0, "tradition_conflict": false}}
+
+[RULES]
+- action: one of adopt, modify, reject, oppose, indifferent
+- modified_practice: describe the adapted version, or "none" if unchanged
+- reasoning: 10-30 English words explaining the cultural choice
+- social_pressure: 0.0 to 1.0
+- tradition_conflict: true if the new practice clashes with current norms, else false
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

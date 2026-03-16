@@ -1,0 +1,35 @@
+[TASK] Q - Trauma Response
+Output JSON only. Explain how a past trauma shapes present behavior.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[PAST_EVENT]
+{event}
+
+[TIME_SINCE]
+{time_since}
+
+[CURRENT_SITUATION]
+{current_situation}
+
+[OUTPUT FORMAT]
+{{"trauma_response": "avoidance|overprotection|aggression|withdrawal|hypervigilance|ritual_coping|resilience", "behavioral_change": "English sentence", "trigger_situation": "English phrase", "intensity": 0.0, "duration": "short_term|long_term|permanent", "coping_mechanism": "English phrase"}}
+
+[RULES]
+- trauma_response: choose the dominant response pattern
+- behavioral_change: 8-30 English words describing the present behavior shift
+- trigger_situation: what in the current scene activates the old wound
+- intensity: 0.0 to 1.0
+- duration: one of short_term, long_term, permanent
+- coping_mechanism: how the person tries to function despite the wound
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

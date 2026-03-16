@@ -1,0 +1,47 @@
+[TASK] F - Emotion Shift
+Output JSON only. Decide which emotion becomes dominant after this event.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[NAME]
+{name}
+
+[PERSONALITY]
+{personality_keywords}
+
+[CURRENT_EMOTION]
+{current_emotion_name}:{current_emotion_intensity}
+
+[STRESS]
+{stress}
+
+[SITUATION]
+{scenario_desc}
+
+[WORLD]
+{world_id}: {world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
+
+[OUTPUT FORMAT]
+{{"emotion": "emotion_id", "intensity": 0.0, "cause": "one English sentence", "previous_emotion": "emotion_id", "transition_type": "gradual|sudden|sustained", "temperament_amplifier": "English snake_case phrase"}}
+
+[RULES]
+- emotion: one of joy, sadness, fear, anger, trust, disgust, surprise, anticipation
+- intensity: 0.0 to 1.0
+- cause: explain why the emotion changed in 10-30 English words
+- previous_emotion: the English emotion id that matches [CURRENT_EMOTION]
+- transition_type: choose one of gradual, sudden, sustained
+- temperament_amplifier: how temperament changes the intensity, English snake_case
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

@@ -75,6 +75,37 @@ SocialMemoryLiteral = Literal[
 NegotiationStanceLiteral = Literal["generous", "fair", "hard_bargain", "exploitative"]
 TimelineLiteral = Literal["immediate", "delayed", "conditional"]
 ResourceCommitmentLiteral = Literal["food", "tools", "labor", "weapons", "none"]
+DeceptionStyleLiteral = Literal["evasion", "half_truth", "outright_lie", "exaggeration", "omission"]
+DistortionTypeLiteral = Literal[
+    "exaggeration",
+    "minimization",
+    "malicious_twist",
+    "emotional_coloring",
+    "detail_invention",
+    "source_confusion",
+    "faithful",
+]
+TraumaResponseLiteral = Literal[
+    "avoidance",
+    "overprotection",
+    "aggression",
+    "withdrawal",
+    "hypervigilance",
+    "ritual_coping",
+    "resilience",
+]
+DurationLiteral = Literal["short_term", "long_term", "permanent"]
+NegotiateActionLiteral = Literal["accept", "counter_offer", "reject", "walk_away", "stall", "bluff"]
+CultureActionLiteral = Literal["adopt", "modify", "reject", "oppose", "indifferent"]
+MinorityActionLiteral = Literal["comply", "grumble", "passive_resist", "splinter", "coup_attempt"]
+SparkEventLiteral = Literal[
+    "food_shortage",
+    "battle_loss",
+    "oracle_conflict",
+    "leader_death",
+    "betrayal",
+    "resource_discovery",
+]
 
 
 class StrictWorldSimModel(BaseModel):
@@ -106,6 +137,12 @@ class TaskCOutput(StrictWorldSimModel):
     emotion_expressed: EmotionLiteral
     speaker_role: SpeakerRoleLiteral
     temperament_tone: str = Field(min_length=1)
+
+
+class TaskDOutput(StrictWorldSimModel):
+    text_ko: str = Field(min_length=1)
+    text_en: str = Field(min_length=1)
+    event_type: str = Field(min_length=1)
 
 
 class TaskEOutput(StrictWorldSimModel):
@@ -223,6 +260,138 @@ class TaskNOutput(StrictWorldSimModel):
     walk_away_threshold: float = Field(ge=0.0, le=1.0)
 
 
+class TaskEOutput_v3(StrictWorldSimModel):
+    action_id: int
+    confidence: float = Field(ge=0.0, le=1.0)
+    hint: str = Field(min_length=1)
+    personality_reasoning: DominantTraitLiteral
+    temperament_factor: str = Field(min_length=1)
+
+
+class TaskFOutput_v3(StrictWorldSimModel):
+    emotion: EmotionLiteral
+    intensity: float = Field(ge=0.0, le=1.0)
+    cause: str = Field(min_length=1)
+    previous_emotion: EmotionLiteral
+    transition_type: TransitionTypeLiteral
+    temperament_amplifier: str = Field(min_length=1)
+
+
+class TaskIOutput_v3(StrictWorldSimModel):
+    priority_id: int = Field(ge=0, le=9)
+    reasoning: str = Field(min_length=5)
+    need_addressed: NeedLiteral
+    urgency: float = Field(ge=0.0, le=1.0)
+
+
+class TaskJOutput_v3(StrictWorldSimModel):
+    coping_id: int = Field(ge=0, le=9)
+    coping_type: CopingTypeLiteral
+    stress_delta: float = Field(ge=-1.0, le=0.0)
+    hint: str = Field(min_length=5)
+    side_effect: SideEffectLiteral
+
+
+class TaskKOutput_v3(StrictWorldSimModel):
+    social_action_id: int = Field(ge=0, le=9)
+    trust_delta: float = Field(ge=-0.5, le=0.5)
+    hint: str = Field(min_length=5)
+    relationship_intent: RelationshipIntentLiteral
+    reciprocity_expectation: ReciprocityExpectationLiteral
+
+
+class TaskLOutput_v3(StrictWorldSimModel):
+    response_id: int = Field(ge=0, le=9)
+    trust_delta: float = Field(ge=-0.5, le=0.5)
+    hint: str = Field(min_length=5)
+    forgiveness_threshold: float = Field(ge=0.0, le=1.0)
+    social_memory: SocialMemoryLiteral
+
+
+class TaskMOutput_v3(StrictWorldSimModel):
+    decision_id: int = Field(ge=0, le=9)
+    confidence: float = Field(ge=0.0, le=1.0)
+    dissent_risk: float = Field(ge=0.0, le=1.0)
+    reasoning: str = Field(min_length=5)
+    resource_commitment: ResourceCommitmentLiteral
+    timeline: TimelineLiteral
+
+
+class TaskNOutput_v3(StrictWorldSimModel):
+    accept: bool
+    counter_offer_give: str = Field(min_length=1)
+    counter_offer_want: str = Field(min_length=1)
+    hint: str = Field(min_length=5)
+    negotiation_stance: NegotiationStanceLiteral
+    walk_away_threshold: float = Field(ge=0.0, le=1.0)
+
+
+class TaskOOutput(StrictWorldSimModel):
+    """Deception — public claim vs private truth."""
+
+    public_claim: str = Field(min_length=5)
+    private_truth: str = Field(min_length=5)
+    deception_style: DeceptionStyleLiteral
+    lie_degree: float = Field(ge=0.0, le=1.0)
+    detection_risk: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0)
+
+
+class TaskPOutput(StrictWorldSimModel):
+    """Rumor — personality-biased information distortion."""
+
+    retold_version: str = Field(min_length=10)
+    distortion_type: DistortionTypeLiteral
+    added_detail: str = Field(min_length=1)
+    dropped_detail: str = Field(min_length=1)
+    emotional_charge: float = Field(ge=-1.0, le=1.0)
+
+
+class TaskQOutput(StrictWorldSimModel):
+    """Trauma — past event affecting present behavior."""
+
+    trauma_response: TraumaResponseLiteral
+    behavioral_change: str = Field(min_length=5)
+    trigger_situation: str = Field(min_length=5)
+    intensity: float = Field(ge=0.0, le=1.0)
+    duration: DurationLiteral
+    coping_mechanism: str = Field(min_length=5)
+
+
+class TaskROutput(StrictWorldSimModel):
+    """Negotiate — single round of personality-driven negotiation."""
+
+    action: NegotiateActionLiteral
+    counter_give: str = Field(min_length=1)
+    counter_want: str = Field(min_length=1)
+    reasoning: str = Field(min_length=5)
+    emotional_state: EmotionLiteral
+    walk_away_threshold: float = Field(ge=0.0, le=1.0)
+
+
+class TaskSOutput(StrictWorldSimModel):
+    """Culture — adopt/modify/reject cultural elements."""
+
+    action: CultureActionLiteral
+    modified_practice: str = Field(min_length=1)
+    reasoning: str = Field(min_length=5)
+    social_pressure: float = Field(ge=0.0, le=1.0)
+    tradition_conflict: bool
+
+
+class TaskTOutput(StrictWorldSimModel):
+    """Group dissent — collective decision with minority faction."""
+
+    decision_id: int = Field(ge=0, le=9)
+    confidence: float = Field(ge=0.0, le=1.0)
+    dissent_risk: float = Field(ge=0.0, le=1.0)
+    minority_position: int = Field(ge=0, le=9)
+    minority_action: MinorityActionLiteral
+    spark_event: SparkEventLiteral
+    reasoning: str = Field(min_length=5)
+    timeline: TimelineLiteral
+
+
 TASK_OUTPUT_SCHEMAS = {
     "A": TaskAOutput,
     "B": TaskBOutput,
@@ -239,6 +408,29 @@ TASK_OUTPUT_SCHEMAS = {
     "N": TaskNOutput,
 }
 
+TASK_OUTPUT_SCHEMAS_V3 = {
+    "A": TaskAOutput,
+    "B": TaskBOutput,
+    "C": TaskCOutput,
+    "D": TaskDOutput,
+    "E": TaskEOutput_v3,
+    "F": TaskFOutput_v3,
+    "G": TaskGOutput,
+    "H": TaskHOutput,
+    "I": TaskIOutput_v3,
+    "J": TaskJOutput_v3,
+    "K": TaskKOutput_v3,
+    "L": TaskLOutput_v3,
+    "M": TaskMOutput_v3,
+    "N": TaskNOutput_v3,
+    "O": TaskOOutput,
+    "P": TaskPOutput,
+    "Q": TaskQOutput,
+    "R": TaskROutput,
+    "S": TaskSOutput,
+    "T": TaskTOutput,
+}
+
 TASK_A_SCHEMA = TaskAOutput
 TASK_B_SCHEMA = TaskBOutput
 TASK_C_SCHEMA = TaskCOutput
@@ -252,13 +444,20 @@ TASK_K_SCHEMA = TaskKOutput
 TASK_L_SCHEMA = TaskLOutput
 TASK_M_SCHEMA = TaskMOutput
 TASK_N_SCHEMA = TaskNOutput
+TASK_O_SCHEMA = TaskOOutput
+TASK_P_SCHEMA = TaskPOutput
+TASK_Q_SCHEMA = TaskQOutput
+TASK_R_SCHEMA = TaskROutput
+TASK_S_SCHEMA = TaskSOutput
+TASK_T_SCHEMA = TaskTOutput
 
 
-def get_schema_for_task(task_id: str) -> type[BaseModel]:
+def get_schema_for_task(task_id: str, *, version: int = 2) -> type[BaseModel]:
+    registry = TASK_OUTPUT_SCHEMAS_V3 if version == 3 else TASK_OUTPUT_SCHEMAS
     try:
-        return TASK_OUTPUT_SCHEMAS[task_id]
+        return registry[task_id]
     except KeyError as exc:  # pragma: no cover - defensive caller error
-        raise ValueError(f"Unknown task_id: {task_id}") from exc
+        raise ValueError(f"Unknown task_id: {task_id} (version={version})") from exc
 
 
 def _literal_values(annotation: Any) -> tuple[str, ...]:
@@ -276,9 +475,9 @@ def _literal_values(annotation: Any) -> tuple[str, ...]:
     return tuple(values)
 
 
-def _build_task_enum_fields() -> dict[str, dict[str, list[str]]]:
+def _build_task_enum_fields(task_output_schemas: dict[str, type[BaseModel]]) -> dict[str, dict[str, list[str]]]:
     task_enum_fields: dict[str, dict[str, list[str]]] = {}
-    for task_id, schema in TASK_OUTPUT_SCHEMAS.items():
+    for task_id, schema in task_output_schemas.items():
         enum_fields: dict[str, list[str]] = {}
         for field_name, field in schema.model_fields.items():
             values = _literal_values(field.annotation)
@@ -288,4 +487,5 @@ def _build_task_enum_fields() -> dict[str, dict[str, list[str]]]:
     return task_enum_fields
 
 
-TASK_ENUM_FIELDS: dict[str, dict[str, list[str]]] = _build_task_enum_fields()
+TASK_ENUM_FIELDS: dict[str, dict[str, list[str]]] = _build_task_enum_fields(TASK_OUTPUT_SCHEMAS)
+TASK_ENUM_FIELDS_V3: dict[str, dict[str, list[str]]] = _build_task_enum_fields(TASK_OUTPUT_SCHEMAS_V3)

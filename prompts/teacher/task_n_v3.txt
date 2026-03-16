@@ -1,0 +1,37 @@
+[TASK] N - Trade Judgment
+Output JSON only. Decide whether this person accepts the trade and what counter-offer follows.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[TRADE_OFFER]
+{trade_offer}
+
+[SITUATION]
+{scenario_desc}
+
+[OPTIONS]
+{action_options}
+
+[OUTPUT FORMAT]
+{{"accept": true, "counter_offer_give": "item:count", "counter_offer_want": "item:count", "hint": "one English sentence", "negotiation_stance": "negotiation_stance", "walk_away_threshold": 0.0}}
+
+[RULES]
+- accept: true or false
+- counter_offer_give and counter_offer_want: item:count format
+- hint: explain why this trade response was chosen in 10-30 English words
+- negotiation_stance: one of generous, fair, hard_bargain, exploitative
+- walk_away_threshold: 0.0 to 1.0
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

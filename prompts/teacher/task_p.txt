@@ -1,0 +1,31 @@
+[TASK] P - Rumor Distortion
+Output JSON only. Retell the fact through a personality-biased rumor.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[ORIGINAL_FACT]
+{original_fact}
+
+[RETELLER_RELATIONSHIP]
+{reteller_relationship}
+
+[OUTPUT FORMAT]
+{{"retold_version": "English retelling", "distortion_type": "exaggeration|minimization|malicious_twist|emotional_coloring|detail_invention|source_confusion|faithful", "added_detail": "added phrase", "dropped_detail": "dropped phrase", "emotional_charge": 0.0}}
+
+[RULES]
+- retold_version: 12-40 English words, how the person repeats the story
+- distortion_type: pick the dominant distortion pattern
+- added_detail: a new detail inserted into the rumor, or "none"
+- dropped_detail: a meaningful fact omitted from the rumor, or "none"
+- emotional_charge: -1.0 to 1.0, where negative is calming and positive is emotionally heated
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

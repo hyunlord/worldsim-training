@@ -1,0 +1,61 @@
+trauma_scenarios:
+  - id: child_loss
+    event: Agent lost a child to winter sickness during the last cold season.
+    time_since: eight_moons
+    current_situation: A younger child in camp starts coughing through the night.
+  - id: predator_attack
+    event: Agent survived a wolf pack attack that killed a hunting partner.
+    time_since: three_moons
+    current_situation: Fresh wolf tracks appear at the edge of camp before dawn.
+  - id: betrayal_in_raid
+    event: Agent was abandoned during a raid when an ally fled with the shared shield.
+    time_since: one_year
+    current_situation: The same ally asks to lead the next dangerous scouting run.
+  - id: abandonment_on_migration
+    event: Agent was left behind during a blizzard migration and survived alone for days.
+    time_since: six_moons
+    current_situation: The band wants to move quickly before another storm arrives.
+  - id: starvation_winter
+    event: Agent endured a winter where two siblings died from hunger.
+    time_since: two_years
+    current_situation: Food stores drop sharply after a failed hunt.
+  - id: flood_escape
+    event: Agent was nearly swept away during a flash flood that destroyed their shelter.
+    time_since: five_moons
+    current_situation: Heavy rain begins and the river starts rising again.
+  - id: fire_in_shelter
+    event: Agent woke trapped in a burning shelter and carries scars from the escape.
+    time_since: ten_moons
+    current_situation: Sparks jump from the communal fire during a windy night.
+  - id: combat_trauma
+    event: Agent killed a familiar rival at close range in a desperate fight.
+    time_since: four_moons
+    current_situation: A tense standoff begins with another band at the river crossing.
+  - id: exile_return
+    event: Agent was exiled alone after a false accusation and later allowed back.
+    time_since: one_year
+    current_situation: An elder suggests banishing a troublesome youth from the camp.
+  - id: mate_death
+    event: Agent watched a mate die from a snakebite during foraging.
+    time_since: seven_moons
+    current_situation: Someone offers to pair with the agent for a long gathering trip.
+  - id: stillbirth_memory
+    event: Agent experienced a stillbirth during a famine and still blames the band for poor care.
+    time_since: nine_moons
+    current_situation: A pregnant bandmate goes into difficult labor during a storm.
+  - id: drowning_witness
+    event: Agent watched a sibling drown while crossing a swollen river.
+    time_since: two_years
+    current_situation: The group must ford fast water before nightfall.
+  - id: collapse_injury
+    event: Agent was buried under a cave-in while mining flint and barely survived.
+    time_since: eleven_moons
+    current_situation: A narrow rock tunnel leads to a cache of rare stone.
+  - id: poisoning_feast
+    event: Agent became violently sick after eating spoiled meat served at a feast.
+    time_since: five_moons
+    current_situation: The chief asks everyone to share from a freshly smoked carcass.
+  - id: isolation_hunt
+    event: Agent spent six days lost alone after falling from a ridge during a hunt.
+    time_since: three_moons
+    current_situation: Fog closes in and the hunting party starts to spread out.

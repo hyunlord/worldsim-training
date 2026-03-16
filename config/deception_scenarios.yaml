@@ -1,0 +1,76 @@
+deception_scenarios:
+  - id: food_hoarding
+    true_state: Agent has 3 days of hidden food reserves
+    public_goal: Appear as hungry as everyone else
+    target: band_leader
+    detection_context: Small band, everyone watches food stores closely
+  - id: false_loyalty
+    true_state: Agent plans to leave the band when the southern tribe passes through
+    public_goal: Appear loyal and committed to the group
+    target: band_members
+    detection_context: Agent has been acting distant recently and avoiding communal tasks
+  - id: blame_shift
+    true_state: Agent accidentally broke the water container at night
+    public_goal: Make others believe the newcomer did it
+    target: elder
+    detection_context: Only the agent and the newcomer were near the storage area
+  - id: skill_exaggeration
+    true_state: Agent has never successfully hunted large game alone
+    public_goal: Gain status as a skilled hunter to attract a mate
+    target: potential_mate
+    detection_context: Several experienced hunters could contradict the claim
+  - id: hide_injury
+    true_state: Agent has a painful leg wound from yesterday's fall
+    public_goal: Appear fit for the upcoming migration
+    target: chief
+    detection_context: Others noticed the agent limping slightly
+  - id: secret_meeting
+    true_state: Agent met with rival band scouts to discuss defection
+    public_goal: Claim to have been gathering herbs alone
+    target: band_leader
+    detection_context: Another gatherer was in the same area
+  - id: stolen_tool
+    true_state: Agent took the best flint knife from the communal store
+    public_goal: Claim the knife was a gift from the elder
+    target: craftsman
+    detection_context: The elder is forgetful and may not remember clearly
+  - id: downplay_discovery
+    true_state: Agent found a rich berry grove that could feed the whole band
+    public_goal: Keep the location secret for personal use
+    target: band
+    detection_context: Scouts will eventually find it on their rounds
+  - id: fake_vision
+    true_state: Agent had no spiritual experience
+    public_goal: Claim a divine vision to gain influence with the shaman
+    target: shaman
+    detection_context: The shaman is skeptical of convenient visions
+  - id: hide_relationship
+    true_state: Agent is secretly trading with the enemy tribe
+    public_goal: Appear to have no contact with outsiders
+    target: war_chief
+    detection_context: Unusual goods have appeared in agent's possession
+  - id: minimize_failure
+    true_state: Agent's hunting party returned empty-handed after 3 days
+    public_goal: Blame the weather and claim they found promising trails
+    target: band
+    detection_context: The other hunters look exhausted and defeated
+  - id: feign_sickness
+    true_state: Agent is perfectly healthy
+    public_goal: Avoid dangerous scouting mission by faking illness
+    target: war_leader
+    detection_context: The healer will examine the agent
+  - id: credit_theft
+    true_state: The trap was designed and built by another hunter
+    public_goal: Take credit for the successful trap design
+    target: chief
+    detection_context: The real designer is quiet and unlikely to speak up
+  - id: alliance_betrayal
+    true_state: Agent promised the same hunting territory to two different allies
+    public_goal: Keep both alliances intact until one proves more useful
+    target: both_allies
+    detection_context: The allies occasionally meet at seasonal gatherings
+  - id: resource_deflection
+    true_state: Agent knows the southern water source has dried up
+    public_goal: Send rivals to the dry source while using a hidden spring
+    target: rival_family
+    detection_context: Others may discover the dry source quickly

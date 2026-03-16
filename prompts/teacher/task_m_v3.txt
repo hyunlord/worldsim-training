@@ -1,0 +1,38 @@
+[TASK] M - Group Decision
+Output JSON only. Decide which choice the group will push through.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[GROUP_CONTEXT]
+{group_context}
+
+[SITUATION]
+{scenario_desc}
+
+[OPTIONS]
+{action_options}
+
+[OUTPUT FORMAT]
+{{"decision_id": number, "confidence": 0.0, "dissent_risk": 0.0, "reasoning": "one English sentence", "resource_commitment": "resource_commitment", "timeline": "timeline"}}
+
+[RULES]
+- decision_id: one of the option numbers above
+- confidence: 0.0 to 1.0
+- dissent_risk: 0.0 to 1.0
+- reasoning: explain why the group converges on this choice in 10-35 English words
+- resource_commitment: one of food, tools, labor, weapons, none
+- timeline: one of immediate, delayed, conditional
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

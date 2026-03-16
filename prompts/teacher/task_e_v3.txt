@@ -1,0 +1,49 @@
+[TASK] E - Action Selection
+Output JSON only. Pick which action this person would choose.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[NAME]
+{name}
+
+[PERSONALITY]
+{personality_keywords}
+
+[EMOTION]
+{emotion_name}:{emotion_intensity}
+
+[STRESS]
+{stress}
+
+[SITUATION]
+{scenario_desc}
+
+[WORLD]
+{world_id}: {world_desc}
+
+[WORLD_VOCAB]
+{world_vocab_additions}
+
+[OPTIONS]
+{action_options}
+
+[OUTPUT FORMAT]
+{{"action_id": number, "confidence": 0.0, "hint": "one English sentence", "personality_reasoning": "novelty_seeking|harm_avoidance|reward_dependence|persistence", "temperament_factor": "English snake_case phrase"}}
+
+[RULES]
+- action_id: one of the option numbers above
+- confidence: 0.0 to 1.0
+- hint: why this action was chosen, 10-30 English words
+- personality_reasoning: exactly one of novelty_seeking, harm_avoidance, reward_dependence, persistence
+- temperament_factor: how temperament drives this choice, English snake_case
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

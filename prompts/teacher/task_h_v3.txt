@@ -1,0 +1,19 @@
+[TASK] H - World Ruleset Conversion
+Convert the worldbuilding text into WorldRuleset JSON IR only.
+
+[WORLDBUILDING]
+{worldbuilding_text}
+
+[OUTPUT FORMAT]
+{{"name":"PascalCase English name","description_en":"English one-sentence summary","resource_modifiers":[{{"target":"resource_id","multiplier":0.0}}],"special_zones":[{{"kind":"zone_kind","spawn_count_min":1,"spawn_count_max":10}}],"special_resources":[{{"name":"resource_name","tags":["tag_one"]}}],"agent_modifiers":[{{"system":"system_name","trigger":"trigger_name","effect":"effect_name"}}]}}
+
+[RULES]
+- include only facts stated in the input text
+- leave unstated lists empty with []
+- name must be English PascalCase
+- description_en must be exactly one English sentence
+- target, kind, name, tags, system, trigger, effect must all be English ids
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

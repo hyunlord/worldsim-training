@@ -1,0 +1,46 @@
+rumor_scenarios:
+  - id: wolf_attack
+    original_fact: A lone wolf attacked a hunter near the eastern river. The hunter was wounded but survived and drove it off with a spear.
+    reteller_relationship: rival
+  - id: food_discovery
+    original_fact: Scouts found a berry grove two hills north. It could feed the band for about a week.
+    reteller_relationship: gossip
+  - id: stranger_sighting
+    original_fact: A single stranger was seen watching our camp from the treeline at dusk. They left when noticed.
+    reteller_relationship: fearful_elder
+  - id: winter_illness
+    original_fact: Two children developed fever after drinking stagnant water, but both are improving with rest.
+    reteller_relationship: neutral
+  - id: tool_innovation
+    original_fact: A craftswoman tied bone hooks to a net frame and caught twice the usual fish.
+    reteller_relationship: friend
+  - id: leadership_challenge
+    original_fact: One veteran hunter privately questioned the chief's route choice during the migration.
+    reteller_relationship: rival
+  - id: romance_secret
+    original_fact: The healer and a visiting scout have been meeting quietly after night watch.
+    reteller_relationship: gossip
+  - id: sacred_site
+    original_fact: Children entered the burial cave while playing, but no graves were disturbed.
+    reteller_relationship: elder
+  - id: trade_offer
+    original_fact: A western band offered obsidian for dried meat and wants to return after the thaw.
+    reteller_relationship: neutral
+  - id: sudden_storm
+    original_fact: Dark clouds formed over the ridge and flooded three temporary shelters before dawn.
+    reteller_relationship: fearful_elder
+  - id: migration_delay
+    original_fact: The scouts asked for two extra days before moving because the pass still has fresh snow.
+    reteller_relationship: rival
+  - id: animal_omen
+    original_fact: A white stag crossed the valley at sunrise and vanished into the cedar grove.
+    reteller_relationship: elder
+  - id: burial_dispute
+    original_fact: One family wants to bury their dead near the river, against the usual ridge custom.
+    reteller_relationship: gossip
+  - id: resource_loss
+    original_fact: The southern drying racks collapsed in the night and spoiled half the smoked fish.
+    reteller_relationship: friend
+  - id: peace_contact
+    original_fact: A former enemy approached unarmed to ask for safe passage for their children.
+    reteller_relationship: neutral

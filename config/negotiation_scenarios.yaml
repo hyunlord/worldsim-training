@@ -1,0 +1,91 @@
+negotiation_scenarios:
+  - id: food_trade
+    context: Another band wants dried fish before winter in exchange for salt.
+    our_resources: dried_fish:12, woven_baskets:4
+    their_resources: salt_blocks:6, shell_beads:10
+    offer_history: They first offered 3 salt blocks for 12 fish and called it generous.
+    power_balance: roughly_equal
+  - id: tool_exchange
+    context: A craft clan wants obsidian flakes and offers finished spearheads.
+    our_resources: obsidian_flakes:18, leather_wraps:5
+    their_resources: spearheads:8, drills:2
+    offer_history: They sweetened the deal after seeing our stockpile.
+    power_balance: they_need_us_more
+  - id: territory_sharing
+    context: A neighboring clan asks to share a valley during the spring hunt.
+    our_resources: valley_access, river_path
+    their_resources: additional_hunters, scouting_reports
+    offer_history: They previously ignored our boundary markers.
+    power_balance: tense_balance
+  - id: alliance_terms
+    context: A war leader proposes a temporary alliance against raiders from the east.
+    our_resources: slingers:6, stored_grain:4
+    their_resources: spearmen:12, shields:7
+    offer_history: They want us to commit first before revealing their full force.
+    power_balance: they_are_stronger
+  - id: mate_exchange
+    context: Two families discuss a marriage alliance with gifts on both sides.
+    our_resources: carved_jewelry:3, wool_cloaks:2
+    their_resources: healthy_livestock:1, amber_beads:9
+    offer_history: Their first ask treated our family as lower status.
+    power_balance: status_uneven
+  - id: hostage_release
+    context: A captured scout can be returned if terms are agreed before dusk.
+    our_resources: captive_scout, safe_passage
+    their_resources: medicine_bundle, apology_oath
+    offer_history: They deny spying and demand immediate release.
+    power_balance: we_hold_leverage
+  - id: migration_rights
+    context: A traveling band wants permission to pass through our cedar pass.
+    our_resources: route_control, water_access
+    their_resources: weather_maps, smoked_meat
+    offer_history: Last season they left trash near sacred stones.
+    power_balance: we_hold_terrain
+  - id: water_access
+    context: A drought forces both groups to rely on the same spring.
+    our_resources: spring_guard, nearby_storage
+    their_resources: extra_containers, labor_crews
+    offer_history: Talks broke down yesterday over guard rotation.
+    power_balance: fragile_stalemate
+  - id: hunting_ground
+    context: A rival band suggests alternating use of a mammoth corridor.
+    our_resources: trap_lines, winter_camp
+    their_resources: dog_team, long_spears
+    offer_history: They accuse us of overhunting the corridor.
+    power_balance: evenly_matched
+  - id: labor_exchange
+    context: Another clan offers help building shelters if we share cured hides.
+    our_resources: cured_hides:10, bone_needles:6
+    their_resources: builders:8, timber_rafts:2
+    offer_history: They need answers before a storm front arrives.
+    power_balance: they_need_us_more
+  - id: rare_material
+    context: A trader offers bright ochre pigment for access to our flint seam.
+    our_resources: flint_access, escort_guards
+    their_resources: ochre_pigment:5, copper_scraps:2
+    offer_history: Their last trip damaged one of our hauling sleds.
+    power_balance: uncertain
+  - id: protection_deal
+    context: A smaller camp wants our warriors to deter raids during calving season.
+    our_resources: warriors:5, warning_fires
+    their_resources: milk:12, hides:4
+    offer_history: They can pay now but resent long obligations.
+    power_balance: we_offer_security
+  - id: knowledge_trade
+    context: A shaman offers star-navigation knowledge in exchange for sacred herbs.
+    our_resources: sacred_herbs:7, carved_bowls:3
+    their_resources: star_routes, omen_songs
+    offer_history: They refuse to teach the final ritual unless trust is shown first.
+    power_balance: mutual_dependency
+  - id: festival_invitation
+    context: A neighboring settlement wants our drummers to attend a seasonal feast.
+    our_resources: drummers:3, ritual_masks:4
+    their_resources: feasting_grain:9, guest_housing
+    offer_history: They previously excluded our elders from the main rites.
+    power_balance: social_tension
+  - id: debt_settlement
+    context: An old debt from a failed harvest needs to be settled before alliance talks continue.
+    our_resources: grain:5, rope:8
+    their_resources: future_hunt_share, bronze_hooks:2
+    offer_history: They say the debt should be forgiven after years of peace.
+    power_balance: we_hold_the_record

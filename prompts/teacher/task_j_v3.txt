@@ -1,0 +1,37 @@
+[TASK] J - Stress Coping
+Output JSON only. Decide how this person copes with the current stress.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[STRESS]
+{stress}
+
+[SITUATION]
+{scenario_desc}
+
+[OPTIONS]
+{action_options}
+
+[OUTPUT FORMAT]
+{{"coping_id": number, "coping_type": "coping_type", "stress_delta": -0.1, "hint": "one English sentence", "side_effect": "side_effect_name"}}
+
+[RULES]
+- coping_id: one of the option numbers above
+- coping_type: one of active_avoidance, emotional_release, social_support, ritualistic, substance, acceptance, aggression
+- stress_delta: -1.0 to 0.0
+- hint: explain why this coping response was chosen in 10-30 English words
+- side_effect: one of aggression_increase, isolation, faith_increase, trust_decrease, morale_boost, exhaustion, none
+- JSON only, no explanations
+
+[VARIANT]
+{variant}

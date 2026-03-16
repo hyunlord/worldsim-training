@@ -1,0 +1,43 @@
+[TASK] L - Trust Reappraisal
+Output JSON only. Decide how this person updates trust after the event.
+
+[TEMP]
+NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
+
+[TEMPERAMENT_NAME]
+{temperament_name}
+
+[TEMPERAMENT_KEYWORDS]
+{temperament_keywords}
+
+[PERSONALITY]
+{personality_keywords}
+
+[RELATIONSHIP_CONTEXT]
+{relationship_context}
+
+[CURRENT_TRUST]
+{trust_level}
+
+[SOCIAL_MEMORY]
+{social_memory}
+
+[SITUATION]
+{scenario_desc}
+
+[OPTIONS]
+{action_options}
+
+[OUTPUT FORMAT]
+{{"response_id": number, "trust_delta": 0.0, "hint": "one English sentence", "forgiveness_threshold": 0.0, "social_memory": "social_memory"}}
+
+[RULES]
+- response_id: one of the option numbers above
+- trust_delta: -0.5 to 0.5
+- hint: explain the trust change in 10-30 English words
+- forgiveness_threshold: 0.0 to 1.0
+- social_memory: one of theft_betrayal, aid_gratitude, shared_danger, insult_resentment, gift_goodwill, combat_respect, abandonment, none
+- JSON only, no explanations
+
+[VARIANT]
+{variant}
