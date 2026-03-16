@@ -8,10 +8,13 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from pydantic import ValidationError
+
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.common import AttrDict, ensure_directory, ensure_within_directory, load_yaml, read_jsonl, resolve_path, write_jsonl
+from training.lib.output_schema import get_schema_for_task
 
 AUTO_REPLACEMENTS = {
     "마을": "무리가 사는 곳",
@@ -130,6 +133,12 @@ TASK_REQUIRED_FIELDS = {
     "L": ["response_id", "trust_delta", "hint_ko", "hint_en", "forgiveness_threshold", "social_memory"],
     "M": ["decision_id", "confidence", "dissent_risk", "reasoning_ko", "reasoning_en", "resource_commitment", "timeline"],
     "N": ["accept", "counter_offer_give", "counter_offer_want", "hint_ko", "hint_en", "negotiation_stance", "walk_away_threshold"],
+    "O": ["public_claim", "private_truth", "deception_style", "lie_degree", "detection_risk", "confidence"],
+    "P": ["retold_version", "distortion_type", "added_detail", "dropped_detail", "emotional_charge"],
+    "Q": ["trauma_response", "behavioral_change", "trigger_situation", "intensity", "duration", "coping_mechanism"],
+    "R": ["action", "counter_give", "counter_want", "reasoning", "emotional_state", "walk_away_threshold"],
+    "S": ["action", "modified_practice", "reasoning", "social_pressure", "tradition_conflict"],
+    "T": ["decision_id", "confidence", "dissent_risk", "minority_position", "minority_action", "spark_event", "reasoning", "timeline"],
 }
 TASK_KO_FIELDS = {
     "A": ["text_ko"],
@@ -162,6 +171,12 @@ TASK_EN_FIELDS = {
     "L": ["hint_en"],
     "M": ["reasoning_en"],
     "N": ["hint_en"],
+    "O": ["public_claim", "private_truth"],
+    "P": ["retold_version", "added_detail", "dropped_detail"],
+    "Q": ["behavioral_change", "trigger_situation", "coping_mechanism"],
+    "R": ["counter_give", "counter_want", "reasoning"],
+    "S": ["modified_practice", "reasoning"],
+    "T": ["reasoning"],
 }
 TASK_PRIMARY_KO_FIELD = {
     "A": "text_ko",
@@ -177,6 +192,17 @@ TASK_PRIMARY_KO_FIELD = {
     "L": "hint_ko",
     "M": "reasoning_ko",
     "N": "hint_ko",
+}
+
+SCHEMA_VALIDATION_TASKS_V3 = {"E", "F", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"}
+OPTION_ID_FIELDS = {
+    "E": ("action_id",),
+    "I": ("priority_id",),
+    "J": ("coping_id",),
+    "K": ("social_action_id",),
+    "L": ("response_id",),
+    "M": ("decision_id",),
+    "T": ("decision_id", "minority_position"),
 }
 
 
@@ -390,6 +416,51 @@ def _is_number_in_range(value: object, minimum: float, maximum: float) -> bool:
     return minimum <= float(value) <= maximum
 
 
+def _schema_validation_violations(exc: ValidationError) -> list[str]:
+    violations: list[str] = []
+    for error in exc.errors():
+        location = "_".join(str(part) for part in error.get("loc", ()))
+        error_type = str(error.get("type", "schema_error"))
+        if location:
+            violations.append(f"schema_{location}_{error_type}")
+        else:
+            violations.append(f"schema_{error_type}")
+    return sorted(set(violations))
+
+
+def _validate_option_ids(task: str, payload: dict, record: dict) -> list[str]:
+    option_fields = OPTION_ID_FIELDS.get(task, ())
+    if not option_fields:
+        return []
+
+    action_options = record.get("action_options", [])
+    if not isinstance(action_options, list) or not action_options:
+        return []
+
+    allowed_ids = {
+        int(option["id"])
+        for option in action_options
+        if isinstance(option, dict) and "id" in option and not isinstance(option["id"], bool)
+    }
+    violations: list[str] = []
+    for field in option_fields:
+        value = payload.get(field)
+        if value not in allowed_ids:
+            violations.append(f"invalid_{field}")
+    return violations
+
+
+def _validate_with_schema(record: dict, payload: dict, *, schema_version: int) -> tuple[str, list[str]]:
+    task = str(record.get("task", ""))
+    schema = get_schema_for_task(task, version=schema_version)
+    validated = schema.model_validate(payload)
+    normalized = validated.model_dump(mode="json", by_alias=True)
+    violations = _validate_option_ids(task, normalized, record)
+    if task == "H":
+        violations.extend(validate_task_h(normalized))
+    return _compact_json(normalized), sorted(set(violations))
+
+
 def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, list[str], int]:
     task = record.get("task", "")
     if task not in TASK_REQUIRED_FIELDS:
@@ -398,6 +469,14 @@ def repair_and_validate_json_output(record: dict, rules: dict) -> tuple[str, lis
     payload, parse_violations = _parse_output(record.get("output", ""))
     if payload is None:
         return str(record.get("output", "")), parse_violations, 0
+
+    schema_version = int(record.get("schema_version", 2) or 2)
+    if schema_version == 3 and task in SCHEMA_VALIDATION_TASKS_V3:
+        try:
+            normalized_output, violations = _validate_with_schema(record, payload, schema_version=schema_version)
+        except ValidationError as exc:
+            return _compact_json(payload), _schema_validation_violations(exc), 0
+        return normalized_output, violations, 0
 
     repair_count = 0
     for field in TASK_KO_FIELDS.get(task, []):

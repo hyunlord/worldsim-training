@@ -1,0 +1,23 @@
+batch_id: batch_v3_02_new_tasks
+schema_version: 3
+description: >
+  WorldSim v3 batch 2: new game-logic tasks O, P, Q, R, S, and T.
+
+tasks:
+  O: 500
+  P: 500
+  Q: 500
+  R: 400
+  S: 400
+  T: 400
+
+reporting:
+  progress_every: 10
+
+output:
+  raw_dir: data/raw/batch_v3_02_new_tasks
+  generated_file: generated.jsonl
+  skipped_file: skipped.jsonl
+  progress_file: progress.json
+  summary_file: summary.json
+  log_file: generate.log

@@ -50,6 +50,12 @@ prompts:
       L: prompts/teacher/task_l.txt
       M: prompts/teacher/task_m.txt
       N: prompts/teacher/task_n.txt
+      O: prompts/teacher/task_o.txt
+      P: prompts/teacher/task_p.txt
+      Q: prompts/teacher/task_q.txt
+      R: prompts/teacher/task_r.txt
+      S: prompts/teacher/task_s.txt
+      T: prompts/teacher/task_t.txt
   training:
     layer0_system: prompts/training/layer0_system.txt
     layer3_system: prompts/training/layer3_system.txt
@@ -81,6 +87,12 @@ task_variants:
   L: 2
   M: 3
   N: 3
+  O: 2
+  P: 2
+  Q: 2
+  R: 2
+  S: 2
+  T: 2
 
 tasks:
   A:
@@ -195,6 +207,48 @@ tasks:
       korean_primary: hint_ko
       english_primary: hint_en
       required: [accept, counter_offer_give, counter_offer_want, hint_ko, hint_en, negotiation_stance, walk_away_threshold]
+  O:
+    layer: L3
+    expected_format: json
+    description: deception
+    output_fields:
+      english_primary: public_claim
+      required: [public_claim, private_truth, deception_style, lie_degree, detection_risk, confidence]
+  P:
+    layer: L3
+    expected_format: json
+    description: rumor distortion
+    output_fields:
+      english_primary: retold_version
+      required: [retold_version, distortion_type, added_detail, dropped_detail, emotional_charge]
+  Q:
+    layer: L3
+    expected_format: json
+    description: trauma response
+    output_fields:
+      english_primary: behavioral_change
+      required: [trauma_response, behavioral_change, trigger_situation, intensity, duration, coping_mechanism]
+  R:
+    layer: L3
+    expected_format: json
+    description: negotiation round
+    output_fields:
+      english_primary: reasoning
+      required: [action, counter_give, counter_want, reasoning, emotional_state, walk_away_threshold]
+  S:
+    layer: L3
+    expected_format: json
+    description: cultural adaptation
+    output_fields:
+      english_primary: reasoning
+      required: [action, modified_practice, reasoning, social_pressure, tradition_conflict]
+  T:
+    layer: L3
+    expected_format: json
+    description: group dissent
+    output_fields:
+      english_primary: reasoning
+      required: [decision_id, confidence, dissent_risk, minority_position, minority_action, spark_event, reasoning, timeline]
 
 names:
   - 돌이
@@ -429,6 +483,14 @@ validation:
     - optimistic_expansion
     - passive_deferral
     - symbolic_abstraction
+  deception_styles: [evasion, half_truth, outright_lie, exaggeration, omission]
+  distortion_types: [exaggeration, minimization, malicious_twist, emotional_coloring, detail_invention, source_confusion, faithful]
+  trauma_responses: [avoidance, overprotection, aggression, withdrawal, hypervigilance, ritual_coping, resilience]
+  durations: [short_term, long_term, permanent]
+  negotiate_actions: [accept, counter_offer, reject, walk_away, stall, bluff]
+  culture_actions: [adopt, modify, reject, oppose, indifferent]
+  minority_actions: [comply, grumble, passive_resist, splinter, coup_attempt]
+  spark_events: [food_shortage, battle_loss, oracle_conflict, leader_death, betrayal, resource_discovery]
   world_ids: [default, dungeon, ocean, winter, magic]
   zone_kinds: [dungeon_node, ocean_island, frozen_cave, magic_spring, tree_village, river_crossing]
   resource_tags: [currency, tradeable, equippable, weapon, food, fuel, building, temperament_modifier, medicine]
@@ -492,6 +554,12 @@ validation:
     L: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
     M: { korean_field: reasoning_ko, min_chars: 10, max_chars: 35, sentences: 1 }
     N: { korean_field: hint_ko, min_chars: 10, max_chars: 30, sentences: 1 }
+    O: { min_chars: 5, max_chars: 120, sentences: 1 }
+    P: { min_chars: 10, max_chars: 180, sentences: 1 }
+    Q: { min_chars: 5, max_chars: 120, sentences: 1 }
+    R: { min_chars: 5, max_chars: 120, sentences: 1 }
+    S: { min_chars: 5, max_chars: 120, sentences: 1 }
+    T: { min_chars: 5, max_chars: 140, sentences: 1 }
   structured_json:
     A:
       required_fields: [text_ko, text_en, register, dominant_trait, temperament_expressed]
@@ -542,6 +610,34 @@ validation:
       english_fields: [description_en]
       zone_kind_enum: [dungeon_node, ocean_island, frozen_cave, magic_spring, tree_village, river_crossing]
       resource_tag_enum: [currency, tradeable, equippable, weapon, food, fuel, building, temperament_modifier, medicine]
+    O:
+      required_fields: [public_claim, private_truth, deception_style, lie_degree, detection_risk, confidence]
+      english_fields: [public_claim, private_truth]
+      deception_style_enum: [evasion, half_truth, outright_lie, exaggeration, omission]
+    P:
+      required_fields: [retold_version, distortion_type, added_detail, dropped_detail, emotional_charge]
+      english_fields: [retold_version, added_detail, dropped_detail]
+      distortion_type_enum: [exaggeration, minimization, malicious_twist, emotional_coloring, detail_invention, source_confusion, faithful]
+    Q:
+      required_fields: [trauma_response, behavioral_change, trigger_situation, intensity, duration, coping_mechanism]
+      english_fields: [behavioral_change, trigger_situation, coping_mechanism]
+      trauma_response_enum: [avoidance, overprotection, aggression, withdrawal, hypervigilance, ritual_coping, resilience]
+      duration_enum: [short_term, long_term, permanent]
+    R:
+      required_fields: [action, counter_give, counter_want, reasoning, emotional_state, walk_away_threshold]
+      english_fields: [counter_give, counter_want, reasoning]
+      action_enum: [accept, counter_offer, reject, walk_away, stall, bluff]
+      emotional_state_enum: [joy, sadness, fear, anger, trust, disgust, surprise, anticipation]
+    S:
+      required_fields: [action, modified_practice, reasoning, social_pressure, tradition_conflict]
+      english_fields: [modified_practice, reasoning]
+      action_enum: [adopt, modify, reject, oppose, indifferent]
+    T:
+      required_fields: [decision_id, confidence, dissent_risk, minority_position, minority_action, spark_event, reasoning, timeline]
+      english_fields: [reasoning]
+      minority_action_enum: [comply, grumble, passive_resist, splinter, coup_attempt]
+      spark_event_enum: [food_shortage, battle_loss, oracle_conflict, leader_death, betrayal, resource_discovery]
+      timeline_enum: [immediate, delayed, conditional]
   auto_replacements:
     "마을": "무리가 사는 곳"
     "식량": "먹거리"
