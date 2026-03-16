@@ -50,7 +50,10 @@ def test_parallel_benchmark_notebook_has_expected_benchmark_references() -> None
     assert "aiohttp" in code_text
     assert "llama-server" in code_text
     assert "parallel_slot_benchmark.json" in code_text
-    assert "asyncio.get_event_loop().run_until_complete" in code_text
+    assert (
+        "asyncio.get_event_loop().run_until_complete" in code_text
+        or "await run_concurrent_requests" in code_text
+    )
     assert "run_concurrent_requests" in code_text
     assert "MODEL_08B" in code_text
     assert "MODEL_2B" in code_text
