@@ -1,0 +1,108 @@
+{
+  "dataset_id": "worldsim-v3-mix",
+  "generated_at": "2026-03-17T03:40:59.445582+00:00",
+  "dev_ratio": 0.1,
+  "seed": 42,
+  "sources": {
+    "v2_train_filtered": 1939,
+    "v2_dev_filtered": 231,
+    "logic_total": 1492,
+    "new_tasks_total": 2661,
+    "negatives": 500,
+    "general": 300
+  },
+  "deduplication": {
+    "removed": 622
+  },
+  "output": {
+    "train": 5856,
+    "dev": 645,
+    "train_curriculum": 5856,
+    "total": 6501
+  },
+  "task_counts": {
+    "train": {
+      "A": 88,
+      "B": 800,
+      "C": 389,
+      "F": 225,
+      "G": 662,
+      "GEN": 30,
+      "H": 45,
+      "I": 180,
+      "J": 180,
+      "K": 180,
+      "L": 179,
+      "M": 180,
+      "N": 173,
+      "NEG": 158,
+      "O": 430,
+      "P": 449,
+      "Q": 442,
+      "R": 346,
+      "S": 360,
+      "T": 360
+    },
+    "dev": {
+      "A": 12,
+      "B": 96,
+      "C": 40,
+      "F": 25,
+      "G": 83,
+      "H": 5,
+      "I": 19,
+      "J": 20,
+      "K": 20,
+      "L": 20,
+      "M": 20,
+      "N": 19,
+      "O": 48,
+      "P": 50,
+      "Q": 49,
+      "R": 39,
+      "S": 40,
+      "T": 40
+    },
+    "train_curriculum": {
+      "A": 88,
+      "B": 800,
+      "C": 389,
+      "F": 225,
+      "G": 662,
+      "GEN": 30,
+      "H": 45,
+      "I": 180,
+      "J": 180,
+      "K": 180,
+      "L": 179,
+      "M": 180,
+      "N": 173,
+      "NEG": 158,
+      "O": 430,
+      "P": 449,
+      "Q": 442,
+      "R": 346,
+      "S": 360,
+      "T": 360
+    }
+  },
+  "source_counts": {
+    "train": {
+      "batch_v3_01": 1342,
+      "batch_v3_02": 2387,
+      "general": 30,
+      "negative": 158,
+      "v2_train": 1939
+    },
+    "dev": {
+      "batch_v3_01": 148,
+      "batch_v3_02": 266,
+      "v2_dev": 231
+    }
+  },
+  "paths": {
+    "train": "/home/hyunlord/github/worldsim-training/data/final/worldsim-v3-mix/train.jsonl",
+    "dev": "/home/hyunlord/github/worldsim-training/data/final/worldsim-v3-mix/dev.jsonl",
+    "train_curriculum": "/home/hyunlord/github/worldsim-training/data/final/worldsim-v3-mix/train_curriculum.jsonl"
+  }
+}

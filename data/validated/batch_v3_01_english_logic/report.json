@@ -1,0 +1,7 @@
+{
+  "input_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_01_english_logic/generated.jsonl",
+  "passed": 1492,
+  "failed": 0,
+  "total": 1492,
+  "violations": {}
+}

@@ -1,0 +1,7 @@
+{
+  "input_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_02_new_tasks/generated.jsonl",
+  "passed": 2661,
+  "failed": 0,
+  "total": 2661,
+  "violations": {}
+}

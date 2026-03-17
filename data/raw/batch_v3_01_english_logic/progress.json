@@ -1,0 +1,174 @@
+{
+  "batch_id": "batch_v3_01_english_logic",
+  "updated_at": "2026-03-16T17:09:33.074462+00:00",
+  "paths": {
+    "generated_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_01_english_logic/generated.jsonl",
+    "skipped_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_01_english_logic/skipped.jsonl",
+    "progress_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_01_english_logic/progress.json",
+    "summary_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_01_english_logic/summary.json"
+  },
+  "total_planned_rows": 1700,
+  "processed_rows": 1700,
+  "successful_rows": 1492,
+  "skipped_rows": 208,
+  "success_rate": 0.877647,
+  "current_task": null,
+  "counts_by_task": {
+    "planned": {
+      "E": 200,
+      "F": 250,
+      "H": 50,
+      "I": 200,
+      "J": 200,
+      "K": 200,
+      "L": 200,
+      "M": 200,
+      "N": 200
+    },
+    "successful": {
+      "E": 0,
+      "F": 250,
+      "H": 50,
+      "I": 200,
+      "J": 200,
+      "K": 200,
+      "L": 200,
+      "M": 200,
+      "N": 192
+    },
+    "skipped": {
+      "E": 200,
+      "F": 0,
+      "H": 0,
+      "I": 0,
+      "J": 0,
+      "K": 0,
+      "L": 0,
+      "M": 0,
+      "N": 8
+    }
+  },
+  "failure_reasons_by_task": {
+    "E": {
+      "generation_validation_failed:invalid_action_id": 200
+    },
+    "N": {
+      "generation_validation_failed:schema_decision_en_extra_forbidden,schema_decision_ko_extra_forbidden,schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden": 4,
+      "generation_validation_failed:not_json": 3,
+      "generation_validation_failed:schema_chosen_option_extra_forbidden,schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden": 1
+    }
+  },
+  "recent_failures": [
+    {
+      "task": "E",
+      "variant": 1,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "situation_id": "strangers",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 0,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "strangers",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 1,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "strangers",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 0,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "situation_id": "strangers",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 1,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "charismatic_chief",
+        "situation_id": "strangers",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 0,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "paranoid_scout",
+        "situation_id": "strangers",
+        "temperament_id": "phlegmatic"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 1,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "paranoid_scout",
+        "situation_id": "strangers",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 0,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "stoic_observer",
+        "situation_id": "strangers",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "N",
+      "variant": 0,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "raft_help_for_oil",
+        "temperament_id": "melancholic"
+      }
+    },
+    {
+      "task": "E",
+      "variant": 1,
+      "reason": "generation_validation_failed:invalid_action_id",
+      "record_hint": {
+        "personality_id": "stoic_observer",
+        "situation_id": "strangers",
+        "temperament_id": "choleric"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2336874,
+    "completion_tokens": 179502,
+    "total_tokens": 2516376,
+    "estimated_cost_usd": 9.703152
+  },
+  "throughput": {
+    "rows_per_second": 0.180494,
+    "tokens_per_second": 267.170854
+  },
+  "eta_seconds": 0.0
+}

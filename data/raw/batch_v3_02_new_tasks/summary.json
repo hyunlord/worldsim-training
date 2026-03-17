@@ -1,0 +1,169 @@
+{
+  "batch_id": "batch_v3_02_new_tasks",
+  "updated_at": "2026-03-17T01:47:27.027805+00:00",
+  "paths": {
+    "generated_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_02_new_tasks/generated.jsonl",
+    "skipped_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_02_new_tasks/skipped.jsonl",
+    "progress_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_02_new_tasks/progress.json",
+    "summary_file": "/home/hyunlord/github/worldsim-training/data/raw/batch_v3_02_new_tasks/summary.json"
+  },
+  "total_planned_rows": 2700,
+  "processed_rows": 2700,
+  "successful_rows": 2661,
+  "skipped_rows": 39,
+  "success_rate": 0.985556,
+  "current_task": null,
+  "counts_by_task": {
+    "planned": {
+      "O": 500,
+      "P": 500,
+      "Q": 500,
+      "R": 400,
+      "S": 400,
+      "T": 400
+    },
+    "successful": {
+      "O": 480,
+      "P": 500,
+      "Q": 491,
+      "R": 390,
+      "S": 400,
+      "T": 400
+    },
+    "skipped": {
+      "O": 20,
+      "P": 0,
+      "Q": 9,
+      "R": 10,
+      "S": 0,
+      "T": 0
+    }
+  },
+  "failure_reasons_by_task": {
+    "O": {
+      "generation_validation_failed:schema_private_truth_ko_extra_forbidden,schema_public_claim_ko_extra_forbidden,schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden": 12,
+      "generation_validation_failed:not_json": 5,
+      "generation_validation_failed:schema_deception_style_ko_extra_forbidden,schema_private_truth_ko_extra_forbidden,schema_public_claim_ko_extra_forbidden,schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden": 3
+    },
+    "Q": {
+      "generation_validation_failed:not_json": 7,
+      "generation_validation_failed:schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden": 2
+    },
+    "R": {
+      "generation_validation_failed:schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden": 10
+    }
+  },
+  "recent_failures": [
+    {
+      "task": "O",
+      "variant": 1,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "vengeful_warrior",
+        "situation_id": "skill_exaggeration",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "O",
+      "variant": 0,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "situation_id": "skill_exaggeration",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "O",
+      "variant": 1,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "situation_id": "skill_exaggeration",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "Q",
+      "variant": 0,
+      "reason": "generation_validation_failed:schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "situation_id": "abandonment_on_migration",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "Q",
+      "variant": 1,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "greedy_gatherer",
+        "situation_id": "abandonment_on_migration",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "Q",
+      "variant": 0,
+      "reason": "generation_validation_failed:schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden",
+      "record_hint": {
+        "personality_id": "diligent_craftsman",
+        "situation_id": "abandonment_on_migration",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "O",
+      "variant": 1,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "stoic_observer",
+        "situation_id": "skill_exaggeration",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "Q",
+      "variant": 1,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "cautious_elder",
+        "situation_id": "starvation_winter",
+        "temperament_id": "mixed"
+      }
+    },
+    {
+      "task": "O",
+      "variant": 1,
+      "reason": "generation_validation_failed:schema_private_truth_ko_extra_forbidden,schema_public_claim_ko_extra_forbidden,schema_temperament_en_extra_forbidden,schema_temperament_ko_extra_forbidden",
+      "record_hint": {
+        "personality_id": "empathetic_healer",
+        "situation_id": "hide_injury",
+        "temperament_id": "sanguine"
+      }
+    },
+    {
+      "task": "Q",
+      "variant": 1,
+      "reason": "generation_validation_failed:not_json",
+      "record_hint": {
+        "personality_id": "empathetic_healer",
+        "situation_id": "starvation_winter",
+        "temperament_id": "mixed"
+      }
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 3091393,
+    "completion_tokens": 313592,
+    "total_tokens": 3404985,
+    "estimated_cost_usd": 13.978059
+  },
+  "throughput": {
+    "rows_per_second": 0.194319,
+    "tokens_per_second": 245.057378
+  },
+  "eta_seconds": 0.0
+}
