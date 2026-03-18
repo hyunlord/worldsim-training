@@ -442,6 +442,8 @@ def _validate_option_ids(task: str, payload: dict, record: dict) -> list[str]:
         for option in action_options
         if isinstance(option, dict) and "id" in option and not isinstance(option["id"], bool)
     }
+    if not allowed_ids:
+        allowed_ids = set(range(len(action_options)))
     violations: list[str] = []
     for field in option_fields:
         value = payload.get(field)

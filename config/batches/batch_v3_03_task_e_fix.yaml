@@ -1,0 +1,5 @@
+batch_id: v3-03-task-e-fix
+schema_version: 3
+description: "Regenerate Task E (Action Selection) that was skipped due to validation bug"
+tasks:
+  E: 200
