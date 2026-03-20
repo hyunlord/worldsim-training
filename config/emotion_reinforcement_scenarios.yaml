@@ -1,0 +1,81 @@
+emotion_reinforcement_scenarios:
+  - id: theft_discovered
+    situation: "A trusted companion was caught stealing food from the communal store"
+    previous_emotion: joy
+    expected_emotion: anger
+    expected_transition: sudden
+  - id: child_first_steps
+    situation: "Your child took their first steps today"
+    previous_emotion: anticipation
+    expected_emotion: joy
+    expected_transition: sudden
+  - id: elder_death_expected
+    situation: "The eldest member of the band passed away after a long illness"
+    previous_emotion: sadness
+    expected_emotion: sadness
+    expected_transition: sustained
+  - id: predator_ambush
+    situation: "A predator suddenly leaped from the bushes toward the children"
+    previous_emotion: trust
+    expected_emotion: fear
+    expected_transition: sudden
+  - id: rival_apology
+    situation: "The rival who stole your food came to apologize and offered double back"
+    previous_emotion: anger
+    expected_emotion: trust
+    expected_transition: gradual
+  - id: missing_child_found
+    situation: "The child who disappeared at dusk was found alive near the riverbank"
+    previous_emotion: fear
+    expected_emotion: joy
+    expected_transition: sudden
+  - id: spoiled_winter_store
+    situation: "Most of the dried meat prepared for winter was ruined by mold"
+    previous_emotion: trust
+    expected_emotion: disgust
+    expected_transition: sudden
+  - id: hunt_success_after_famine
+    situation: "After a week of hunger, the hunting party returned with a massive stag"
+    previous_emotion: sadness
+    expected_emotion: joy
+    expected_transition: gradual
+  - id: unexpected_betrayal
+    situation: "A long-time ally secretly told a rival band about your migration route"
+    previous_emotion: trust
+    expected_emotion: disgust
+    expected_transition: sudden
+  - id: omen_before_storm
+    situation: "Dark birds circled the camp just before the sky turned green"
+    previous_emotion: anticipation
+    expected_emotion: surprise
+    expected_transition: sudden
+  - id: healed_after_injury
+    situation: "The healer announced that your leg wound has fully recovered"
+    previous_emotion: fear
+    expected_emotion: trust
+    expected_transition: gradual
+  - id: sacred_fire_extinguished
+    situation: "The sacred fire went out during the night watch"
+    previous_emotion: joy
+    expected_emotion: surprise
+    expected_transition: sudden
+  - id: rival_band_gift
+    situation: "A rival band unexpectedly brought medicine for your sick elder"
+    previous_emotion: anger
+    expected_emotion: trust
+    expected_transition: gradual
+  - id: repeated_hunger
+    situation: "Another day passed without finding food for the band"
+    previous_emotion: sadness
+    expected_emotion: sadness
+    expected_transition: sustained
+  - id: newborn_cry
+    situation: "A healthy newborn cried loudly just after a difficult birth"
+    previous_emotion: fear
+    expected_emotion: joy
+    expected_transition: sudden
+  - id: warning_signs_ignored
+    situation: "The group ignored your warning and now the river is flooding the camp"
+    previous_emotion: anticipation
+    expected_emotion: anger
+    expected_transition: sudden

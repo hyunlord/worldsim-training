@@ -59,6 +59,7 @@ prompts:
   training:
     layer0_system: prompts/training/layer0_system.txt
     layer3_system: prompts/training/layer3_system.txt
+    layer3_en_system: prompts/training/layer3_en_system.txt
     layer4_system: prompts/training/layer4_system.txt
     layer5_system: prompts/training/layer5_system.txt
     negative_system: prompts/training/negative_system.txt

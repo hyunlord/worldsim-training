@@ -1,0 +1,5 @@
+batch_id: batch_v31_04_task_f_reinforce
+schema_version: 3
+description: "Reinforce Task F emotion judgment with clear transition scenarios"
+tasks:
+  F: 200

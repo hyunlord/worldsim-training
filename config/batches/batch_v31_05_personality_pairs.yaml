@@ -1,0 +1,7 @@
+batch_id: batch_v31_05_personality_pairs
+schema_version: 3
+description: "Personality contrast pairs — same scenario, opposite temperament, different actions"
+tasks:
+  E: 100
+  M: 50
+  O: 50
