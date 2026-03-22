@@ -1,0 +1,34 @@
+emotion_transitions:
+  - {prev: joy, next: anger, trigger: betrayal, type: sudden, plausibility: 0.95}
+  - {prev: joy, next: sadness, trigger: loss, type: sudden, plausibility: 0.90}
+  - {prev: trust, next: fear, trigger: threat, type: sudden, plausibility: 0.95}
+  - {prev: trust, next: anger, trigger: betrayal, type: sudden, plausibility: 0.90}
+  - {prev: trust, next: disgust, trigger: betrayal, type: sudden, plausibility: 0.85}
+  - {prev: anticipation, next: joy, trigger: success, type: sudden, plausibility: 0.90}
+  - {prev: anticipation, next: fear, trigger: threat, type: sudden, plausibility: 0.85}
+  - {prev: sadness, next: sadness, trigger: grief, type: sustained, plausibility: 0.95}
+  - {prev: sadness, next: anger, trigger: injustice, type: gradual, plausibility: 0.80}
+  - {prev: anger, next: trust, trigger: reconciliation, type: gradual, plausibility: 0.75}
+  - {prev: anger, next: sadness, trigger: regret, type: gradual, plausibility: 0.80}
+  - {prev: fear, next: anger, trigger: cornered, type: sudden, plausibility: 0.85}
+  - {prev: fear, next: trust, trigger: rescue, type: gradual, plausibility: 0.80}
+  - {prev: disgust, next: anger, trigger: repeated_offense, type: gradual, plausibility: 0.85}
+  - {prev: surprise, next: fear, trigger: threat, type: sudden, plausibility: 0.90}
+  - {prev: surprise, next: joy, trigger: gift, type: sudden, plausibility: 0.90}
+  - {prev: anger, next: anger, trigger: ongoing_conflict, type: sustained, plausibility: 0.85}
+  - {prev: fear, next: fear, trigger: ongoing_threat, type: sustained, plausibility: 0.90}
+  - {prev: joy, next: joy, trigger: celebration, type: sustained, plausibility: 0.80}
+  - {prev: joy, next: anger, trigger: nothing, type: gradual, plausibility: 0.15}
+  - {prev: trust, next: disgust, trigger: nothing, type: gradual, plausibility: 0.10}
+
+situation_triggers:
+  predator: threat
+  food_found: success
+  storm: threat
+  injury: loss
+  kin_death: grief
+  theft: betrayal
+  migration: uncertainty
+  tool_craft: success
+  fire: threat
+  strangers: uncertainty
