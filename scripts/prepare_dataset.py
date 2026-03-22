@@ -36,6 +36,7 @@ def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str
     defaults = {
         "L0": "너는 세계관 규칙을 JSON IR로만 답하는 도우미다.",
         "L3": "너는 석기시대 서사 도우미다. JSON으로만 답하라.",
+        "L3_EN": "You are WorldSim logic assistant. Output JSON only. Follow [TEMP], [STRESS], [WORLD] context. Use English for all text fields. Respect enum values and numeric ranges exactly.",
         "L4": "너는 석기시대 서사 도우미다. JSON으로만 답하라. 한국어와 영어를 함께 써라.",
         "L5": "너는 신탁 해석 도우미다. bilingual JSON으로만 답하라.",
         "NEG": "너는 학습 샘플 감시자다. 제시된 답안이 버릴 예시인지 retain 또는 reject 한 단어로만 답하라.",
@@ -47,6 +48,7 @@ def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str
     training_prompts = settings.get("prompts", {}).get("training", {})
     layer0_path = training_prompts.get("layer0_system")
     layer3_path = training_prompts.get("layer3_system")
+    layer3_en_path = training_prompts.get("layer3_en_system")
     layer4_path = training_prompts.get("layer4_system")
     layer5_path = training_prompts.get("layer5_system")
     negative_path = training_prompts.get("negative_system")
@@ -55,6 +57,8 @@ def _training_system_prompts(repo_root: Path | None, settings: dict) -> dict[str
         defaults["L0"] = resolve_path(repo_root, layer0_path).read_text(encoding="utf-8").strip()
     if layer3_path:
         defaults["L3"] = resolve_path(repo_root, layer3_path).read_text(encoding="utf-8").strip()
+    if layer3_en_path:
+        defaults["L3_EN"] = resolve_path(repo_root, layer3_en_path).read_text(encoding="utf-8").strip()
     if layer4_path:
         defaults["L4"] = resolve_path(repo_root, layer4_path).read_text(encoding="utf-8").strip()
     if layer5_path:
@@ -86,6 +90,10 @@ def _assistant_content(output: object, *, task: str) -> str:
     raise ValueError(f"Unsupported dataset row for task {task}: output must be a string or JSON value")
 
 
+V3_ENGLISH_LOGIC_TASKS = {"E", "F", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"}
+ALL_STRUCTURED_TASKS = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"}
+
+
 def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
     if "messages" in row:
         return _validate_messages_row(row)
@@ -93,7 +101,7 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
     task = row.get("task")
     prompt = row.get("prompt")
     output = row.get("output")
-    if task in {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"} and prompt and output:
+    if task in ALL_STRUCTURED_TASKS and prompt and output:
         default_layers = {
             "E": "L3",
             "F": "L3",
@@ -113,18 +121,23 @@ def _row_to_training_example(row: dict, system_prompts: dict[str, str]) -> dict:
             "T": "L3",
         }
         layer = row.get("layer", default_layers.get(task, "L4"))
+        schema_version = row.get("schema_version")
+        if schema_version == 3 and task in V3_ENGLISH_LOGIC_TASKS and "L3_EN" in system_prompts:
+            system_key = "L3_EN"
+        else:
+            system_key = layer
         assistant_content = _assistant_content(output, task=task)
         return {
             "task": task,
             "layer": layer,
             "source_split": row.get("source_split"),
             "messages": [
-                {"role": "system", "content": system_prompts[layer]},
+                {"role": "system", "content": system_prompts[system_key]},
                 {"role": "user", "content": prompt},
                 {"role": "assistant", "content": assistant_content},
             ],
         }
-    if task in {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"}:
+    if task in ALL_STRUCTURED_TASKS:
         raise ValueError(f"Unsupported dataset row for task {task}: missing prompt/output")
     if task == "NEG" and output:
         sample_output = _assistant_content(output, task=task)
