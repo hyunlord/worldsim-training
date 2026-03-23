@@ -5,13 +5,16 @@ from pathlib import Path
 
 from scripts.reward_functions import (
     combined_reward,
+    confidence_personality_reward,
     diversity_reward,
+    hint_quality_reward,
     gate_check,
     load_action_features,
     load_emotion_transitions,
     parse_options_from_prompt,
     parse_tci_from_prompt,
     personality_coherence_reward,
+    reasoning_action_consistency_reward,
     score_best_of_n,
     select_dpo_pair,
     tci_to_expected_features,
@@ -105,6 +108,47 @@ def test_text_richness_real_content() -> None:
     assert reward == 1.0
 
 
+def test_hint_quality_long_vs_short() -> None:
+    long_hint = {"hint": "carefully set a trap using nearby branches and rocks to ambush the predator at dawn"}
+    short_hint = {"hint": "confront"}
+    assert hint_quality_reward(long_hint) > hint_quality_reward(short_hint) + 0.2
+
+
+def test_hint_quality_placeholder_penalty() -> None:
+    placeholder = {"hint": "str", "personality_reasoning": "novelty_seeking"}
+    assert hint_quality_reward(placeholder) < 0.15
+
+
+def test_confidence_personality_high_ha_low_conf() -> None:
+    score = confidence_personality_reward({"confidence": 0.3}, {"NS": 0.2, "HA": 0.9, "RD": 0.5, "P": 0.5})
+    assert score > 0.8
+
+
+def test_confidence_personality_high_ha_high_conf() -> None:
+    score = confidence_personality_reward({"confidence": 0.95}, {"NS": 0.2, "HA": 0.9, "RD": 0.5, "P": 0.5})
+    assert score < 0.5
+
+
+def test_reasoning_action_consistency_match() -> None:
+    feature_map = load_action_features(CONFIG_DIR)
+    score = reasoning_action_consistency_reward(
+        {"action_id": 0, "personality_reasoning": "novelty_seeking"},
+        [(0, "confront"), (1, "retreat")],
+        feature_map,
+    )
+    assert score > 0.8
+
+
+def test_reasoning_action_consistency_contradiction() -> None:
+    feature_map = load_action_features(CONFIG_DIR)
+    score = reasoning_action_consistency_reward(
+        {"action_id": 0, "personality_reasoning": "harm_avoidance"},
+        [(0, "confront"), (1, "retreat")],
+        feature_map,
+    )
+    assert score < 0.4
+
+
 def test_gate_check_valid_json() -> None:
     parsed, gate = gate_check(
         '{"action_id":0,"confidence":0.9,"hint":"Charge forward now.","personality_reasoning":"novelty_seeking","temperament_factor":"bold"}',
@@ -129,6 +173,32 @@ def test_combined_reward_returns_all_components() -> None:
     assert {"total", "gate", "personality", "emotion", "plausibility", "diversity", "task", "details"} <= set(result)
     assert result["task"] == "E"
     assert result["gate"] == 1.0
+
+
+def test_combined_reward_same_action_different_hints() -> None:
+    prompt = "[TASK] E\n[TEMP]\nNS=0.8 HA=0.2 RD=0.5 P=0.7 type=choleric\n[OPTIONS]\n0:confront 1:observe 2:retreat"
+    good = json.dumps(
+        {
+            "action_id": 0,
+            "confidence": 0.85,
+            "hint": "charge forward boldly to confront the rival band near the river crossing",
+            "personality_reasoning": "novelty_seeking",
+            "temperament_factor": "dominant_impulse",
+        }
+    )
+    weak = json.dumps(
+        {
+            "action_id": 0,
+            "confidence": 0.5,
+            "hint": "confront",
+            "personality_reasoning": "persistence",
+            "temperament_factor": "bold",
+        }
+    )
+    good_reward = combined_reward(good, prompt, config_dir=CONFIG_DIR)
+    weak_reward = combined_reward(weak, prompt, config_dir=CONFIG_DIR)
+    gap = good_reward["total"] - weak_reward["total"]
+    assert gap > 0.10, f"Same action but different quality should have gap > 0.10, got {gap:.3f}"
 
 
 def test_score_best_of_n_sorted_by_reward() -> None:
@@ -158,7 +228,7 @@ def test_select_dpo_pair_none_if_gap_small() -> None:
         {"output": "a", "reward": {"total": 0.61}},
         {"output": "b", "reward": {"total": 0.55}},
     ]
-    assert select_dpo_pair(scored) is None
+    assert select_dpo_pair(scored, min_gap=0.1) is None
 
 
 def test_diversity_reward_all_same() -> None:

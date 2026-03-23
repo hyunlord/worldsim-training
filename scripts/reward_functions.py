@@ -12,20 +12,56 @@ import yaml
 
 FEATURE_DIMENSIONS = ("risk_avoid", "approach", "prosocial", "persist", "passive")
 PLACEHOLDER_WORDS = {"str", "string", "sentence", "English", "enum", "number", "해라체", "one of"}
+STOP_WORDS = {
+    "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+    "have", "has", "had", "do", "does", "did", "will", "would", "could",
+    "should", "may", "might", "can", "shall", "to", "of", "in", "for",
+    "on", "with", "at", "by", "from", "as", "into", "through", "and",
+    "but", "or", "not", "no", "so", "if", "then", "than", "that", "this",
+    "는", "은", "이", "가", "을", "를", "에", "의", "로", "와", "과",
+    "도", "만", "까지", "부터", "에서", "으로", "하다", "이다",
+}
+REASONING_TO_FEATURE = {
+    "novelty_seeking": "approach",
+    "novelty": "approach",
+    "curiosity": "approach",
+    "exploration": "approach",
+    "bold": "approach",
+    "impulsive": "approach",
+    "harm_avoidance": "risk_avoid",
+    "caution": "risk_avoid",
+    "safety": "risk_avoid",
+    "fear": "risk_avoid",
+    "anxiety": "risk_avoid",
+    "avoidance": "risk_avoid",
+    "reward_dependence": "prosocial",
+    "social": "prosocial",
+    "cooperation": "prosocial",
+    "bond": "prosocial",
+    "empathy": "prosocial",
+    "attachment": "prosocial",
+    "persistence": "persist",
+    "determination": "persist",
+    "endurance": "persist",
+    "perseverance": "persist",
+    "tenacity": "persist",
+}
 
 DEFAULT_WEIGHTS = {
-    "personality": 0.35,
-    "emotion": 0.25,
-    "plausibility": 0.25,
-    "diversity": 0.15,
+    "personality": 0.25,
+    "emotion": 0.15,
+    "hint_quality": 0.25,
+    "confidence_fit": 0.15,
+    "reasoning_fit": 0.10,
+    "diversity": 0.10,
 }
 
 TASK_WEIGHTS = {
-    "E": {"personality": 0.40, "emotion": 0.10, "plausibility": 0.30, "diversity": 0.20},
-    "F": {"personality": 0.15, "emotion": 0.50, "plausibility": 0.25, "diversity": 0.10},
-    "B": {"personality": 0.20, "emotion": 0.20, "plausibility": 0.20, "diversity": 0.10, "text_richness": 0.30},
-    "C": {"personality": 0.20, "emotion": 0.20, "plausibility": 0.20, "diversity": 0.10, "text_richness": 0.30},
-    "O": {"personality": 0.30, "emotion": 0.10, "plausibility": 0.30, "diversity": 0.15, "text_richness": 0.15},
+    "E": {"personality": 0.25, "emotion": 0.05, "hint_quality": 0.25, "confidence_fit": 0.20, "reasoning_fit": 0.15, "diversity": 0.10},
+    "F": {"personality": 0.10, "emotion": 0.35, "hint_quality": 0.25, "confidence_fit": 0.10, "reasoning_fit": 0.10, "diversity": 0.10},
+    "B": {"personality": 0.15, "emotion": 0.10, "hint_quality": 0.40, "confidence_fit": 0.10, "reasoning_fit": 0.10, "diversity": 0.15},
+    "C": {"personality": 0.15, "emotion": 0.10, "hint_quality": 0.40, "confidence_fit": 0.10, "reasoning_fit": 0.10, "diversity": 0.15},
+    "O": {"personality": 0.20, "emotion": 0.05, "hint_quality": 0.30, "confidence_fit": 0.15, "reasoning_fit": 0.15, "diversity": 0.15},
 }
 
 REQUIRED_FIELDS = {
@@ -233,6 +269,119 @@ def text_richness_reward(output: dict, min_avg_len: int = 15) -> float:
     return 0.0
 
 
+def _iter_text_tokens(parsed: dict) -> tuple[list[str], list[str]]:
+    text_fields = []
+    all_words: list[str] = []
+    for value in parsed.values():
+        if not isinstance(value, str):
+            continue
+        stripped = value.strip()
+        if not stripped:
+            continue
+        text_fields.append(stripped)
+        all_words.extend(re.findall(r"[A-Za-z가-힣']+", stripped.lower()))
+    return text_fields, all_words
+
+
+def _piecewise_length_score(avg_len: float) -> float:
+    points = [
+        (0.0, 0.0),
+        (5.0, 0.0),
+        (15.0, 0.2),
+        (30.0, 0.5),
+        (60.0, 0.8),
+        (90.0, 1.0),
+    ]
+    if avg_len <= points[0][0]:
+        return points[0][1]
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        if avg_len <= x1:
+            if x1 == x0:
+                return y1
+            ratio = (avg_len - x0) / (x1 - x0)
+            return y0 + ratio * (y1 - y0)
+    return 1.0
+
+
+def hint_quality_reward(parsed: dict) -> float:
+    text_fields, all_words = _iter_text_tokens(parsed)
+    if not text_fields:
+        return 0.0
+
+    avg_len = sum(len(value) for value in text_fields) / len(text_fields)
+    length_score = _piecewise_length_score(avg_len)
+
+    vocab_score = 0.0
+    if all_words:
+        vocab_score = len(set(all_words)) / len(all_words)
+
+    specific_words = [word for word in all_words if word not in STOP_WORDS]
+    specificity_score = 0.0
+    if all_words:
+        specificity_score = min((len(specific_words) / len(all_words)) * 2.0, 1.0)
+
+    placeholder_mult = 0.1 if any(value.lower() in PLACEHOLDER_WORDS for value in text_fields) else 1.0
+    score = (length_score * 0.4 + vocab_score * 0.3 + specificity_score * 0.3) * placeholder_mult
+    return clamp(score)
+
+
+def confidence_personality_reward(parsed: dict, tci: dict) -> float:
+    actual_conf = parsed.get("confidence", 0.5)
+    if not isinstance(actual_conf, (int, float)):
+        return 0.5
+    expected_conf = 0.5 + 0.3 * (float(tci.get("NS", 0.5)) - 0.5) - 0.2 * (float(tci.get("HA", 0.5)) - 0.5) + 0.1 * (float(tci.get("P", 0.5)) - 0.5)
+    expected_conf = clamp(expected_conf, 0.2, 0.95)
+    distance = abs(float(actual_conf) - expected_conf)
+    return clamp(1.0 - distance)
+
+
+def reasoning_action_consistency_reward(
+    parsed: dict,
+    options: list[tuple[int, str]],
+    feature_map: dict,
+) -> float:
+    reasoning_text = " ".join(
+        str(parsed.get(key, "")).strip().lower()
+        for key in ("personality_reasoning", "reasoning")
+        if parsed.get(key)
+    ).strip()
+    if not reasoning_text:
+        return 0.5
+
+    expected_feature = None
+    for keyword, feature_name in REASONING_TO_FEATURE.items():
+        if keyword in reasoning_text:
+            expected_feature = feature_name
+            break
+    if expected_feature is None:
+        return 0.5
+
+    action_name = None
+    if "action_id" in parsed:
+        try:
+            action_id = int(parsed["action_id"])
+        except (TypeError, ValueError):
+            return 0.2
+        action_name = dict(options).get(action_id)
+    elif "action" in parsed and isinstance(parsed["action"], str):
+        action_name = parsed["action"]
+    if not action_name:
+        return 0.5
+
+    action_features = get_action_features(action_name, feature_map)
+    dominant_feature = max(action_features, key=action_features.get)
+    dominant_value = action_features.get(dominant_feature, 0.0)
+    expected_value = action_features.get(expected_feature, 0.0)
+
+    if dominant_feature == expected_feature and dominant_value >= 0.5:
+        return 1.0
+    if expected_value >= 0.5:
+        return 0.6
+    if dominant_value >= 0.6 and dominant_feature != expected_feature:
+        return 0.2
+    return 0.5
+
+
 def numeric_validity_reward(output: dict) -> float:
     ranges = {
         "confidence": (0.0, 1.0),
@@ -357,8 +506,11 @@ def combined_reward(
     personality = personality_coherence_reward(parsed, tci, options, feature_map) if task == "E" else 0.5
     emotion = emotion_transition_reward(parsed, situation_type, transition_table, situation_triggers) if task == "F" else 0.5
     text_score = text_richness_reward(parsed)
+    hint_qual = hint_quality_reward(parsed)
+    conf_fit = confidence_personality_reward(parsed, tci) if tci.get("type") != "unknown" else 0.5
+    reason_fit = reasoning_action_consistency_reward(parsed, options, feature_map) if options or "action" in parsed else 0.5
     numeric_score = numeric_validity_reward(parsed)
-    plausibility = (text_score + numeric_score) / 2.0
+    plausibility = (hint_qual + numeric_score) / 2.0
 
     diversity = 0.0
     if group_outputs:
@@ -370,12 +522,12 @@ def combined_reward(
     components = {
         "personality": personality,
         "emotion": emotion,
-        "plausibility": plausibility,
+        "hint_quality": hint_qual,
+        "confidence_fit": conf_fit,
+        "reasoning_fit": reason_fit,
     }
     if group_outputs:
         components["diversity"] = diversity
-    if "text_richness" in task_weights:
-        components["text_richness"] = text_score
 
     active_weights = {name: task_weights.get(name, 0.0) for name in components}
     total_weight = sum(active_weights.values()) or 1.0
@@ -394,6 +546,9 @@ def combined_reward(
             "options": options,
             "situation_type": situation_type,
             "text_richness": text_score,
+            "hint_quality": hint_qual,
+            "confidence_fit": conf_fit,
+            "reasoning_fit": reason_fit,
             "numeric_validity": numeric_score,
             "weights": active_weights,
         },
@@ -415,11 +570,11 @@ def score_best_of_n(
     return scored
 
 
-def select_dpo_pair(scored: list[dict]) -> tuple[str, str] | None:
+def select_dpo_pair(scored: list[dict], min_gap: float = 0.05) -> tuple[str, str] | None:
     if len(scored) < 2:
         return None
     chosen = scored[0]
     rejected = scored[-1]
-    if chosen["reward"]["total"] - rejected["reward"]["total"] < 0.15:
+    if chosen["reward"]["total"] - rejected["reward"]["total"] < min_gap:
         return None
     return chosen["output"], rejected["output"]
