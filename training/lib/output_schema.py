@@ -261,58 +261,58 @@ class TaskNOutput(StrictWorldSimModel):
 
 
 class TaskEOutput_v3(StrictWorldSimModel):
+    personality_reasoning: DominantTraitLiteral
+    temperament_factor: str = Field(min_length=1)
     action_id: int
     confidence: float = Field(ge=0.0, le=1.0)
     hint: str = Field(min_length=1)
-    personality_reasoning: DominantTraitLiteral
-    temperament_factor: str = Field(min_length=1)
 
 
 class TaskFOutput_v3(StrictWorldSimModel):
+    temperament_amplifier: str = Field(min_length=1)
+    cause: str = Field(min_length=1)
     emotion: EmotionLiteral
     intensity: float = Field(ge=0.0, le=1.0)
-    cause: str = Field(min_length=1)
     previous_emotion: EmotionLiteral
     transition_type: TransitionTypeLiteral
-    temperament_amplifier: str = Field(min_length=1)
 
 
 class TaskIOutput_v3(StrictWorldSimModel):
-    priority_id: int = Field(ge=0, le=9)
     reasoning: str = Field(min_length=5)
+    priority_id: int = Field(ge=0, le=9)
     need_addressed: NeedLiteral
     urgency: float = Field(ge=0.0, le=1.0)
 
 
 class TaskJOutput_v3(StrictWorldSimModel):
+    hint: str = Field(min_length=5)
     coping_id: int = Field(ge=0, le=9)
     coping_type: CopingTypeLiteral
     stress_delta: float = Field(ge=-1.0, le=0.0)
-    hint: str = Field(min_length=5)
     side_effect: SideEffectLiteral
 
 
 class TaskKOutput_v3(StrictWorldSimModel):
+    hint: str = Field(min_length=5)
     social_action_id: int = Field(ge=0, le=9)
     trust_delta: float = Field(ge=-0.5, le=0.5)
-    hint: str = Field(min_length=5)
     relationship_intent: RelationshipIntentLiteral
     reciprocity_expectation: ReciprocityExpectationLiteral
 
 
 class TaskLOutput_v3(StrictWorldSimModel):
+    hint: str = Field(min_length=5)
     response_id: int = Field(ge=0, le=9)
     trust_delta: float = Field(ge=-0.5, le=0.5)
-    hint: str = Field(min_length=5)
     forgiveness_threshold: float = Field(ge=0.0, le=1.0)
     social_memory: SocialMemoryLiteral
 
 
 class TaskMOutput_v3(StrictWorldSimModel):
+    reasoning: str = Field(min_length=5)
     decision_id: int = Field(ge=0, le=9)
     confidence: float = Field(ge=0.0, le=1.0)
     dissent_risk: float = Field(ge=0.0, le=1.0)
-    reasoning: str = Field(min_length=5)
     resource_commitment: ResourceCommitmentLiteral
     timeline: TimelineLiteral
 
@@ -361,10 +361,10 @@ class TaskQOutput(StrictWorldSimModel):
 class TaskROutput(StrictWorldSimModel):
     """Negotiate — single round of personality-driven negotiation."""
 
+    reasoning: str = Field(min_length=5)
     action: NegotiateActionLiteral
     counter_give: str = Field(min_length=1)
     counter_want: str = Field(min_length=1)
-    reasoning: str = Field(min_length=5)
     emotional_state: EmotionLiteral
     walk_away_threshold: float = Field(ge=0.0, le=1.0)
 
@@ -382,13 +382,13 @@ class TaskSOutput(StrictWorldSimModel):
 class TaskTOutput(StrictWorldSimModel):
     """Group dissent — collective decision with minority faction."""
 
+    reasoning: str = Field(min_length=5)
     decision_id: int = Field(ge=0, le=9)
     confidence: float = Field(ge=0.0, le=1.0)
     dissent_risk: float = Field(ge=0.0, le=1.0)
     minority_position: int = Field(ge=0, le=9)
     minority_action: MinorityActionLiteral
     spark_event: SparkEventLiteral
-    reasoning: str = Field(min_length=5)
     timeline: TimelineLiteral
 
 

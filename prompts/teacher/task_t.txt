@@ -22,17 +22,19 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [FACTION_HINT]
 {faction_hint}
 
+Explain the personality-driven reasoning FIRST, then select the action.
+
 [OUTPUT FORMAT]
-{{"decision_id": number, "confidence": 0.0, "dissent_risk": 0.0, "minority_position": number, "minority_action": "comply|grumble|passive_resist|splinter|coup_attempt", "spark_event": "food_shortage|battle_loss|oracle_conflict|leader_death|betrayal|resource_discovery", "reasoning": "one English sentence", "timeline": "immediate|delayed|conditional"}}
+{{"reasoning": "one English sentence", "decision_id": number, "confidence": 0.0, "dissent_risk": 0.0, "minority_position": number, "minority_action": "comply|grumble|passive_resist|splinter|coup_attempt", "spark_event": "food_shortage|battle_loss|oracle_conflict|leader_death|betrayal|resource_discovery", "timeline": "immediate|delayed|conditional"}}
 
 [RULES]
+- reasoning: 10-35 English words explaining the majority decision and minority reaction
 - decision_id: one of the option numbers above
 - confidence: 0.0 to 1.0
 - dissent_risk: 0.0 to 1.0
 - minority_position: one of the option numbers above representing the minority preference
 - minority_action: one of comply, grumble, passive_resist, splinter, coup_attempt
 - spark_event: choose the closest trigger category from the situation
-- reasoning: 10-35 English words explaining the majority decision and minority reaction
 - timeline: one of immediate, delayed, conditional
 - JSON only, no explanations
 

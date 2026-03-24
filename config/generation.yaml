@@ -1,4 +1,6 @@
 seed: 42
+schema_release: v3.2-cot
+cot_reasoning_first_tasks: [E, F, I, J, K, L, M, R, T]
 
 provider:
   base_url: https://openrouter.ai/api/v1

@@ -31,16 +31,18 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [WORLD_VOCAB]
 {world_vocab_additions}
 
+Think about WHY this personality would make this choice FIRST, then decide WHAT action to take.
+
 [OUTPUT FORMAT]
-{{"emotion": "emotion_id", "intensity": 0.0, "cause": "one English sentence", "previous_emotion": "emotion_id", "transition_type": "gradual|sudden|sustained", "temperament_amplifier": "English snake_case phrase"}}
+{{"temperament_amplifier": "English snake_case phrase", "cause": "one English sentence", "emotion": "emotion_id", "intensity": 0.0, "previous_emotion": "emotion_id", "transition_type": "gradual|sudden|sustained"}}
 
 [RULES]
+- temperament_amplifier: how temperament changes the intensity, English snake_case
+- cause: explain why the emotion changed in 10-30 English words
 - emotion: one of joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 - intensity: 0.0 to 1.0
-- cause: explain why the emotion changed in 10-30 English words
 - previous_emotion: the English emotion id that matches [CURRENT_EMOTION]
 - transition_type: choose one of gradual, sudden, sustained
-- temperament_amplifier: how temperament changes the intensity, English snake_case
 - JSON only, no explanations
 
 [VARIANT]
