@@ -49,18 +49,23 @@ def test_contrastive_dpo_notebook_has_expected_pipeline_references() -> None:
     )
 
     for keyword in [
-        "google/gemini-2.5-flash",
+        "google/gemini-3.1-flash-lite-preview",
         "CONTRASTIVE_PAIRS",
         "DPOTrainer",
         "combined_reward",
         "call_teacher",
         "build_task_e_prompt",
         "build_student_prompt",
+        "FastLanguageModel",
+        "input_rate",
         "chosen",
         "contrastive",
         "worldsim-dpo-contrastive-v31-qwen3.5-2b-q4_k_m.gguf",
     ]:
         assert keyword in code_text
+
+    assert "google/gemini-2.5-flash" not in code_text
+    assert "0.375 / 1_000_000" not in code_text
 
 
 def test_contrastive_dpo_notebook_code_cells_have_empty_outputs() -> None:
