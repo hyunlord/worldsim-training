@@ -49,15 +49,17 @@ joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 [전이 방식 선택지]
 gradual, sudden, sustained
 
+이 성격이 왜 이런 선택을 하는지 먼저 설명하고, 그 다음 행동을 정하라.
+
 [출력 형식]
-{{"emotion": "8개중하나", "intensity": 0.0, "cause_ko": "순우리말 한 문장", "cause_en": "English 1 sentence", "previous_emotion": "이전 감정", "transition_type": "전이 방식", "temperament_amplifier": "English snake_case phrase"}}
+{{"temperament_amplifier": "English snake_case phrase", "cause_ko": "순우리말 한 문장", "cause_en": "English 1 sentence", "emotion": "8개중하나", "intensity": 0.0, "previous_emotion": "이전 감정", "transition_type": "전이 방식"}}
 
 [규칙]
-- emotion은 위 8개 중 하나를 영어로 쓴다
-- intensity는 0.0~1.0
+- temperament_amplifier는 이 기질이 감정 세기를 어떻게 키우거나 누르는지 영어 snake_case 한 구절로 적어라
 - cause_ko는 왜 이 감정이 일어났는지 순우리말 10~25글자로 써라
 - cause_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
+- emotion은 위 8개 중 하나를 영어로 쓴다
+- intensity는 0.0~1.0
 - previous_emotion은 [지금 느끼는 것]에 맞는 영어 감정 id로 적어라
 - transition_type은 감정이 바뀌는 흐름에 맞춰 gradual, sudden, sustained 중 하나를 고르라
-- temperament_amplifier는 이 기질이 감정 세기를 어떻게 키우거나 누르는지 영어 snake_case 한 구절로 적어라
 - JSON만 출력하고 다른 설명문은 쓰지 마라

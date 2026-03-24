@@ -34,15 +34,17 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [OPTIONS]
 {action_options}
 
+Think about WHY this personality would make this choice FIRST, then decide WHAT action to take.
+
 [OUTPUT FORMAT]
-{{"action_id": number, "confidence": 0.0, "hint": "one English sentence", "personality_reasoning": "novelty_seeking|harm_avoidance|reward_dependence|persistence", "temperament_factor": "English snake_case phrase"}}
+{{"personality_reasoning": "novelty_seeking|harm_avoidance|reward_dependence|persistence", "temperament_factor": "English snake_case phrase", "action_id": number, "confidence": 0.0, "hint": "one English sentence"}}
 
 [RULES]
+- personality_reasoning: exactly one of novelty_seeking, harm_avoidance, reward_dependence, persistence
+- temperament_factor: how temperament drives this choice, English snake_case
 - action_id: one of the option numbers above
 - confidence: 0.0 to 1.0
 - hint: why this action was chosen, 10-30 English words
-- personality_reasoning: exactly one of novelty_seeking, harm_avoidance, reward_dependence, persistence
-- temperament_factor: how temperament drives this choice, English snake_case
 - JSON only, no explanations
 
 [VARIANT]

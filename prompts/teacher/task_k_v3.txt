@@ -25,13 +25,15 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [OPTIONS]
 {action_options}
 
+Think about WHY this personality would make this choice FIRST, then decide WHAT action to take.
+
 [OUTPUT FORMAT]
-{{"social_action_id": number, "trust_delta": 0.0, "hint": "one English sentence", "relationship_intent": "relationship_intent", "reciprocity_expectation": "reciprocity_expectation"}}
+{{"hint": "one English sentence", "social_action_id": number, "trust_delta": 0.0, "relationship_intent": "relationship_intent", "reciprocity_expectation": "reciprocity_expectation"}}
 
 [RULES]
+- hint: explain why this social move is chosen in 10-30 English words
 - social_action_id: one of the option numbers above
 - trust_delta: -0.5 to 0.5
-- hint: explain why this social move is chosen in 10-30 English words
 - relationship_intent: one of alliance, cautious_observation, hostile, submissive, dominant, trade_partner, ignore
 - reciprocity_expectation: one of none, gift, service, alliance
 - JSON only, no explanations

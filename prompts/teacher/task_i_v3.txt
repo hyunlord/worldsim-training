@@ -22,12 +22,14 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [OPTIONS]
 {action_options}
 
+Think about WHY this personality would make this choice FIRST, then decide WHAT action to take.
+
 [OUTPUT FORMAT]
-{{"priority_id": number, "reasoning": "one English sentence", "need_addressed": "need_name", "urgency": 0.0}}
+{{"reasoning": "one English sentence", "priority_id": number, "need_addressed": "need_name", "urgency": 0.0}}
 
 [RULES]
-- priority_id: one of the option numbers above
 - reasoning: explain why this need comes first in 10-30 English words
+- priority_id: one of the option numbers above
 - need_addressed: one of hunger, thirst, warmth, rest, safety, belonging, esteem, curiosity, reproduction, comfort, purpose, transcendence, play
 - urgency: 0.0 to 1.0
 - JSON only, no explanations

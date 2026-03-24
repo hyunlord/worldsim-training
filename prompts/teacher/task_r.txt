@@ -25,13 +25,15 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [POWER_BALANCE]
 {power_balance}
 
+Explain the personality-driven reasoning FIRST, then select the action.
+
 [OUTPUT FORMAT]
-{{"action": "accept|counter_offer|reject|walk_away|stall|bluff", "counter_give": "item:count", "counter_want": "item:count", "reasoning": "one English sentence", "emotional_state": "emotion_id", "walk_away_threshold": 0.0}}
+{{"reasoning": "one English sentence", "action": "accept|counter_offer|reject|walk_away|stall|bluff", "counter_give": "item:count", "counter_want": "item:count", "emotional_state": "emotion_id", "walk_away_threshold": 0.0}}
 
 [RULES]
+- reasoning: 10-30 English words explaining this move
 - action: one of accept, counter_offer, reject, walk_away, stall, bluff
 - counter_give and counter_want: item:count format, use "none" if not applicable
-- reasoning: 10-30 English words explaining this move
 - emotional_state: one of joy, sadness, fear, anger, trust, disgust, surprise, anticipation
 - walk_away_threshold: 0.0 to 1.0
 - JSON only, no explanations

@@ -39,16 +39,18 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [판단 근거 선택지]
 high_NS, high_HA, high_RD, high_P
 
+이 성격이 왜 이런 선택을 하는지 먼저 설명하고, 그 다음 행동을 정하라.
+
 [출력 형식]
-{{"action_id": 번호, "confidence": 0.0, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "personality_reasoning": "판단 근거 TCI 축", "temperament_factor": "English snake_case phrase"}}
+{{"personality_reasoning": "판단 근거 TCI 축", "temperament_factor": "English snake_case phrase", "action_id": 번호, "confidence": 0.0, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence"}}
 
 [규칙]
+- personality_reasoning은 위 선택지 중 하나로만 적어라
+- temperament_factor는 이 기질이 선택을 미는 힘을 영어 snake_case 한 구절로 적어라
 - action_id는 위 선택지 번호 중 하나
 - confidence는 0.0~1.0
 - hint_ko는 왜 이 행동을 골랐는지 순우리말 10~30글자로 써라
 - hint_en은 같은 뜻의 자연스러운 영어 1문장으로 써라
-- personality_reasoning은 위 선택지 중 하나로만 적어라
-- temperament_factor는 이 기질이 선택을 미는 힘을 영어 snake_case 한 구절로 적어라
 - JSON만 출력하고 다른 설명문은 쓰지 마라
 
 [변형번호]

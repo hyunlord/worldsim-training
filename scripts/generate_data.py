@@ -1917,16 +1917,16 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["action_id", "confidence", "hint", "personality_reasoning", "temperament_factor"],
+            "required": ["personality_reasoning", "temperament_factor", "action_id", "confidence", "hint"],
             "properties": {
-                "action_id": {"type": "integer", "enum": option_ids or list(range(len(action_options)))},
-                "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-                "hint": {"type": "string", "minLength": 3},
                 "personality_reasoning": {
                     "type": "string",
                     "enum": [job.get("personality_reasoning")] if job.get("personality_reasoning") else enum_values("E", "personality_reasoning", trait_axes),
                 },
                 "temperament_factor": {"type": "string", "minLength": 1},
+                "action_id": {"type": "integer", "enum": option_ids or list(range(len(action_options)))},
+                "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                "hint": {"type": "string", "minLength": 3},
             },
         }
     elif task == "E":
@@ -1948,14 +1948,14 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["emotion", "intensity", "cause", "previous_emotion", "transition_type", "temperament_amplifier"],
+            "required": ["temperament_amplifier", "cause", "emotion", "intensity", "previous_emotion", "transition_type"],
             "properties": {
+                "temperament_amplifier": {"type": "string", "minLength": 1},
+                "cause": {"type": "string", "minLength": 3},
                 "emotion": {"type": "string", "enum": list(valid_emotions)},
                 "intensity": {"type": "number", "minimum": 0, "maximum": 1},
-                "cause": {"type": "string", "minLength": 3},
                 "previous_emotion": {"type": "string", "enum": list(valid_emotions)},
                 "transition_type": {"type": "string", "enum": enum_values("F", "transition_type", transition_types)},
-                "temperament_amplifier": {"type": "string", "minLength": 1},
             },
         }
     elif task == "F":
@@ -2069,10 +2069,10 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["priority_id", "reasoning", "need_addressed", "urgency"],
+            "required": ["reasoning", "priority_id", "need_addressed", "urgency"],
             "properties": {
-                "priority_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "reasoning": {"type": "string", "minLength": 5},
+                "priority_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "need_addressed": {
                     "type": "string",
                     "enum": enum_values(
@@ -2119,8 +2119,9 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["coping_id", "coping_type", "stress_delta", "hint", "side_effect"],
+            "required": ["hint", "coping_id", "coping_type", "stress_delta", "side_effect"],
             "properties": {
+                "hint": {"type": "string", "minLength": 5},
                 "coping_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "coping_type": {
                     "type": "string",
@@ -2131,7 +2132,6 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
                     ),
                 },
                 "stress_delta": {"type": "number", "minimum": -1.0, "maximum": 0.0},
-                "hint": {"type": "string", "minLength": 5},
                 "side_effect": {
                     "type": "string",
                     "enum": enum_values(
@@ -2167,11 +2167,11 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["social_action_id", "trust_delta", "hint", "relationship_intent", "reciprocity_expectation"],
+            "required": ["hint", "social_action_id", "trust_delta", "relationship_intent", "reciprocity_expectation"],
             "properties": {
+                "hint": {"type": "string", "minLength": 5},
                 "social_action_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "trust_delta": {"type": "number", "minimum": -0.5, "maximum": 0.5},
-                "hint": {"type": "string", "minLength": 5},
                 "relationship_intent": {
                     "type": "string",
                     "enum": enum_values(
@@ -2208,11 +2208,11 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["response_id", "trust_delta", "hint", "forgiveness_threshold", "social_memory"],
+            "required": ["hint", "response_id", "trust_delta", "forgiveness_threshold", "social_memory"],
             "properties": {
+                "hint": {"type": "string", "minLength": 5},
                 "response_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "trust_delta": {"type": "number", "minimum": -0.5, "maximum": 0.5},
-                "hint": {"type": "string", "minLength": 5},
                 "forgiveness_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
                 "social_memory": {
                     "type": "string",
@@ -2246,12 +2246,12 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["decision_id", "confidence", "dissent_risk", "reasoning", "resource_commitment", "timeline"],
+            "required": ["reasoning", "decision_id", "confidence", "dissent_risk", "resource_commitment", "timeline"],
             "properties": {
+                "reasoning": {"type": "string", "minLength": 5},
                 "decision_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
                 "dissent_risk": {"type": "number", "minimum": 0.0, "maximum": 1.0},
-                "reasoning": {"type": "string", "minLength": 5},
                 "resource_commitment": {
                     "type": "string",
                     "enum": enum_values("M", "resource_commitment", ["food", "tools", "labor", "weapons", "none"]),
@@ -2370,12 +2370,12 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["action", "counter_give", "counter_want", "reasoning", "emotional_state", "walk_away_threshold"],
+            "required": ["reasoning", "action", "counter_give", "counter_want", "emotional_state", "walk_away_threshold"],
             "properties": {
+                "reasoning": {"type": "string", "minLength": 5},
                 "action": {"type": "string", "enum": enum_values("R", "action", ["accept", "counter_offer", "reject", "walk_away", "stall", "bluff"])},
                 "counter_give": {"type": "string", "minLength": 1},
                 "counter_want": {"type": "string", "minLength": 1},
-                "reasoning": {"type": "string", "minLength": 5},
                 "emotional_state": {"type": "string", "enum": list(valid_emotions)},
                 "walk_away_threshold": {"type": "number", "minimum": 0.0, "maximum": 1.0},
             },
@@ -2397,8 +2397,9 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
         schema = {
             "type": "object",
             "additionalProperties": False,
-            "required": ["decision_id", "confidence", "dissent_risk", "minority_position", "minority_action", "spark_event", "reasoning", "timeline"],
+            "required": ["reasoning", "decision_id", "confidence", "dissent_risk", "minority_position", "minority_action", "spark_event", "timeline"],
             "properties": {
+                "reasoning": {"type": "string", "minLength": 5},
                 "decision_id": {"type": "integer", "enum": option_ids or list(range(10))},
                 "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
                 "dissent_risk": {"type": "number", "minimum": 0.0, "maximum": 1.0},
@@ -2411,7 +2412,6 @@ def build_response_format(job: dict, settings: dict, *, schema_version: int | No
                     "type": "string",
                     "enum": enum_values("T", "spark_event", ["food_shortage", "battle_loss", "oracle_conflict", "leader_death", "betrayal", "resource_discovery"]),
                 },
-                "reasoning": {"type": "string", "minLength": 5},
                 "timeline": {"type": "string", "enum": enum_values("T", "timeline", ["immediate", "delayed", "conditional"])},
             },
         }

@@ -27,15 +27,17 @@ NS={tci_ns} HA={tci_ha} RD={tci_rd} P={tci_p} type={temperament_id}
 [선택지]
 {action_options}
 
+이 성격이 왜 이런 선택을 하는지 먼저 설명하고, 그 다음 행동을 정하라.
+
 [출력 형식]
-{{"response_id": 번호, "trust_delta": 0.0, "hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "forgiveness_threshold": 0.0, "social_memory": "기억 이름"}}
+{{"hint_ko": "순우리말 한 문장", "hint_en": "English 1 sentence", "response_id": 번호, "trust_delta": 0.0, "forgiveness_threshold": 0.0, "social_memory": "기억 이름"}}
 
 [규칙]
-- response_id는 위 선택지 번호 중 하나
-- trust_delta는 -0.5~0.5이다
 - hint_ko는 왜 이렇게 믿음을 바꾸는지 순우리말 10~30글자로 써라
 - hint_ko는 반드시 한국어로만 써라. 영어를 섞지 마라.
 - hint_en은 같은 뜻의 영어 1문장으로 써라
+- response_id는 위 선택지 번호 중 하나
+- trust_delta는 -0.5~0.5이다
 - forgiveness_threshold는 0.0~1.0이다
 - social_memory는 theft_betrayal, aid_gratitude, shared_danger, insult_resentment, gift_goodwill, combat_respect, abandonment, none 중 하나
 - JSON만 출력하고 다른 설명문은 쓰지 마라
