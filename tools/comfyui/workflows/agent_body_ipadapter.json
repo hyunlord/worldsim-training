@@ -581,6 +581,7 @@
       },
       "widgets_values": [
         42,
+        "randomize",
         25,
         7.0,
         "euler",
