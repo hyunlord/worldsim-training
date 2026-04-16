@@ -16,31 +16,44 @@ bash tools/comfyui/serve.sh      # DGX: start server on port 8188
 
 Then from local PC, open: `http://<dgx-ip>:8188`
 
-## Workflows
+## Workflows (drag into ComfyUI UI)
 
-- `building_pixelate.json` — buildings (shelter, hearth, workbench)
-- `agent_body_ipadapter.json` — 8-direction agent from reference
-- `ui_icon_batch.json` — UI icons batch
+The 3 JSON files in `tools/comfyui/workflows/` are full node graphs.
 
-## Workflow: Building sprite
+### How to load
+1. Start ComfyUI: `bash tools/comfyui/serve.sh`
+2. Open http://<dgx-ip>:8188 in browser
+3. Drag a `.json` file from File Explorer directly onto the ComfyUI canvas
+4. OR: Click the workflow sidebar -> Load -> select file
 
-1. Load `building_pixelate.json` in ComfyUI
-2. Edit positive prompt: replace `{building_name}` and `{material}`
-3. Queue Prompt → 4 variants in ~15s on GB10
-4. Download best 1-2 → import into Aseprite for cleanup
+### 1. building_pixelate.json
+- Input: edit the positive prompt node to describe the building
+- Output: 4 images at ~/ComfyUI/output/worldsim_building_*.png (pixelated after generation)
+- Usage: replace "campfire" in prompt with "shelter", "hearth", "workbench", etc.
+- Generation time: ~33s per batch of 4 on GB10
 
-## Workflow: Agent 8-direction
+### 2. ui_icon_batch.json
+- Same pipeline as building but with icon-specific prompt template
+- Replace "wood axe" with "berry basket", "stone knife", etc.
 
-1. Prepare reference: 1 clean front-view pixel art of the character (manual or AI-generated)
-2. Load `agent_body_ipadapter.json`
-3. Drop reference in IPAdapter node
-4. Queue → 8 directions generated
-5. Cleanup each in Aseprite (expect 15-30 min per direction)
+### 3. agent_body_ipadapter.json
+- Requires: a reference character image loaded into the "Load Image" node
+- Generate one direction at a time by editing prompt: "from east", "from west", "from north", etc.
+- 8 runs per character for full rotation
+- IPAdapter weight 0.7 for consistency with prompt guidance
+
+## Aseprite cleanup (after AI generation)
+1. Open generated PNG in Aseprite
+2. Sprite > Sprite Size > 32x32 (use "nearest" algorithm)
+3. Sprite > Color Mode > Indexed (reduces palette)
+4. Manual touch-up: outlines, anti-alias pixels
+5. Save to `assets/sprites/structures/{name}.png`
 
 ## Cost: $0 (local DGX)
 
 ## Tips
 
 - LoRA weight 0.8 is baseline; lower to 0.6 for more variety, higher to 1.0 for pure pixel
-- Use `ImagePixelate` node (from comfy_pixelization) after generation for clean grid-aligned pixels
-- Always generate at 1024x1024 then downscale — direct 32x32 generation fails
+- Pixelization node (from comfy_pixelization) uses neural-network-based pixel art conversion
+- Always generate at 1024x1024 then pixelate — direct 32x32 generation fails
+- Change the seed in KSampler for different variations
