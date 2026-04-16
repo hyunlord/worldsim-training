@@ -1,0 +1,17 @@
+{
+  "_comment": "TODO: Build this workflow in ComfyUI UI and export here.",
+  "_description": "8-direction agent sprite generation: SDXL + Pixel Art XL LoRA + IPAdapter (reference character image). Generate 8 variants with directional prompts (north, northeast, east, etc.). IPAdapter strength 0.6-0.8.",
+  "_prompt_template": {
+    "positive": "pixelart, pixel art, {character_description}, {direction} facing view, centered, no background, game sprite, top-down RPG character",
+    "negative": "blurry, realistic, 3d render, photo, text, watermark, frame"
+  },
+  "_directions": ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"],
+  "_settings": {
+    "steps": 20,
+    "cfg": 7,
+    "sampler": "euler",
+    "scheduler": "normal",
+    "lora_weight": 0.8,
+    "ipadapter_strength": 0.7
+  }
+}

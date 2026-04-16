@@ -1,0 +1,17 @@
+{
+  "_comment": "TODO: Build this workflow in ComfyUI UI and export here.",
+  "_description": "Building pixel art generation: SDXL + Pixel Art XL LoRA (0.8) → 1024x1024 → Pixelate node (target 32x32, upscale 128x128 nearest-neighbor). Batch size 4.",
+  "_prompt_template": {
+    "positive": "pixelart, pixel art, simple stone age {building_name}, top-down isometric view, {material}, centered, no background, game sprite",
+    "negative": "blurry, realistic, 3d render, photo, text, watermark, frame, border, floor shadow"
+  },
+  "_settings": {
+    "steps": 20,
+    "cfg": 7,
+    "sampler": "euler",
+    "scheduler": "normal",
+    "lora_weight": 0.8,
+    "pixelate_size": 128,
+    "num_colors": 16
+  }
+}

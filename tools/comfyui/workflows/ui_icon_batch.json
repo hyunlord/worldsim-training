@@ -1,0 +1,18 @@
+{
+  "_comment": "TODO: Build this workflow in ComfyUI UI and export here.",
+  "_description": "UI icon batch generation: SDXL + Pixel Art XL LoRA → 512x512 → Pixelate to 32x32. Batch of 4 per run. For the 51 UI icons needed.",
+  "_prompt_template": {
+    "positive": "pixelart icon, {item}, top-down, centered, flat background, game UI, simple shapes",
+    "negative": "blurry, realistic, 3d render, photo, text, watermark, complex details"
+  },
+  "_settings": {
+    "steps": 20,
+    "cfg": 7,
+    "sampler": "euler",
+    "scheduler": "normal",
+    "lora_weight": 0.8,
+    "generation_size": 512,
+    "pixelate_target": 32,
+    "batch_size": 4
+  }
+}
