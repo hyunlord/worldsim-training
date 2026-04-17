@@ -77,6 +77,12 @@ assets/sprites/concepts/**/*.webp
 assets/sprites/concepts/_archive/
 assets/sprites/concepts/_contact_sheet_thumbs/
 
+# ComfyUI batch-generated concept art — v2 (regeneratable from configs/buildings_v2.yaml + seeds)
+assets/sprites/concepts_v2/**/*.png
+assets/sprites/concepts_v2/**/*.webp
+assets/sprites/concepts_v2/_archive/
+assets/sprites/concepts_v2/_contact_sheet_thumbs/
+
 # ComfyUI runtime logs
 tools/comfyui/*.log
 

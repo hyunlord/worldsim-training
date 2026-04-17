@@ -1,0 +1,25 @@
+{
+  "building": "shelter",
+  "seed": 143,
+  "batch_size": 8,
+  "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none primitive A-frame lean-to hut, wooden branch walls, leaf thatch roof, single small dark doorway facing camera, no doors, weathered brown wood, compact hut proportions, roughly as wide as tall, isolated on bare dirt",
+  "negative_prompt": "multiple objects, scene with several items, sprite sheet, icon grid, tileable texture, repeating pattern, ground tile, floor tile, fence, wall, courtyard, yard, building interior, map view, RPG asset pack, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, blurry, low quality, side view elevation, architectural blueprint",
+  "notes": "측면 뷰 방지 위해 3/4 각도 + doorway facing camera 명시",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T23:47:56.706148+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "shelter_001.png",
+    "shelter_002.png",
+    "shelter_003.png",
+    "shelter_004.png",
+    "shelter_005.png",
+    "shelter_006.png",
+    "shelter_007.png",
+    "shelter_008.png"
+  ]
+}

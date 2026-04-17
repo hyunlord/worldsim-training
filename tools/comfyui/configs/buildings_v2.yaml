@@ -1,0 +1,130 @@
+# Stone-Age building concept prompt catalog — V2
+# Redesigned 2026-04-17 after v1 analysis (see WS-ASSETS-BUILDING-REGEN-V2.md)
+#
+# Key design changes from v1:
+#   1. Removed "top-down view" (caused tile-texture interpretation).
+#      Replaced with "orthographic 3/4 view, slight overhead angle".
+#   2. Every positive prompt leads with "SINGLE isolated {object}, centered, fills frame".
+#      Prevents scene/tile/sprite-sheet interpretations.
+#   3. Added "empty dirt background" to every prompt so SDXL doesn't invent fences,
+#      grass patches, or neighbouring props.
+#   4. Explicit numeric counts ("3 to 5 stones tall", "one pole") suppress
+#      over-embellishment.
+#   5. Seeds shifted to 142-151 so deterministic re-runs don't collide with v1.
+#
+# NOTE: version is pinned to 1 because prompt_catalog.py currently validates
+# version == 1. The v2 identity is carried by the filename (buildings_v2.yaml)
+# and the output directory (concepts_v2/). Content is the v2 redesign.
+
+version: 1
+
+global:
+  # Hard negative prompt — every failure pattern from v1 is listed here
+  negative_prompt: >
+    multiple objects, scene with several items, sprite sheet, icon grid,
+    tileable texture, repeating pattern, ground tile, floor tile, fence, wall,
+    courtyard, yard, building interior, map view, RPG asset pack,
+    photo-realistic, 3d render, anti-aliasing, smooth gradients,
+    text, watermark, signature, modern objects, metal, plastic,
+    blurry, low quality, side view elevation, architectural blueprint
+
+  # v2 style prefix — drops "top-down view", adds object-isolation enforcement
+  style_prefix: >
+    SINGLE isolated stone-age object, centered composition, object fills 70% of frame,
+    empty bare dirt background, no surrounding props, no fences or walls,
+    orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels,
+    16-color earthy palette, primitive prehistoric era, clear silhouette,
+    rendered as a standalone game sprite
+
+buildings:
+  campfire:
+    positive: >
+      one small circular fire pit, ring of grey stones around glowing orange flames,
+      thin smoke wisp rising, ash under the fire, nothing else in view
+    seed: 142
+    batch_size: 8
+    notes: "v1 이미 잘됨; v2는 배경 잡동사니 제거가 목표"
+
+  shelter:
+    positive: >
+      one primitive A-frame lean-to hut, wooden branch walls, leaf thatch roof,
+      single small dark doorway facing camera, no doors, weathered brown wood,
+      compact hut proportions, roughly as wide as tall, isolated on bare dirt
+    seed: 143
+    batch_size: 8
+    notes: "측면 뷰 방지 위해 3/4 각도 + doorway facing camera 명시"
+
+  stockpile:
+    positive: >
+      one small compact pile of 5 to 7 wood logs loosely stacked with a few grey stones,
+      knee-high heap, messy but discrete, occupies only the center of the frame,
+      nothing else stored around it, no containers no baskets
+    seed: 144
+    batch_size: 8
+    notes: "단일 더미 강조 + 숫자 명시로 scene 해석 차단"
+
+  workbench:
+    positive: >
+      one flat rectangular stone slab on two short log legs, few flint chips and
+      hide scraps resting on top, simple primitive crafting table, knee-high,
+      nothing else on the ground around it
+    seed: 145
+    batch_size: 8
+    notes: "'on top of slab'로 장식 위치 고정; 주변 잡동사니 차단"
+
+  hearth:
+    positive: >
+      one large circular hearth made of stacked grey stones forming a waist-high ring,
+      contained cooking fire with orange flames inside, ash bed at the bottom,
+      single simple wooden spit resting across the top, more substantial than a campfire,
+      nothing else around
+    seed: 146
+    batch_size: 8
+    notes: "v1 잘됨; v2는 단일 오브젝트 강조 + 접시/항아리 배경 제거"
+
+  drying_rack:
+    positive: >
+      one simple wooden drying frame, two vertical posts with two horizontal
+      cross-beams, three strips of dark hide hanging from the top beam,
+      primitive fiber lashings at the joints, empty dirt ground below,
+      rack is roughly as wide as tall
+    seed: 147
+    batch_size: 8
+    notes: "'frame' 단수 강조 + 숫자 (2+2+3)로 타일/격자 해석 차단"
+
+  storage_pit:
+    positive: >
+      one round shallow pit dug into dirt ground, low mound of dirt around the rim,
+      woven grass cover half pulled aside revealing dark opening inside,
+      single pit only, nothing stored around it, clear dark entrance visible
+    seed: 148
+    batch_size: 8
+    notes: "'clear dark entrance'로 '지도의 구멍'이 아닌 '오브젝트'임을 강조"
+
+  gathering_marker:
+    positive: >
+      one simple circle of 7 rounded stones arranged on bare dirt,
+      one flat ceremonial stone at the center of the ring, stones are knee-high,
+      compact ritual site, nothing else in frame, no carvings no symbols
+    seed: 149
+    batch_size: 8
+    notes: "숫자 명시 + 'no carvings no symbols'로 정교한 격자 생성 차단"
+
+  totem:
+    positive: >
+      one tall vertical wooden totem pole planted upright in dirt ground,
+      single carved post about three times as tall as wide, simple weathered
+      animal face carvings stacked along the pole, one bone and feather decoration
+      near the top, nothing else in the scene
+    seed: 150
+    batch_size: 8
+    notes: "'three times as tall as wide' + 'single'로 스프라이트 시트 해석 차단"
+
+  cairn:
+    positive: >
+      one conical cairn of 5 stacked rounded stones, tallest in the middle,
+      narrowing toward the top, stones are grey with small patches of green moss
+      on the lowest ones, compact monument on flat bare dirt, nothing else visible
+    seed: 151
+    batch_size: 8
+    notes: "숫자 (5) + 'compact monument' + 'nothing else'로 타일 텍스처 차단"

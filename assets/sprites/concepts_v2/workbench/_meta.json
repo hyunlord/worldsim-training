@@ -1,0 +1,25 @@
+{
+  "building": "workbench",
+  "seed": 145,
+  "batch_size": 8,
+  "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none flat rectangular stone slab on two short log legs, few flint chips and hide scraps resting on top, simple primitive crafting table, knee-high, nothing else on the ground around it",
+  "negative_prompt": "multiple objects, scene with several items, sprite sheet, icon grid, tileable texture, repeating pattern, ground tile, floor tile, fence, wall, courtyard, yard, building interior, map view, RPG asset pack, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, blurry, low quality, side view elevation, architectural blueprint",
+  "notes": "'on top of slab'로 장식 위치 고정; 주변 잡동사니 차단",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T23:55:15.201793+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "workbench_001.png",
+    "workbench_002.png",
+    "workbench_003.png",
+    "workbench_004.png",
+    "workbench_005.png",
+    "workbench_006.png",
+    "workbench_007.png",
+    "workbench_008.png"
+  ]
+}
