@@ -1,0 +1,25 @@
+{
+  "building": "stockpile",
+  "seed": 44,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\npile of assorted raw materials, wood logs and stones mixed, low disorganized heap, tarp-free, ground-level",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "Storage marker; avoid crates/barrels (too advanced).",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:17:02.389171+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 220.2,
+  "attempts": 1,
+  "outputs": [
+    "stockpile_001.png",
+    "stockpile_002.png",
+    "stockpile_003.png",
+    "stockpile_004.png",
+    "stockpile_005.png",
+    "stockpile_006.png",
+    "stockpile_007.png",
+    "stockpile_008.png"
+  ]
+}

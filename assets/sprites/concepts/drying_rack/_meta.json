@@ -1,0 +1,25 @@
+{
+  "building": "drying_rack",
+  "seed": 47,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\nwooden frame with horizontal cross-beams, strips of hide or fish hanging, primitive lashing with fiber cord, open-air",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "Food preservation. Hide strips, not cloth.",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:28:01.146869+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 220.2,
+  "attempts": 1,
+  "outputs": [
+    "drying_rack_001.png",
+    "drying_rack_002.png",
+    "drying_rack_003.png",
+    "drying_rack_004.png",
+    "drying_rack_005.png",
+    "drying_rack_006.png",
+    "drying_rack_007.png",
+    "drying_rack_008.png"
+  ]
+}

@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorldSim Building Concepts</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: "Courier New", Courier, monospace;
+    line-height: 1.5;
+    padding: 2rem 1.5rem;
+  }
+
+  a { color: #7ec8e3; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Header ─────────────────────────────────── */
+  .header {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    border-bottom: 2px solid #2e2e4a;
+    padding-bottom: 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.6rem;
+    color: #f0f0f0;
+    margin-bottom: 0.5rem;
+  }
+
+  .header .meta {
+    font-size: 0.85rem;
+    color: #9090b0;
+  }
+
+  .header .meta span + span::before {
+    content: " | ";
+    color: #4a4a6a;
+  }
+
+  .header .stats {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #b0b0d0;
+  }
+
+  .header .stats .dot {
+    color: #4a4a6a;
+    margin: 0 0.4rem;
+  }
+
+  /* ── Building section ───────────────────────── */
+  .building-section {
+    max-width: 1200px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .building-header {
+    border-top: 1px solid #3a3a5a;
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .building-header h2 {
+    font-size: 1.25rem;
+    color: #c8c8ff;
+    margin-bottom: 0.35rem;
+  }
+
+  .building-header .info {
+    font-size: 0.8rem;
+    color: #8888aa;
+    margin-bottom: 0.25rem;
+  }
+
+  .building-header .notes {
+    font-size: 0.8rem;
+    color: #a8a8c8;
+    font-style: italic;
+    margin-bottom: 0.25rem;
+  }
+
+  .building-header .prompt {
+    font-size: 0.75rem;
+    color: #707090;
+    word-break: break-word;
+    max-height: 3.6em;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .building-header .prompt:hover {
+    max-height: 40em;
+  }
+
+  .building-header .prompt-label {
+    color: #9090b0;
+    font-weight: bold;
+  }
+
+  /* ── Thumbnail grid ─────────────────────────── */
+  .thumb-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .thumb-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .thumb-cell {
+    text-align: center;
+  }
+
+  .thumb-cell a {
+    display: block;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    padding: 4px;
+  }
+
+  .thumb-cell a:hover {
+    border-color: #7ec8e3;
+    box-shadow: 0 0 8px rgba(126, 200, 227, 0.3);
+    text-decoration: none;
+  }
+
+  .thumb-cell img {
+    width: 256px;
+    height: 256px;
+    max-width: 100%;
+    image-rendering: pixelated;
+    display: block;
+    margin: 0 auto;
+    background: #0e0e1a;
+    border-radius: 2px;
+  }
+
+  .thumb-cell .label {
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: #9090b0;
+  }
+
+  /* ── Footer ─────────────────────────────────── */
+  .footer {
+    max-width: 1200px;
+    margin: 3rem auto 0;
+    padding-top: 1rem;
+    border-top: 1px solid #2e2e4a;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #5a5a7a;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>WorldSim Building Concepts</h1>
+  <div class="meta">
+    <span>Generated: 2026-04-17 10:42:41</span>
+    <span>Workflow: cc962a68b10d</span>
+  </div>
+  <div class="stats">
+    10 buildings
+    <span class="dot">&middot;</span>
+    80 variants
+    <span class="dot">&middot;</span>
+    Total size: 11.46 MB
+  </div>
+</div>
+
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>cairn</h2>
+    <div class="info">seed=51, batch=8</div>
+    
+    <div class="notes">"Memorial/boundary. Stones only, no wood."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+stacked stone pile, roughly conical, moss on lower stones, deliberately placed rocks, burial or boundary marker</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_001.webp"
+          alt="cairn_001.png"
+          title="cairn_001.png | seed=51 | cairn/cairn_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_002.webp"
+          alt="cairn_002.png"
+          title="cairn_002.png | seed=51 | cairn/cairn_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_003.webp"
+          alt="cairn_003.png"
+          title="cairn_003.png | seed=51 | cairn/cairn_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_004.webp"
+          alt="cairn_004.png"
+          title="cairn_004.png | seed=51 | cairn/cairn_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_005.webp"
+          alt="cairn_005.png"
+          title="cairn_005.png | seed=51 | cairn/cairn_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_006.webp"
+          alt="cairn_006.png"
+          title="cairn_006.png | seed=51 | cairn/cairn_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_007.webp"
+          alt="cairn_007.png"
+          title="cairn_007.png | seed=51 | cairn/cairn_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="cairn/cairn_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/cairn_008.webp"
+          alt="cairn_008.png"
+          title="cairn_008.png | seed=51 | cairn/cairn_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">cairn_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>campfire</h2>
+    <div class="info">seed=42, batch=8</div>
+    
+    <div class="notes">"Core warmth source; should read clearly at 32x32."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+small stone fire pit, ring of grey stones, orange flames, faint smoke plume rising upward, ash on ground, rustic</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_001.webp"
+          alt="campfire_001.png"
+          title="campfire_001.png | seed=42 | campfire/campfire_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_002.webp"
+          alt="campfire_002.png"
+          title="campfire_002.png | seed=42 | campfire/campfire_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_003.webp"
+          alt="campfire_003.png"
+          title="campfire_003.png | seed=42 | campfire/campfire_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_004.webp"
+          alt="campfire_004.png"
+          title="campfire_004.png | seed=42 | campfire/campfire_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_005.webp"
+          alt="campfire_005.png"
+          title="campfire_005.png | seed=42 | campfire/campfire_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_006.webp"
+          alt="campfire_006.png"
+          title="campfire_006.png | seed=42 | campfire/campfire_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_007.webp"
+          alt="campfire_007.png"
+          title="campfire_007.png | seed=42 | campfire/campfire_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="campfire/campfire_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/campfire_008.webp"
+          alt="campfire_008.png"
+          title="campfire_008.png | seed=42 | campfire/campfire_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">campfire_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>drying_rack</h2>
+    <div class="info">seed=47, batch=8</div>
+    
+    <div class="notes">"Food preservation. Hide strips, not cloth."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+wooden frame with horizontal cross-beams, strips of hide or fish hanging, primitive lashing with fiber cord, open-air</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_001.webp"
+          alt="drying_rack_001.png"
+          title="drying_rack_001.png | seed=47 | drying_rack/drying_rack_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_002.webp"
+          alt="drying_rack_002.png"
+          title="drying_rack_002.png | seed=47 | drying_rack/drying_rack_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_003.webp"
+          alt="drying_rack_003.png"
+          title="drying_rack_003.png | seed=47 | drying_rack/drying_rack_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_004.webp"
+          alt="drying_rack_004.png"
+          title="drying_rack_004.png | seed=47 | drying_rack/drying_rack_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_005.webp"
+          alt="drying_rack_005.png"
+          title="drying_rack_005.png | seed=47 | drying_rack/drying_rack_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_006.webp"
+          alt="drying_rack_006.png"
+          title="drying_rack_006.png | seed=47 | drying_rack/drying_rack_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_007.webp"
+          alt="drying_rack_007.png"
+          title="drying_rack_007.png | seed=47 | drying_rack/drying_rack_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="drying_rack/drying_rack_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/drying_rack_008.webp"
+          alt="drying_rack_008.png"
+          title="drying_rack_008.png | seed=47 | drying_rack/drying_rack_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">drying_rack_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>gathering_marker</h2>
+    <div class="info">seed=49, batch=8</div>
+    
+    <div class="notes">"Social ritual site; empty but deliberate."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+circle of arranged stones on bare earth, flat central stone, no structure, ceremonial meeting point, worn ground</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_001.webp"
+          alt="gathering_marker_001.png"
+          title="gathering_marker_001.png | seed=49 | gathering_marker/gathering_marker_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_002.webp"
+          alt="gathering_marker_002.png"
+          title="gathering_marker_002.png | seed=49 | gathering_marker/gathering_marker_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_003.webp"
+          alt="gathering_marker_003.png"
+          title="gathering_marker_003.png | seed=49 | gathering_marker/gathering_marker_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_004.webp"
+          alt="gathering_marker_004.png"
+          title="gathering_marker_004.png | seed=49 | gathering_marker/gathering_marker_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_005.webp"
+          alt="gathering_marker_005.png"
+          title="gathering_marker_005.png | seed=49 | gathering_marker/gathering_marker_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_006.webp"
+          alt="gathering_marker_006.png"
+          title="gathering_marker_006.png | seed=49 | gathering_marker/gathering_marker_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_007.webp"
+          alt="gathering_marker_007.png"
+          title="gathering_marker_007.png | seed=49 | gathering_marker/gathering_marker_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="gathering_marker/gathering_marker_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/gathering_marker_008.webp"
+          alt="gathering_marker_008.png"
+          title="gathering_marker_008.png | seed=49 | gathering_marker/gathering_marker_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">gathering_marker_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>hearth</h2>
+    <div class="info">seed=46, batch=8</div>
+    
+    <div class="notes">"Upgraded campfire; larger stone structure, more permanent."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+enclosed stone hearth, ring of large stacked stones, controlled cooking fire, ash bed, simple spit of wood</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_001.webp"
+          alt="hearth_001.png"
+          title="hearth_001.png | seed=46 | hearth/hearth_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_002.webp"
+          alt="hearth_002.png"
+          title="hearth_002.png | seed=46 | hearth/hearth_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_003.webp"
+          alt="hearth_003.png"
+          title="hearth_003.png | seed=46 | hearth/hearth_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_004.webp"
+          alt="hearth_004.png"
+          title="hearth_004.png | seed=46 | hearth/hearth_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_005.webp"
+          alt="hearth_005.png"
+          title="hearth_005.png | seed=46 | hearth/hearth_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_006.webp"
+          alt="hearth_006.png"
+          title="hearth_006.png | seed=46 | hearth/hearth_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_007.webp"
+          alt="hearth_007.png"
+          title="hearth_007.png | seed=46 | hearth/hearth_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="hearth/hearth_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/hearth_008.webp"
+          alt="hearth_008.png"
+          title="hearth_008.png | seed=46 | hearth/hearth_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">hearth_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>shelter</h2>
+    <div class="info">seed=43, batch=8</div>
+    
+    <div class="notes">"L1 housing; must NOT look like a modern tent."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+primitive lean-to shelter, wooden branches, leaf thatch roof, single small entrance, no doors, weathered wood</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_001.webp"
+          alt="shelter_001.png"
+          title="shelter_001.png | seed=43 | shelter/shelter_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_002.webp"
+          alt="shelter_002.png"
+          title="shelter_002.png | seed=43 | shelter/shelter_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_003.webp"
+          alt="shelter_003.png"
+          title="shelter_003.png | seed=43 | shelter/shelter_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_004.webp"
+          alt="shelter_004.png"
+          title="shelter_004.png | seed=43 | shelter/shelter_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_005.webp"
+          alt="shelter_005.png"
+          title="shelter_005.png | seed=43 | shelter/shelter_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_006.webp"
+          alt="shelter_006.png"
+          title="shelter_006.png | seed=43 | shelter/shelter_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_007.webp"
+          alt="shelter_007.png"
+          title="shelter_007.png | seed=43 | shelter/shelter_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="shelter/shelter_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/shelter_008.webp"
+          alt="shelter_008.png"
+          title="shelter_008.png | seed=43 | shelter/shelter_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">shelter_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>stockpile</h2>
+    <div class="info">seed=44, batch=8</div>
+    
+    <div class="notes">"Storage marker; avoid crates/barrels (too advanced)."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+pile of assorted raw materials, wood logs and stones mixed, low disorganized heap, tarp-free, ground-level</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_001.webp"
+          alt="stockpile_001.png"
+          title="stockpile_001.png | seed=44 | stockpile/stockpile_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_002.webp"
+          alt="stockpile_002.png"
+          title="stockpile_002.png | seed=44 | stockpile/stockpile_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_003.webp"
+          alt="stockpile_003.png"
+          title="stockpile_003.png | seed=44 | stockpile/stockpile_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_004.webp"
+          alt="stockpile_004.png"
+          title="stockpile_004.png | seed=44 | stockpile/stockpile_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_005.webp"
+          alt="stockpile_005.png"
+          title="stockpile_005.png | seed=44 | stockpile/stockpile_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_006.webp"
+          alt="stockpile_006.png"
+          title="stockpile_006.png | seed=44 | stockpile/stockpile_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_007.webp"
+          alt="stockpile_007.png"
+          title="stockpile_007.png | seed=44 | stockpile/stockpile_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="stockpile/stockpile_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/stockpile_008.webp"
+          alt="stockpile_008.png"
+          title="stockpile_008.png | seed=44 | stockpile/stockpile_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">stockpile_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>storage_pit</h2>
+    <div class="info">seed=48, batch=8</div>
+    
+    <div class="notes">"Underground cache. Must show the pit opening clearly."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+shallow pit dug into ground, woven grass cover pulled aside, dirt mound around edge, primitive food storage</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_001.webp"
+          alt="storage_pit_001.png"
+          title="storage_pit_001.png | seed=48 | storage_pit/storage_pit_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_002.webp"
+          alt="storage_pit_002.png"
+          title="storage_pit_002.png | seed=48 | storage_pit/storage_pit_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_003.webp"
+          alt="storage_pit_003.png"
+          title="storage_pit_003.png | seed=48 | storage_pit/storage_pit_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_004.webp"
+          alt="storage_pit_004.png"
+          title="storage_pit_004.png | seed=48 | storage_pit/storage_pit_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_005.webp"
+          alt="storage_pit_005.png"
+          title="storage_pit_005.png | seed=48 | storage_pit/storage_pit_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_006.webp"
+          alt="storage_pit_006.png"
+          title="storage_pit_006.png | seed=48 | storage_pit/storage_pit_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_007.webp"
+          alt="storage_pit_007.png"
+          title="storage_pit_007.png | seed=48 | storage_pit/storage_pit_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="storage_pit/storage_pit_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/storage_pit_008.webp"
+          alt="storage_pit_008.png"
+          title="storage_pit_008.png | seed=48 | storage_pit/storage_pit_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">storage_pit_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>totem</h2>
+    <div class="info">seed=50, batch=8</div>
+    
+    <div class="notes">"Faith/identity marker. Should feel sacred."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+tall carved wooden post, weathered pictograms and animal symbols, bone and feather decorations, planted upright in ground</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_001.webp"
+          alt="totem_001.png"
+          title="totem_001.png | seed=50 | totem/totem_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_002.webp"
+          alt="totem_002.png"
+          title="totem_002.png | seed=50 | totem/totem_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_003.webp"
+          alt="totem_003.png"
+          title="totem_003.png | seed=50 | totem/totem_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_004.webp"
+          alt="totem_004.png"
+          title="totem_004.png | seed=50 | totem/totem_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_005.webp"
+          alt="totem_005.png"
+          title="totem_005.png | seed=50 | totem/totem_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_006.webp"
+          alt="totem_006.png"
+          title="totem_006.png | seed=50 | totem/totem_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_007.webp"
+          alt="totem_007.png"
+          title="totem_007.png | seed=50 | totem/totem_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="totem/totem_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/totem_008.webp"
+          alt="totem_008.png"
+          title="totem_008.png | seed=50 | totem/totem_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">totem_008</div>
+    </div>
+    
+  </div>
+</div>
+
+<div class="building-section">
+  <div class="building-header">
+    <h2>workbench</h2>
+    <div class="info">seed=45, batch=8</div>
+    
+    <div class="notes">"Tier-1 crafting. Flint, bone, wood only."</div>
+    
+    
+    <div class="prompt"><span class="prompt-label">Prompt:</span> pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur
+flat stone slab on log supports, scattered flint tools and hide scraps, primitive crafting surface, no metal</div>
+    
+  </div>
+
+  <div class="thumb-grid">
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_001.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_001.webp"
+          alt="workbench_001.png"
+          title="workbench_001.png | seed=45 | workbench/workbench_001.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_001</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_002.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_002.webp"
+          alt="workbench_002.png"
+          title="workbench_002.png | seed=45 | workbench/workbench_002.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_002</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_003.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_003.webp"
+          alt="workbench_003.png"
+          title="workbench_003.png | seed=45 | workbench/workbench_003.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_003</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_004.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_004.webp"
+          alt="workbench_004.png"
+          title="workbench_004.png | seed=45 | workbench/workbench_004.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_004</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_005.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_005.webp"
+          alt="workbench_005.png"
+          title="workbench_005.png | seed=45 | workbench/workbench_005.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_005</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_006.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_006.webp"
+          alt="workbench_006.png"
+          title="workbench_006.png | seed=45 | workbench/workbench_006.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_006</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_007.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_007.webp"
+          alt="workbench_007.png"
+          title="workbench_007.png | seed=45 | workbench/workbench_007.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_007</div>
+    </div>
+    
+    <div class="thumb-cell">
+      <a href="workbench/workbench_008.png" target="_blank">
+        <img
+          src="_contact_sheet_thumbs/workbench_008.webp"
+          alt="workbench_008.png"
+          title="workbench_008.png | seed=45 | workbench/workbench_008.png"
+          width="256"
+          height="256"
+          loading="lazy"
+        >
+      </a>
+      <div class="label">workbench_008</div>
+    </div>
+    
+  </div>
+</div>
+
+
+<div class="footer">
+  WorldSim Contact Sheet &mdash; generated 2026-04-17 10:42:41
+</div>
+
+</body>
+</html>

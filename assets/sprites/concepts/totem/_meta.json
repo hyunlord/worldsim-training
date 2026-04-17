@@ -1,0 +1,25 @@
+{
+  "building": "totem",
+  "seed": 50,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\ntall carved wooden post, weathered pictograms and animal symbols, bone and feather decorations, planted upright in ground",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "Faith/identity marker. Should feel sacred.",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:39:01.812157+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 220.2,
+  "attempts": 1,
+  "outputs": [
+    "totem_001.png",
+    "totem_002.png",
+    "totem_003.png",
+    "totem_004.png",
+    "totem_005.png",
+    "totem_006.png",
+    "totem_007.png",
+    "totem_008.png"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "building": "workbench",
+  "seed": 45,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\nflat stone slab on log supports, scattered flint tools and hide scraps, primitive crafting surface, no metal",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "Tier-1 crafting. Flint, bone, wood only.",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:20:40.738624+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 218.3,
+  "attempts": 1,
+  "outputs": [
+    "workbench_001.png",
+    "workbench_002.png",
+    "workbench_003.png",
+    "workbench_004.png",
+    "workbench_005.png",
+    "workbench_006.png",
+    "workbench_007.png",
+    "workbench_008.png"
+  ]
+}

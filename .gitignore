@@ -70,6 +70,12 @@ logs/
 .DS_Store
 Thumbs.db
 
+# ComfyUI batch-generated concept art (regeneratable from configs/buildings.yaml + seeds)
+assets/sprites/concepts/**/*.png
+assets/sprites/concepts/**/*.webp
+assets/sprites/concepts/_archive/
+assets/sprites/concepts/_contact_sheet_thumbs/
+
 # External tools (cloned repos, large binaries)
 tools/llama.cpp/
 

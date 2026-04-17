@@ -1,0 +1,25 @@
+{
+  "building": "shelter",
+  "seed": 43,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\nprimitive lean-to shelter, wooden branches, leaf thatch roof, single small entrance, no doors, weathered wood",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "L1 housing; must NOT look like a modern tent.",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:13:22.186648+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "shelter_001.png",
+    "shelter_002.png",
+    "shelter_003.png",
+    "shelter_004.png",
+    "shelter_005.png",
+    "shelter_006.png",
+    "shelter_007.png",
+    "shelter_008.png"
+  ]
+}

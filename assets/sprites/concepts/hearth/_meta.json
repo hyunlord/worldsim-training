@@ -1,0 +1,25 @@
+{
+  "building": "hearth",
+  "seed": 46,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\nenclosed stone hearth, ring of large stacked stones, controlled cooking fire, ash bed, simple spit of wood",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "Upgraded campfire; larger stone structure, more permanent.",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:24:20.978523+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 220.2,
+  "attempts": 1,
+  "outputs": [
+    "hearth_001.png",
+    "hearth_002.png",
+    "hearth_003.png",
+    "hearth_004.png",
+    "hearth_005.png",
+    "hearth_006.png",
+    "hearth_007.png",
+    "hearth_008.png"
+  ]
+}

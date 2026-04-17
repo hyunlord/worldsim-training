@@ -1,0 +1,25 @@
+{
+  "building": "campfire",
+  "seed": 42,
+  "batch_size": 8,
+  "positive_prompt": "pixel art, 32x32 style, top-down view, stone-age primitive, 16-color earthy palette, crisp pixels, no outline blur\nsmall stone fire pit, ring of grey stones, orange flames, faint smoke plume rising upward, ash on ground, rustic",
+  "negative_prompt": "blurry, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, low quality",
+  "notes": "Core warmth source; should read clearly at 32x32.",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-17T10:09:25.611038+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "campfire_001.png",
+    "campfire_002.png",
+    "campfire_003.png",
+    "campfire_004.png",
+    "campfire_005.png",
+    "campfire_006.png",
+    "campfire_007.png",
+    "campfire_008.png"
+  ]
+}
