@@ -71,10 +71,14 @@ logs/
 Thumbs.db
 
 # ComfyUI batch-generated concept art (regeneratable from configs/buildings.yaml + seeds)
+# Keep: _meta.json (reproducibility reference) and _contact_sheet.html (project snapshot)
 assets/sprites/concepts/**/*.png
 assets/sprites/concepts/**/*.webp
 assets/sprites/concepts/_archive/
 assets/sprites/concepts/_contact_sheet_thumbs/
+
+# ComfyUI runtime logs
+tools/comfyui/*.log
 
 # External tools (cloned repos, large binaries)
 tools/llama.cpp/
