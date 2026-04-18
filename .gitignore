@@ -83,6 +83,13 @@ assets/sprites/concepts_v2/**/*.webp
 assets/sprites/concepts_v2/_archive/
 assets/sprites/concepts_v2/_contact_sheet_thumbs/
 
+# v3 full regeneration output (regeneratable from configs/buildings.yaml + seeds)
+# Source tree for concepts_final/; Keep tracked: _meta.json, _contact_sheet.html
+assets/sprites/concepts_v3/**/*.png
+assets/sprites/concepts_v3/**/*.webp
+assets/sprites/concepts_v3/_archive/
+assets/sprites/concepts_v3/_contact_sheet_thumbs/
+
 # Consolidated final concept art (regeneratable from configs/buildings.yaml + seeds)
 # Keep tracked: _meta.json, _manifest.json, _contact_sheet.html
 assets/sprites/concepts_final/**/*.png

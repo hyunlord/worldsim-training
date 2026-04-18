@@ -1,38 +1,29 @@
 {
-  "generated_at": "2026-04-18T19:00:33.636534+09:00",
+  "generated_at": "2026-04-19T04:19:58.994080+09:00",
   "source_yaml": "tools/comfyui/configs/buildings.yaml",
-  "source_yaml_version": "final-2026-04-18",
+  "source_yaml_version": "v3-full-regen-2026-04-18",
   "source_runs": {
     "v2": {
       "yaml": "tools/comfyui/configs/buildings_v2.yaml",
       "date": "2026-04-17",
-      "buildings": [
-        "campfire",
-        "shelter",
-        "stockpile",
-        "hearth",
-        "storage_pit",
-        "gathering_marker",
-        "totem",
-        "cairn"
-      ]
+      "batch_size": 8,
+      "role": "rollback fallback (preserved, only used if v3 quality drops per-building)"
     },
     "v3": {
       "yaml": "tools/comfyui/configs/buildings.yaml",
       "date": "2026-04-18",
-      "buildings": [
-        "drying_rack",
-        "workbench"
-      ]
+      "batch_size": 16,
+      "role": "canonical source for all buildings unless rolled back"
     }
   },
   "buildings": {
     "cairn": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 151,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none conical cairn of 5 stacked rounded stones, tallest in the middle, narrowing toward the top, stones are grey with small patches of green moss on the lowest ones, compact monument on flat bare dirt, nothing else visible",
-      "generated_at": "2026-04-18T00:17:28.577347+09:00",
+      "generated_at": "2026-04-19T04:05:28.851402+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "cairn_001.png",
@@ -42,15 +33,24 @@
         "cairn_005.png",
         "cairn_006.png",
         "cairn_007.png",
-        "cairn_008.png"
+        "cairn_008.png",
+        "cairn_009.png",
+        "cairn_010.png",
+        "cairn_011.png",
+        "cairn_012.png",
+        "cairn_013.png",
+        "cairn_014.png",
+        "cairn_015.png",
+        "cairn_016.png"
       ]
     },
     "campfire": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 142,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none small circular fire pit, ring of grey stones around glowing orange flames, thin smoke wisp rising, ash under the fire, nothing else in view",
-      "generated_at": "2026-04-17T23:44:14.508959+09:00",
+      "generated_at": "2026-04-19T03:16:37.066047+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "campfire_001.png",
@@ -60,15 +60,24 @@
         "campfire_005.png",
         "campfire_006.png",
         "campfire_007.png",
-        "campfire_008.png"
+        "campfire_008.png",
+        "campfire_009.png",
+        "campfire_010.png",
+        "campfire_011.png",
+        "campfire_012.png",
+        "campfire_013.png",
+        "campfire_014.png",
+        "campfire_015.png",
+        "campfire_016.png"
       ]
     },
     "drying_rack": {
       "source_run": "v3",
       "seed": 147,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\nTHREE large dark brown strips of animal hide prominently HANGING VERTICALLY from a simple wooden crossbeam, hide strips are the main visual subject and fill most of the frame, two short vertical posts hold up one horizontal beam, primitive fiber lashings visible at joints, hide strips dominate the composition, stone-age prehistoric food preservation rack, standing on empty dirt ground",
-      "generated_at": "2026-04-18T18:56:32.503431+09:00",
+      "generated_at": "2026-04-19T04:12:28.192200+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "drying_rack_001.png",
@@ -78,15 +87,24 @@
         "drying_rack_005.png",
         "drying_rack_006.png",
         "drying_rack_007.png",
-        "drying_rack_008.png"
+        "drying_rack_008.png",
+        "drying_rack_009.png",
+        "drying_rack_010.png",
+        "drying_rack_011.png",
+        "drying_rack_012.png",
+        "drying_rack_013.png",
+        "drying_rack_014.png",
+        "drying_rack_015.png",
+        "drying_rack_016.png"
       ]
     },
     "gathering_marker": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 149,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none simple circle of 7 rounded stones arranged on bare dirt, one flat ceremonial stone at the center of the ring, stones are knee-high, compact ritual site, nothing else in frame, no carvings no symbols",
-      "generated_at": "2026-04-18T00:10:04.108242+09:00",
+      "generated_at": "2026-04-19T03:51:32.044498+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "gathering_marker_001.png",
@@ -96,15 +114,24 @@
         "gathering_marker_005.png",
         "gathering_marker_006.png",
         "gathering_marker_007.png",
-        "gathering_marker_008.png"
+        "gathering_marker_008.png",
+        "gathering_marker_009.png",
+        "gathering_marker_010.png",
+        "gathering_marker_011.png",
+        "gathering_marker_012.png",
+        "gathering_marker_013.png",
+        "gathering_marker_014.png",
+        "gathering_marker_015.png",
+        "gathering_marker_016.png"
       ]
     },
     "hearth": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 146,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none large circular hearth made of stacked grey stones forming a waist-high ring, contained cooking fire with orange flames inside, ash bed at the bottom, single simple wooden spit resting across the top, more substantial than a campfire, nothing else around",
-      "generated_at": "2026-04-17T23:58:57.390128+09:00",
+      "generated_at": "2026-04-19T03:37:35.201903+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "hearth_001.png",
@@ -114,15 +141,24 @@
         "hearth_005.png",
         "hearth_006.png",
         "hearth_007.png",
-        "hearth_008.png"
+        "hearth_008.png",
+        "hearth_009.png",
+        "hearth_010.png",
+        "hearth_011.png",
+        "hearth_012.png",
+        "hearth_013.png",
+        "hearth_014.png",
+        "hearth_015.png",
+        "hearth_016.png"
       ]
     },
     "shelter": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 143,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none primitive A-frame lean-to hut, wooden branch walls, leaf thatch roof, single small dark doorway facing camera, no doors, weathered brown wood, compact hut proportions, roughly as wide as tall, isolated on bare dirt",
-      "generated_at": "2026-04-17T23:47:56.706148+09:00",
+      "generated_at": "2026-04-19T03:23:36.441024+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "shelter_001.png",
@@ -132,15 +168,24 @@
         "shelter_005.png",
         "shelter_006.png",
         "shelter_007.png",
-        "shelter_008.png"
+        "shelter_008.png",
+        "shelter_009.png",
+        "shelter_010.png",
+        "shelter_011.png",
+        "shelter_012.png",
+        "shelter_013.png",
+        "shelter_014.png",
+        "shelter_015.png",
+        "shelter_016.png"
       ]
     },
     "stockpile": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 144,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none small compact pile of 5 to 7 wood logs loosely stacked with a few grey stones, knee-high heap, messy but discrete, occupies only the center of the frame, nothing else stored around it, no containers no baskets",
-      "generated_at": "2026-04-17T23:51:32.954431+09:00",
+      "generated_at": "2026-04-19T03:30:35.889458+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "stockpile_001.png",
@@ -150,15 +195,24 @@
         "stockpile_005.png",
         "stockpile_006.png",
         "stockpile_007.png",
-        "stockpile_008.png"
+        "stockpile_008.png",
+        "stockpile_009.png",
+        "stockpile_010.png",
+        "stockpile_011.png",
+        "stockpile_012.png",
+        "stockpile_013.png",
+        "stockpile_014.png",
+        "stockpile_015.png",
+        "stockpile_016.png"
       ]
     },
     "storage_pit": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 148,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none round shallow pit dug into dirt ground, low mound of dirt around the rim, woven grass cover half pulled aside revealing dark opening inside, single pit only, nothing stored around it, clear dark entrance visible",
-      "generated_at": "2026-04-18T00:06:21.860611+09:00",
+      "generated_at": "2026-04-19T03:44:34.642344+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "storage_pit_001.png",
@@ -168,15 +222,24 @@
         "storage_pit_005.png",
         "storage_pit_006.png",
         "storage_pit_007.png",
-        "storage_pit_008.png"
+        "storage_pit_008.png",
+        "storage_pit_009.png",
+        "storage_pit_010.png",
+        "storage_pit_011.png",
+        "storage_pit_012.png",
+        "storage_pit_013.png",
+        "storage_pit_014.png",
+        "storage_pit_015.png",
+        "storage_pit_016.png"
       ]
     },
     "totem": {
-      "source_run": "v2",
+      "source_run": "v3",
       "seed": 150,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none tall vertical wooden totem pole planted upright in dirt ground, single carved post about three times as tall as wide, simple weathered animal face carvings stacked along the pole, one bone and feather decoration near the top, nothing else in the scene",
-      "generated_at": "2026-04-18T00:13:46.344027+09:00",
+      "generated_at": "2026-04-19T03:58:31.378192+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "totem_001.png",
@@ -186,15 +249,24 @@
         "totem_005.png",
         "totem_006.png",
         "totem_007.png",
-        "totem_008.png"
+        "totem_008.png",
+        "totem_009.png",
+        "totem_010.png",
+        "totem_011.png",
+        "totem_012.png",
+        "totem_013.png",
+        "totem_014.png",
+        "totem_015.png",
+        "totem_016.png"
       ]
     },
     "workbench": {
       "source_run": "v3",
       "seed": 145,
-      "batch_size": 8,
+      "batch_size": 16,
+      "variant_count": 16,
       "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none primitive stone-age WORKBENCH TABLE with visible open space underneath, flat rectangular stone top supported by FOUR short wooden log legs clearly visible beneath the tabletop, table is knee-high, few flint chips and bone tools resting on the flat tabletop surface, clearly a table or workshop bench not a solid rock, legs and tabletop distinctly separated",
-      "generated_at": "2026-04-18T18:59:58.715383+09:00",
+      "generated_at": "2026-04-19T04:19:25.531078+09:00",
       "workflow_hash": "cc962a68b10d",
       "outputs": [
         "workbench_001.png",
@@ -204,7 +276,15 @@
         "workbench_005.png",
         "workbench_006.png",
         "workbench_007.png",
-        "workbench_008.png"
+        "workbench_008.png",
+        "workbench_009.png",
+        "workbench_010.png",
+        "workbench_011.png",
+        "workbench_012.png",
+        "workbench_013.png",
+        "workbench_014.png",
+        "workbench_015.png",
+        "workbench_016.png"
       ]
     }
   }

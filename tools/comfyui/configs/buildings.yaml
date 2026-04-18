@@ -1,15 +1,15 @@
-# Stone-Age building concept prompt catalog — FINAL
-# Consolidated 2026-04-18 after v1 (baseline) and v2 (style_prefix redesign) reviews.
+# Stone-Age building concept prompt catalog — FINAL (v3 full regen)
+# Generated 2026-04-18. batch_size 16 per building for richer variant pool.
 #
-# Promotion logic:
-#   - 8 buildings (campfire/shelter/stockpile/hearth/drying_rack*/storage_pit/
-#     gathering_marker/totem/cairn): v2 prompts promoted as-is. v2 hit rate ≥60%.
+# Prompt strategy:
+#   - 8 buildings (campfire/shelter/stockpile/hearth/storage_pit/
+#     gathering_marker/totem/cairn): v2 prompts promoted as-is. v2 hit rate was ≥60%.
 #   - 2 buildings (drying_rack, workbench): v3 prompts — targeted rewrites for
 #     the specific failure mode each one showed in v2.
 #
-# Seeds retained from v2 (142-151). Running `--only drying_rack,workbench --force`
-# after this YAML update regenerates only the 2 failures. The other 8 buildings
-# stay intact at assets/sprites/concepts_v2/.
+# Seeds unchanged from v2 (142-151). Running full batch (no --only) against
+# `--output-root concepts_v3` produces 10 × 16 = 160 PNGs.
+# concepts_v2/ is preserved as rollback fallback.
 
 version: 1
 
@@ -38,7 +38,7 @@ buildings:
       one small circular fire pit, ring of grey stones around glowing orange flames,
       thin smoke wisp rising, ash under the fire, nothing else in view
     seed: 142
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (7/8 성공). 단일 모닥불 + 최소 배경."
 
   shelter:
@@ -47,7 +47,7 @@ buildings:
       single small dark doorway facing camera, no doors, weathered brown wood,
       compact hut proportions, roughly as wide as tall, isolated on bare dirt
     seed: 143
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (6/8 성공). 3/4 각도 + 정면 doorway로 측면뷰 문제 해결."
 
   stockpile:
@@ -56,7 +56,7 @@ buildings:
       knee-high heap, messy but discrete, occupies only the center of the frame,
       nothing else stored around it, no containers no baskets
     seed: 144
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (3/8 성공, 일부 통나무 그릇 해석 있지만 사용 가능 변종 존재)."
 
   hearth:
@@ -66,7 +66,7 @@ buildings:
       single simple wooden spit resting across the top, more substantial than a campfire,
       nothing else around
     seed: 146
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (7/8 성공). v1의 잡동사니 배경 제거됨."
 
   storage_pit:
@@ -75,7 +75,7 @@ buildings:
       woven grass cover half pulled aside revealing dark opening inside,
       single pit only, nothing stored around it, clear dark entrance visible
     seed: 148
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (6/8 성공). 단일 구덩이 오브젝트로 '장면' 문제 해결."
 
   gathering_marker:
@@ -84,7 +84,7 @@ buildings:
       one flat ceremonial stone at the center of the ring, stones are knee-high,
       compact ritual site, nothing else in frame, no carvings no symbols
     seed: 149
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (8/8 완벽). 'no carvings no symbols'로 스프라이트 시트 차단 성공."
 
   totem:
@@ -94,7 +94,7 @@ buildings:
       animal face carvings stacked along the pole, one bone and feather decoration
       near the top, nothing else in the scene
     seed: 150
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (8/8 성공). SDXL이 'wooden'을 'stone moai'로 해석했지만 결과 훌륭. wooden 유지 선택 — 만약 stone 명시하면 해석 붕괴 위험."
 
   cairn:
@@ -103,7 +103,7 @@ buildings:
       narrowing toward the top, stones are grey with small patches of green moss
       on the lowest ones, compact monument on flat bare dirt, nothing else visible
     seed: 151
-    batch_size: 8
+    batch_size: 16
     notes: "v2 결과 유지 (7/8 성공). 'compact' + 숫자 명시로 타일 텍스처 차단."
 
   # ─── 2 buildings rewritten as v3 — targeted fixes ────────────────────
@@ -118,7 +118,7 @@ buildings:
       primitive fiber lashings visible at joints, hide strips dominate the composition,
       stone-age prehistoric food preservation rack, standing on empty dirt ground
     seed: 147
-    batch_size: 8
+    batch_size: 16
     notes: "v3 재설계. v2는 프레임만 그리고 가죽 스트립 누락. 'THREE large' + 'HANGING VERTICALLY' + 'main visual subject' + 'fill most of the frame'로 가죽에 어텐션 강제."
 
   workbench:
@@ -134,5 +134,5 @@ buildings:
       tools resting on the flat tabletop surface, clearly a table or workshop bench
       not a solid rock, legs and tabletop distinctly separated
     seed: 145
-    batch_size: 8
+    batch_size: 16
     notes: "v3 재설계. v2는 'flat stone slab'을 단일 돌덩어리로 해석. 'TABLE' 주명사화 + 'FOUR legs visible' + 'open space underneath' + 'not a solid rock'로 테이블 개념 강제 주입."
