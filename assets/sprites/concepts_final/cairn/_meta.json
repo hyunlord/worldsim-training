@@ -1,0 +1,25 @@
+{
+  "building": "cairn",
+  "seed": 151,
+  "batch_size": 8,
+  "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none conical cairn of 5 stacked rounded stones, tallest in the middle, narrowing toward the top, stones are grey with small patches of green moss on the lowest ones, compact monument on flat bare dirt, nothing else visible",
+  "negative_prompt": "multiple objects, scene with several items, sprite sheet, icon grid, tileable texture, repeating pattern, ground tile, floor tile, fence, wall, courtyard, yard, building interior, map view, RPG asset pack, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, blurry, low quality, side view elevation, architectural blueprint",
+  "notes": "숫자 (5) + 'compact monument' + 'nothing else'로 타일 텍스처 차단",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-18T00:17:28.577347+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "cairn_001.png",
+    "cairn_002.png",
+    "cairn_003.png",
+    "cairn_004.png",
+    "cairn_005.png",
+    "cairn_006.png",
+    "cairn_007.png",
+    "cairn_008.png"
+  ]
+}

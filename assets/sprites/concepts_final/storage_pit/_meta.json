@@ -1,0 +1,25 @@
+{
+  "building": "storage_pit",
+  "seed": 148,
+  "batch_size": 8,
+  "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none round shallow pit dug into dirt ground, low mound of dirt around the rim, woven grass cover half pulled aside revealing dark opening inside, single pit only, nothing stored around it, clear dark entrance visible",
+  "negative_prompt": "multiple objects, scene with several items, sprite sheet, icon grid, tileable texture, repeating pattern, ground tile, floor tile, fence, wall, courtyard, yard, building interior, map view, RPG asset pack, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, blurry, low quality, side view elevation, architectural blueprint",
+  "notes": "'clear dark entrance'로 '지도의 구멍'이 아닌 '오브젝트'임을 강조",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-18T00:06:21.860611+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "storage_pit_001.png",
+    "storage_pit_002.png",
+    "storage_pit_003.png",
+    "storage_pit_004.png",
+    "storage_pit_005.png",
+    "storage_pit_006.png",
+    "storage_pit_007.png",
+    "storage_pit_008.png"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "building": "totem",
+  "seed": 150,
+  "batch_size": 8,
+  "positive_prompt": "SINGLE isolated stone-age object, centered composition, object fills 70% of frame, empty bare dirt background, no surrounding props, no fences or walls, orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels, 16-color earthy palette, primitive prehistoric era, clear silhouette, rendered as a standalone game sprite\none tall vertical wooden totem pole planted upright in dirt ground, single carved post about three times as tall as wide, simple weathered animal face carvings stacked along the pole, one bone and feather decoration near the top, nothing else in the scene",
+  "negative_prompt": "multiple objects, scene with several items, sprite sheet, icon grid, tileable texture, repeating pattern, ground tile, floor tile, fence, wall, courtyard, yard, building interior, map view, RPG asset pack, photo-realistic, 3d render, anti-aliasing, smooth gradients, text, watermark, signature, modern objects, metal, plastic, blurry, low quality, side view elevation, architectural blueprint",
+  "notes": "'three times as tall as wide' + 'single'로 스프라이트 시트 해석 차단",
+  "workflow_hash": "cc962a68b10d",
+  "workflow_file": "building_pixelate.json",
+  "generated_at": "2026-04-18T00:13:46.344027+09:00",
+  "comfy_host": "http://127.0.0.1:8188",
+  "comfy_version": "0.19.1",
+  "elapsed_seconds": 222.2,
+  "attempts": 1,
+  "outputs": [
+    "totem_001.png",
+    "totem_002.png",
+    "totem_003.png",
+    "totem_004.png",
+    "totem_005.png",
+    "totem_006.png",
+    "totem_007.png",
+    "totem_008.png"
+  ]
+}
