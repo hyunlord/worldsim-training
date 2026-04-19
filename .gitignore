@@ -97,6 +97,15 @@ assets/sprites/concepts_final/**/*.webp
 assets/sprites/concepts_final/_archive/
 assets/sprites/concepts_final/_contact_sheet_thumbs/
 
+# Aseprite pipeline staging (intermediate work, regeneratable from concepts_final/)
+/_raw_cleanup_stage/
+
+# Variant-folder PNGs (regeneratable from concepts_final/ + tools/aseprite/auto_process.py)
+# Legacy placeholders like assets/sprites/buildings/campfire.png stay tracked —
+# game-dev session removes them in its own commits.
+assets/sprites/buildings/*/*.png
+assets/sprites/furniture/*/*.png
+
 # ComfyUI runtime logs
 tools/comfyui/*.log
 

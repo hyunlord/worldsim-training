@@ -1,0 +1,101 @@
+# Sprite taxonomy for Phase 1 auto-processing.
+# Maps concepts_final/{building}/{index}.png → variant-folder output.
+# Generated 2026-04-18 after 3 rounds of cross-session handoff with game-dev Claude.
+#
+# 3rd handoff confirmed:
+#   - Representative file is NOT produced here. Game uses variant folder directly
+#     via `_load_building_texture(type, variant_seed)` → {id}/{seed % count + 1}.png.
+#   - File naming MUST be 1-indexed and contiguous (1.png..8.png, no gaps).
+
+version: 1
+
+# Global processing parameters
+processing:
+  downscale_filter: "nearest"           # Pixel art MUST use nearest-neighbor
+  palette_size: 16                      # Earthy 16-color (approximate via Pillow.quantize)
+  background_removal:
+    method: "edge_flood"                # Flood-fill from image corners
+    tolerance: 32                       # Colors within L2 distance 32 of corner seed → transparent
+    feather_px: 0                       # Hard edge, no anti-aliasing (pixel art)
+  outline:
+    add_auto: false                     # Do NOT auto-add outline — reserved for Aseprite manual stage
+
+buildings:
+  # Structure category — goes to assets/sprites/buildings/{id}/
+  campfire:
+    category: structure
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/buildings"
+    skip_reason: null
+
+  stockpile:
+    category: structure
+    tile_size: [2, 2]
+    png_size: [64, 64]
+    target_dir: "assets/sprites/buildings"
+    skip_reason: null
+
+  shelter:
+    category: structure
+    tile_size: [5, 5]
+    png_size: null                      # ⚠️ No target — game decomposes into wall+floor tiles
+    target_dir: null
+    skip_reason: "Game engine decomposes shelter into wall(16×16) + floor(16×16) + furniture tiles. A single 80×80 PNG is not consumable. Concept art retained in concepts_final/shelter/ for future reference."
+
+  totem:
+    category: structure                 # New structure — RON defined in Feature 1 (game-dev session)
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/buildings"
+    skip_reason: null
+    notes: "Stone-material interpretation retained (game-dev session confirmed: stone-totem feels more stone-age than wood)."
+
+  cairn:
+    category: structure
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/buildings"
+    skip_reason: null
+    notes: "Defined in Feature 1 landmarks.ron with role 'landmark', influence spiritual+social (weak)."
+
+  gathering_marker:
+    category: structure
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/buildings"
+    skip_reason: null
+    notes: "Defined in Feature 1 landmarks.ron with role 'gathering', influence social (strong, radius 6 intensity 0.55)."
+
+  # Furniture category — goes to assets/sprites/furniture/{id}/ (new directory)
+  hearth:
+    category: furniture
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/furniture"
+    skip_reason: null
+    notes: |
+      Separate furniture id (confirmed in 1st handoff — NOT a fire_pit variant).
+      Feature 1 defines in ritual.ron alongside totem.
+      Contributes to shelter's hearth role_vote (same mechanic as fire_pit) plus stronger influence.
+
+  storage_pit:
+    category: furniture
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/furniture"
+    skip_reason: null
+
+  workbench:
+    category: furniture
+    tile_size: [2, 1]
+    png_size: [64, 32]
+    target_dir: "assets/sprites/furniture"
+    skip_reason: null
+
+  drying_rack:
+    category: furniture
+    tile_size: [2, 1]
+    png_size: [64, 32]
+    target_dir: "assets/sprites/furniture"
+    skip_reason: null
