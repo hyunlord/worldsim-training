@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Experiment B — FLUX Migration</title>
+<style>
+body { font-family: system-ui; background: #0a0e14; color: #dce4f0; padding: 20px; max-width: 1400px; margin: 0 auto; }
+table { border-collapse: collapse; margin: 20px 0; }
+th, td { padding: 6px; vertical-align: top; text-align: center; }
+th { background: #1a2530; color: #6ee7b7; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+img { width: 256px; height: 256px; image-rendering: pixelated; border: 1px solid #1e2d4a; display: block; background: #000; }
+.label { font-size: 10px; color: #6b7fa0; padding: 4px; }
+.run-label { background: #162033; font-weight: bold; color: #fbbf24; font-size: 12px; padding: 8px; text-align: left; white-space: nowrap; }
+h1 { color: #60a5fa; }
+h2 { color: #fbbf24; margin-top: 40px; border-bottom: 1px solid #1e2d4a; padding-bottom: 8px; }
+.note { background: #162033; padding: 12px; border-radius: 6px; margin: 12px 0; font-size: 13px; }
+.decision { background: #1a2530; padding: 16px; border-left: 3px solid #6ee7b7; margin: 20px 0; }
+</style></head><body>
+<h1>Experiment B — FLUX.1 schnell Migration Benchmark</h1>
+<p class='note'>Generated 2026-04-19T18:08:09.148845+09:00. 5 buildings × 4 variants × 3 runs. Detected runs: baseline_sdxl_rembg, flux_raw, flux_rembg</p>
+<h2>cairn</h2>
+<table>
+<tr><th>Run</th><th>V1</th><th>V2</th><th>V3</th><th>V4</th></tr>
+<tr><td class='run-label'>baseline_sdxl_rembg</td>
+<td><img src='baseline_sdxl_rembg/cairn_001.png' loading='lazy'/><div class='label'>cairn_001.png</div></td>
+<td><img src='baseline_sdxl_rembg/cairn_002.png' loading='lazy'/><div class='label'>cairn_002.png</div></td>
+<td><img src='baseline_sdxl_rembg/cairn_003.png' loading='lazy'/><div class='label'>cairn_003.png</div></td>
+<td><img src='baseline_sdxl_rembg/cairn_004.png' loading='lazy'/><div class='label'>cairn_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_raw</td>
+<td><img src='flux_raw/cairn_001.png' loading='lazy'/><div class='label'>cairn_001.png</div></td>
+<td><img src='flux_raw/cairn_002.png' loading='lazy'/><div class='label'>cairn_002.png</div></td>
+<td><img src='flux_raw/cairn_003.png' loading='lazy'/><div class='label'>cairn_003.png</div></td>
+<td><img src='flux_raw/cairn_004.png' loading='lazy'/><div class='label'>cairn_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_rembg</td>
+<td><img src='flux_rembg/cairn_001.png' loading='lazy'/><div class='label'>cairn_001.png</div></td>
+<td><img src='flux_rembg/cairn_002.png' loading='lazy'/><div class='label'>cairn_002.png</div></td>
+<td><img src='flux_rembg/cairn_003.png' loading='lazy'/><div class='label'>cairn_003.png</div></td>
+<td><img src='flux_rembg/cairn_004.png' loading='lazy'/><div class='label'>cairn_004.png</div></td>
+</tr>
+</table>
+<h2>totem</h2>
+<table>
+<tr><th>Run</th><th>V1</th><th>V2</th><th>V3</th><th>V4</th></tr>
+<tr><td class='run-label'>baseline_sdxl_rembg</td>
+<td><img src='baseline_sdxl_rembg/totem_001.png' loading='lazy'/><div class='label'>totem_001.png</div></td>
+<td><img src='baseline_sdxl_rembg/totem_002.png' loading='lazy'/><div class='label'>totem_002.png</div></td>
+<td><img src='baseline_sdxl_rembg/totem_003.png' loading='lazy'/><div class='label'>totem_003.png</div></td>
+<td><img src='baseline_sdxl_rembg/totem_004.png' loading='lazy'/><div class='label'>totem_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_raw</td>
+<td><img src='flux_raw/totem_001.png' loading='lazy'/><div class='label'>totem_001.png</div></td>
+<td><img src='flux_raw/totem_002.png' loading='lazy'/><div class='label'>totem_002.png</div></td>
+<td><img src='flux_raw/totem_003.png' loading='lazy'/><div class='label'>totem_003.png</div></td>
+<td><img src='flux_raw/totem_004.png' loading='lazy'/><div class='label'>totem_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_rembg</td>
+<td><img src='flux_rembg/totem_001.png' loading='lazy'/><div class='label'>totem_001.png</div></td>
+<td><img src='flux_rembg/totem_002.png' loading='lazy'/><div class='label'>totem_002.png</div></td>
+<td><img src='flux_rembg/totem_003.png' loading='lazy'/><div class='label'>totem_003.png</div></td>
+<td><img src='flux_rembg/totem_004.png' loading='lazy'/><div class='label'>totem_004.png</div></td>
+</tr>
+</table>
+<h2>gathering_marker</h2>
+<table>
+<tr><th>Run</th><th>V1</th><th>V2</th><th>V3</th><th>V4</th></tr>
+<tr><td class='run-label'>baseline_sdxl_rembg</td>
+<td><img src='baseline_sdxl_rembg/gathering_marker_001.png' loading='lazy'/><div class='label'>gathering_marker_001.png</div></td>
+<td><img src='baseline_sdxl_rembg/gathering_marker_002.png' loading='lazy'/><div class='label'>gathering_marker_002.png</div></td>
+<td><img src='baseline_sdxl_rembg/gathering_marker_003.png' loading='lazy'/><div class='label'>gathering_marker_003.png</div></td>
+<td><img src='baseline_sdxl_rembg/gathering_marker_004.png' loading='lazy'/><div class='label'>gathering_marker_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_raw</td>
+<td><img src='flux_raw/gathering_marker_001.png' loading='lazy'/><div class='label'>gathering_marker_001.png</div></td>
+<td><img src='flux_raw/gathering_marker_002.png' loading='lazy'/><div class='label'>gathering_marker_002.png</div></td>
+<td><img src='flux_raw/gathering_marker_003.png' loading='lazy'/><div class='label'>gathering_marker_003.png</div></td>
+<td><img src='flux_raw/gathering_marker_004.png' loading='lazy'/><div class='label'>gathering_marker_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_rembg</td>
+<td><img src='flux_rembg/gathering_marker_001.png' loading='lazy'/><div class='label'>gathering_marker_001.png</div></td>
+<td><img src='flux_rembg/gathering_marker_002.png' loading='lazy'/><div class='label'>gathering_marker_002.png</div></td>
+<td><img src='flux_rembg/gathering_marker_003.png' loading='lazy'/><div class='label'>gathering_marker_003.png</div></td>
+<td><img src='flux_rembg/gathering_marker_004.png' loading='lazy'/><div class='label'>gathering_marker_004.png</div></td>
+</tr>
+</table>
+<h2>workbench</h2>
+<table>
+<tr><th>Run</th><th>V1</th><th>V2</th><th>V3</th><th>V4</th></tr>
+<tr><td class='run-label'>baseline_sdxl_rembg</td>
+<td><img src='baseline_sdxl_rembg/workbench_001.png' loading='lazy'/><div class='label'>workbench_001.png</div></td>
+<td><img src='baseline_sdxl_rembg/workbench_002.png' loading='lazy'/><div class='label'>workbench_002.png</div></td>
+<td><img src='baseline_sdxl_rembg/workbench_003.png' loading='lazy'/><div class='label'>workbench_003.png</div></td>
+<td><img src='baseline_sdxl_rembg/workbench_004.png' loading='lazy'/><div class='label'>workbench_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_raw</td>
+<td><img src='flux_raw/workbench_001.png' loading='lazy'/><div class='label'>workbench_001.png</div></td>
+<td><img src='flux_raw/workbench_002.png' loading='lazy'/><div class='label'>workbench_002.png</div></td>
+<td><img src='flux_raw/workbench_003.png' loading='lazy'/><div class='label'>workbench_003.png</div></td>
+<td><img src='flux_raw/workbench_004.png' loading='lazy'/><div class='label'>workbench_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_rembg</td>
+<td><img src='flux_rembg/workbench_001.png' loading='lazy'/><div class='label'>workbench_001.png</div></td>
+<td><img src='flux_rembg/workbench_002.png' loading='lazy'/><div class='label'>workbench_002.png</div></td>
+<td><img src='flux_rembg/workbench_003.png' loading='lazy'/><div class='label'>workbench_003.png</div></td>
+<td><img src='flux_rembg/workbench_004.png' loading='lazy'/><div class='label'>workbench_004.png</div></td>
+</tr>
+</table>
+<h2>drying_rack</h2>
+<table>
+<tr><th>Run</th><th>V1</th><th>V2</th><th>V3</th><th>V4</th></tr>
+<tr><td class='run-label'>baseline_sdxl_rembg</td>
+<td><img src='baseline_sdxl_rembg/drying_rack_001.png' loading='lazy'/><div class='label'>drying_rack_001.png</div></td>
+<td><img src='baseline_sdxl_rembg/drying_rack_002.png' loading='lazy'/><div class='label'>drying_rack_002.png</div></td>
+<td><img src='baseline_sdxl_rembg/drying_rack_003.png' loading='lazy'/><div class='label'>drying_rack_003.png</div></td>
+<td><img src='baseline_sdxl_rembg/drying_rack_004.png' loading='lazy'/><div class='label'>drying_rack_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_raw</td>
+<td><img src='flux_raw/drying_rack_001.png' loading='lazy'/><div class='label'>drying_rack_001.png</div></td>
+<td><img src='flux_raw/drying_rack_002.png' loading='lazy'/><div class='label'>drying_rack_002.png</div></td>
+<td><img src='flux_raw/drying_rack_003.png' loading='lazy'/><div class='label'>drying_rack_003.png</div></td>
+<td><img src='flux_raw/drying_rack_004.png' loading='lazy'/><div class='label'>drying_rack_004.png</div></td>
+</tr>
+<tr><td class='run-label'>flux_rembg</td>
+<td><img src='flux_rembg/drying_rack_001.png' loading='lazy'/><div class='label'>drying_rack_001.png</div></td>
+<td><img src='flux_rembg/drying_rack_002.png' loading='lazy'/><div class='label'>drying_rack_002.png</div></td>
+<td><img src='flux_rembg/drying_rack_003.png' loading='lazy'/><div class='label'>drying_rack_003.png</div></td>
+<td><img src='flux_rembg/drying_rack_004.png' loading='lazy'/><div class='label'>drying_rack_004.png</div></td>
+</tr>
+</table>
+<h2>Decision Matrix</h2>
+<table style='background:#162033;'>
+<tr><th style='text-align:left;'>Outcome</th><th style='text-align:left;'>Action</th></tr>
+<tr><td>FLUX raw clearly beats SDXL+rembg on 3+ buildings</td><td>Consider Option A extension (dev LoRAs)</td></tr>
+<tr><td>FLUX solves totem backgrounds natively (no rembg needed)</td><td>Strong migration signal</td></tr>
+<tr><td>FLUX solves workbench structural failure</td><td>Very strong migration signal</td></tr>
+<tr><td>FLUX and SDXL+rembg comparable</td><td>Keep SDXL+rembg (proven, migration cost not justified)</td></tr>
+<tr><td>FLUX raw looks photorealistic (no pixel-art style)</td><td>Confirm schnell LoRA ecosystem immature, revisit 6 months</td></tr>
+</table>
+<div class='decision'><b>User next step</b>: write <code>_decision.md</code> with your verdict.</div>
+</body></html>

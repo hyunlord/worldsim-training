@@ -1,0 +1,80 @@
+# Experiment B: FLUX.1 schnell migration benchmark
+# 5 representative buildings, seeds retained from production for fair comparison.
+#
+# Scope: Option B (lightweight probe, per user decision 2026-04-19)
+#   - SDXL+rembg baseline vs raw FLUX schnell (no LoRA)
+#   - Goal: determine if raw FLUX is competitive on isolated-object pixel art
+#   - If FLUX looks photorealistic/cluttered → confirm "schnell LoRA ecosystem immature"
+#   - If FLUX surprisingly good → consider extending to Option A (dev LoRAs on schnell)
+
+version: 1
+
+global:
+  # Kept same as production for fair comparison.
+  # NOTE: FLUX schnell at cfg=1.0 effectively ignores negative_prompt. Present for
+  # SDXL baseline's fair comparison; FLUX driver may pass it anyway at cfg=1 (no-op).
+  negative_prompt: >
+    multiple objects, scene with several items, sprite sheet, icon grid,
+    tileable texture, repeating pattern, ground tile, floor tile, fence, wall,
+    courtyard, yard, building interior, map view, RPG asset pack,
+    photo-realistic, 3d render, anti-aliasing, smooth gradients,
+    text, watermark, signature, modern objects, metal, plastic,
+    blurry, low quality, side view elevation, architectural blueprint
+
+  style_prefix: >
+    SINGLE isolated stone-age object, centered composition, object fills 70% of frame,
+    empty bare dirt background, no surrounding props, no fences or walls,
+    orthographic 3/4 view with slight overhead angle, pixel art, crisp pixels,
+    16-color earthy palette, primitive prehistoric era, clear silhouette,
+    rendered as a standalone game sprite
+
+buildings:
+  cairn:
+    positive: >
+      one conical cairn of 5 stacked rounded stones, tallest in the middle,
+      narrowing toward the top, stones are grey with small patches of green moss
+      on the lowest ones, compact monument on flat bare dirt, nothing else visible
+    seed: 151
+    batch_size: 4
+    notes: "SDXL v3+rembg baseline 13/16. Does FLUX match?"
+
+  totem:
+    positive: >
+      one tall vertical wooden totem pole planted upright in dirt ground,
+      single carved post about three times as tall as wide, simple weathered
+      animal face carvings stacked along the pole, one bone and feather decoration
+      near the top, nothing else in the scene
+    seed: 150
+    batch_size: 4
+    notes: "SDXL v3+rembg baseline 14/16 (big rembg win). Does FLUX handle landscape natively?"
+
+  gathering_marker:
+    positive: >
+      one simple circle of 7 rounded stones arranged on bare dirt,
+      one flat ceremonial stone at the center of the ring, stones are knee-high,
+      compact ritual site, nothing else in frame, no carvings no symbols
+    seed: 149
+    batch_size: 4
+    notes: "SDXL v2 baseline 8/8 perfect. FLUX floor test."
+
+  workbench:
+    positive: >
+      one primitive stone-age WORKBENCH TABLE with visible open space underneath,
+      flat rectangular stone top supported by FOUR short wooden log legs clearly
+      visible beneath the tabletop, table is knee-high, few flint chips and bone
+      tools resting on the flat tabletop surface, clearly a table or workshop bench
+      not a solid rock, legs and tabletop distinctly separated
+    seed: 145
+    batch_size: 4
+    notes: "SDXL structural failure (even v3 rewrite). Does FLUX solve the TABLE concept?"
+
+  drying_rack:
+    positive: >
+      THREE large dark brown strips of animal hide prominently HANGING VERTICALLY
+      from a simple wooden crossbeam, hide strips are the main visual subject and
+      fill most of the frame, two short vertical posts hold up one horizontal beam,
+      primitive fiber lashings visible at joints, hide strips dominate the composition,
+      stone-age prehistoric food preservation rack, standing on empty dirt ground
+    seed: 147
+    batch_size: 4
+    notes: "SDXL structural failure (v3 rewrite helped but hide strips still inconsistent)."

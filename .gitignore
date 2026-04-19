@@ -106,6 +106,13 @@ assets/sprites/concepts_final/_contact_sheet_thumbs/
 assets/sprites/buildings/*/*.png
 assets/sprites/furniture/*/*.png
 
+# Experiment B (FLUX migration benchmark) — regeneratable from configs/experiment_b.yaml
+# Keep tracked: _comparison.html, _timing.json, _decision.md, .gitkeep
+assets/sprites/experiment_b/**/*.png
+assets/sprites/experiment_b/**/*.webp
+assets/sprites/experiment_b/_archive/
+assets/sprites/experiment_b/_*_stage/
+
 # ComfyUI runtime logs
 tools/comfyui/*.log
 

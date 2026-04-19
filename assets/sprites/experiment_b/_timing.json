@@ -1,0 +1,33 @@
+{
+  "sdxl_baseline": {
+    "per_building_s": {
+      "cairn": 120.1,
+      "totem": 118.1,
+      "gathering_marker": 116.1,
+      "workbench": 116.3,
+      "drying_rack": 116.1
+    },
+    "total_s": 586.7,
+    "images_per_building": 4,
+    "seconds_per_image": 29.3
+  },
+  "flux_schnell_raw": {
+    "per_building_s": {
+      "cairn": 144.14,
+      "totem": 136.15,
+      "gathering_marker": 128.14,
+      "workbench": 128.13,
+      "drying_rack": 128.14
+    },
+    "total_s": 664.7,
+    "images_per_building": 4,
+    "seconds_per_image": 33.2
+  },
+  "models": {
+    "sdxl_base": "checkpoint: pixelArtDiffusionXL.safetensors + LoRA: pixel-art-xl",
+    "flux_base": "UNet flux1-schnell.safetensors (22GB) + T5xxl fp16 (9.2GB) + clip_l (235MB) + ae VAE (320MB)",
+    "flux_cfg": 1.0,
+    "flux_steps": 4
+  },
+  "notes": "FLUX schnell at batch_size 4 was NOT faster than SDXL at the same batch_size. FLUX is 12B params (4-step x higher cost/step) vs SDXL's 2.6B (20-step x lower cost/step)."
+}
