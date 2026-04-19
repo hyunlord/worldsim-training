@@ -88,6 +88,16 @@ def remove_background_flood(
     return Image.fromarray(rgba, mode="RGBA"), bg_pixels, total_pixels
 
 
+def binarize_alpha(img: Image.Image, threshold: int = 128) -> Image.Image:
+    """Pixel art requires hard {0, 255} alpha. rembg produces 0..255 soft edges;
+    binarize before palette reduction or halos bleed through."""
+    if img.mode != "RGBA":
+        return img
+    arr = np.array(img)
+    arr[:, :, 3] = np.where(arr[:, :, 3] > threshold, 255, 0).astype(np.uint8)
+    return Image.fromarray(arr, mode="RGBA")
+
+
 def quantize_palette(img: Image.Image, palette_size: int = 16) -> tuple[Image.Image, int]:
     if img.mode != "RGBA":
         img = img.convert("RGBA")
@@ -111,6 +121,8 @@ def process_one(
     variant: int,
     palette_size: int,
     bg_tolerance: int,
+    use_rembg: bool = False,
+    alpha_threshold: int = 128,
 ) -> ProcessingStats:
     img = Image.open(source_png)
     source_size = img.size
@@ -120,7 +132,16 @@ def process_one(
     stage1_dir.mkdir(parents=True, exist_ok=True)
     s1.save(stage1_dir / f"{variant}.png")
 
-    s2, bg_pixels, total_pixels = remove_background_flood(s1, tolerance=bg_tolerance)
+    if use_rembg:
+        # Source already has rembg alpha (0..255 soft). Binarize for pixel art.
+        s2 = binarize_alpha(s1 if s1.mode == "RGBA" else s1.convert("RGBA"),
+                            threshold=alpha_threshold)
+        alpha_arr = np.array(s2)[:, :, 3]
+        bg_pixels = int((alpha_arr == 0).sum())
+        total_pixels = alpha_arr.size
+    else:
+        s2, bg_pixels, total_pixels = remove_background_flood(s1, tolerance=bg_tolerance)
+
     stage2_dir = staging_dir / "02_bg_removed" / building
     stage2_dir.mkdir(parents=True, exist_ok=True)
     s2.save(stage2_dir / f"{variant}.png")
@@ -211,12 +232,24 @@ def main() -> int:
     ap.add_argument("--skip-classify", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--use-rembg-source", action="store_true",
+                    help="Read from {staging_root}/00_rembg/ instead of --source-root. "
+                         "Skips 4-corner flood-fill and applies alpha binarization.")
+    ap.add_argument("--alpha-threshold", type=int, default=128,
+                    help="Alpha binarization threshold when --use-rembg-source (default 128)")
     args = ap.parse_args()
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
     )
+
+    # When using rembg source, redirect input from staging/00_rembg
+    if args.use_rembg_source:
+        effective_source = args.staging_root / "00_rembg"
+        logging.info(f"Using rembg pre-processed source: {effective_source}")
+    else:
+        effective_source = args.source_root
 
     classifier = yaml.safe_load(args.config.read_text())
     proc_cfg = classifier["processing"]
@@ -242,7 +275,7 @@ def main() -> int:
             continue
 
         target_size = tuple(cfg["png_size"])
-        source_dir = args.source_root / building
+        source_dir = effective_source / building
         if not source_dir.exists():
             logging.error(f"Source missing: {source_dir}")
             continue
@@ -264,6 +297,8 @@ def main() -> int:
                 variant=variant_idx,
                 palette_size=palette_size,
                 bg_tolerance=bg_tolerance,
+                use_rembg=args.use_rembg_source,
+                alpha_threshold=args.alpha_threshold,
             )
             all_stats.append(stats)
             logging.info(
