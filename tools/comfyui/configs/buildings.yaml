@@ -136,3 +136,46 @@ buildings:
     seed: 145
     batch_size: 16
     notes: "v3 재설계. v2는 'flat stone slab'을 단일 돌덩어리로 해석. 'TABLE' 주명사화 + 'FOUR legs visible' + 'open space underneath' + 'not a solid rock'로 테이블 개념 강제 주입."
+
+  # ─── Round 3: Tier 1 furniture gap — shelter required_components ───────
+  fire_pit:
+    positive: >
+      small primitive stone age fire pit seen from 3/4 perspective,
+      three to five round stones arranged in a loose circle on bare ground,
+      few thin twigs and sticks in the center,
+      small modest flame or glowing embers, not a large fire,
+      temporary rustic outdoor campfire, dirt ground base,
+      isolated single object on transparent background,
+      pixel art, 32x32 game sprite, stone-age primitive,
+      earthy palette, simple composition, no shelter walls
+    negative: >
+      large fire, tall flames, fireplace with walls, enclosed hearth,
+      cauldron, cooking pot, iron equipment, metal,
+      many stones, stone ring wall, complete fire pit walls,
+      landscape, scene, mountains, forest, sky, horizon,
+      background elements, ground texture large area, grass field,
+      cartoon, anime, realistic photo, 3D render,
+      multiple fire pits, crowd, people, character
+    seed: 212
+    batch_size: 16
+
+  lean_to:
+    positive: >
+      simple primitive lean-to shelter bed viewed from 3/4 perspective,
+      stone age sleeping place, either slanted hide canvas propped up by sticks,
+      or simple grass and hide bedding on the ground,
+      wooden support poles optional, animal skin or woven grass,
+      rustic resting spot, isolated single object on transparent background,
+      pixel art, 64x32 wide game sprite, horizontal composition,
+      earthy brown and cream palette, primitive construction
+    negative: >
+      bed with mattress, pillows, modern bedroom,
+      tent full enclosure, complete hut, walls, shelter exterior,
+      decorative patterns, carved wood, metal fittings,
+      furniture like chairs tables, chest of drawers,
+      landscape, scene, outdoor environment, mountains,
+      background elements, scene context, multiple beds,
+      cartoon, anime, realistic photo, 3D render,
+      characters, people, animals
+    seed: 213
+    batch_size: 16

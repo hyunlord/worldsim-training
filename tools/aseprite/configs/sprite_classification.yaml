@@ -172,3 +172,18 @@ buildings:
     png_size: [16, 16]
     target_dir: "assets/sprites/floors"
     skip_reason: null
+
+  # ── Round 3: Tier 1 furniture (object mode, rembg + outline + alpha) ──
+  fire_pit:
+    category: furniture
+    tile_size: [1, 1]
+    png_size: [32, 32]
+    target_dir: "assets/sprites/furniture"
+    skip_reason: null
+
+  lean_to:
+    category: furniture
+    tile_size: [2, 1]
+    png_size: [64, 32]
+    target_dir: "assets/sprites/furniture"
+    skip_reason: null
