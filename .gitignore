@@ -97,6 +97,17 @@ assets/sprites/concepts_final/**/*.webp
 assets/sprites/concepts_final/_archive/
 assets/sprites/concepts_final/_contact_sheet_thumbs/
 
+# Round 2 raw ComfyUI output — regeneratable from configs/walls.yaml + configs/floors.yaml
+assets/sprites/concepts_walls_v1/**/*.png
+assets/sprites/concepts_walls_v1/**/*.webp
+assets/sprites/concepts_walls_v1/_archive/
+assets/sprites/concepts_walls_v1/_contact_sheet_thumbs/
+
+assets/sprites/concepts_floors_v1/**/*.png
+assets/sprites/concepts_floors_v1/**/*.webp
+assets/sprites/concepts_floors_v1/_archive/
+assets/sprites/concepts_floors_v1/_contact_sheet_thumbs/
+
 # Aseprite pipeline staging (intermediate work, regeneratable from concepts_final/)
 /_raw_cleanup_stage/
 

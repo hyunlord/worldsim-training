@@ -1,0 +1,83 @@
+# Round 2 wall material prompt catalog — 7 materials × 3 variants = 21 PNGs
+# Each material generates 1024×1024 via SDXL + Pixel Art XL LoRA.
+# auto_process --tile-mode downscales to 16×16 RGB (no alpha, no outline).
+#
+# Seeds: 162-168 (away from buildings seed range 142-151).
+
+version: 1
+
+global:
+  style_prefix: >
+    seamless tileable pixel art wall texture, top-down overhead view,
+    flat uniform surface filling entire frame, 16-color earthy stone-age palette,
+    pixel-perfect crisp edges, no anti-aliasing, no dithering
+
+  negative_prompt: >
+    outline, border, frame, vignette, edge shadow, border shading,
+    transparent background, alpha channel, transparency, cutout,
+    3D perspective, isometric, side view, dramatic shadow,
+    single rock, single plank, isolated object,
+    object on background, diorama, pedestal,
+    scene, landscape, sky, mountain, horizon, environment,
+    anti-aliased, blurry, gradient, soft edges,
+    multiple objects, sprite sheet, icon grid,
+    black border, dark edges, shaded corners
+
+buildings:
+  granite:
+    positive: >
+      seamless gray granite stone wall texture, speckled granite grain pattern,
+      cool gray tone with subtle blue undertone, natural rock surface,
+      uniform mineral speckles, solid stone wall material
+    seed: 162
+    batch_size: 3
+
+  basalt:
+    positive: >
+      seamless black basalt stone wall texture, dark volcanic rock surface,
+      porous texture with cooling cracks, deep charcoal black color,
+      rough igneous rock pattern, solid stone wall material
+    seed: 163
+    batch_size: 3
+
+  limestone:
+    positive: >
+      seamless cream limestone wall texture, horizontal sedimentary layers,
+      warm cream white color with subtle beige banding,
+      layered stone bedding pattern, solid stone wall material
+    seed: 164
+    batch_size: 3
+
+  sandstone:
+    positive: >
+      seamless tan sandstone wall texture, sandy beige warm yellow color,
+      fine horizontal striations, earthy desert stone surface,
+      warm sandy tone, solid stone wall material
+    seed: 165
+    batch_size: 3
+
+  oak:
+    positive: >
+      seamless dark oak wood wall texture, vertical wood grain pattern,
+      deep rich brown color, visible wood grain lines running top to bottom,
+      dense hardwood plank surface, solid wood wall material
+    seed: 166
+    batch_size: 3
+
+  birch:
+    positive: >
+      seamless birch wood wall texture, pale cream brown color,
+      distinctive dark horizontal marks on pale wood,
+      fine vertical grain, characteristic birch bark pattern on planks,
+      solid wood wall material
+    seed: 167
+    batch_size: 3
+
+  pine:
+    positive: >
+      seamless pine wood wall texture, warm reddish brown color,
+      visible vertical grain with knots,
+      soft wood plank surface, warm amber red-brown tones,
+      solid wood wall material
+    seed: 168
+    batch_size: 3

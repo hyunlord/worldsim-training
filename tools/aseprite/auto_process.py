@@ -123,6 +123,7 @@ def process_one(
     bg_tolerance: int,
     use_rembg: bool = False,
     alpha_threshold: int = 128,
+    tile_mode: bool = False,
 ) -> ProcessingStats:
     img = Image.open(source_png)
     source_size = img.size
@@ -132,21 +133,39 @@ def process_one(
     stage1_dir.mkdir(parents=True, exist_ok=True)
     s1.save(stage1_dir / f"{variant}.png")
 
-    if use_rembg:
-        # Source already has rembg alpha (0..255 soft). Binarize for pixel art.
-        s2 = binarize_alpha(s1 if s1.mode == "RGBA" else s1.convert("RGBA"),
-                            threshold=alpha_threshold)
-        alpha_arr = np.array(s2)[:, :, 3]
-        bg_pixels = int((alpha_arr == 0).sum())
-        total_pixels = alpha_arr.size
+    if tile_mode:
+        # Tile path: flatten any alpha to opaque RGB, skip all transparency logic.
+        # Game renders tile outlines as overlay — texture must be fully opaque RGB.
+        if s1.mode == "RGBA":
+            bg = Image.new("RGB", s1.size, (128, 128, 128))
+            bg.paste(s1, mask=s1.split()[3])
+            rgb_img = bg
+        elif s1.mode != "RGB":
+            rgb_img = s1.convert("RGB")
+        else:
+            rgb_img = s1
+        quantized = rgb_img.quantize(colors=palette_size, method=Image.Quantize.MEDIANCUT)
+        s3 = quantized.convert("RGB")
+        palette_used = palette_size
+        bg_pixels = 0
+        total_pixels = target_size[0] * target_size[1]
     else:
-        s2, bg_pixels, total_pixels = remove_background_flood(s1, tolerance=bg_tolerance)
+        if use_rembg:
+            # Source already has rembg alpha (0..255 soft). Binarize for pixel art.
+            s2 = binarize_alpha(s1 if s1.mode == "RGBA" else s1.convert("RGBA"),
+                                threshold=alpha_threshold)
+            alpha_arr = np.array(s2)[:, :, 3]
+            bg_pixels = int((alpha_arr == 0).sum())
+            total_pixels = alpha_arr.size
+        else:
+            s2, bg_pixels, total_pixels = remove_background_flood(s1, tolerance=bg_tolerance)
 
-    stage2_dir = staging_dir / "02_bg_removed" / building
-    stage2_dir.mkdir(parents=True, exist_ok=True)
-    s2.save(stage2_dir / f"{variant}.png")
+        stage2_dir = staging_dir / "02_bg_removed" / building
+        stage2_dir.mkdir(parents=True, exist_ok=True)
+        s2.save(stage2_dir / f"{variant}.png")
 
-    s3, palette_used = quantize_palette(s2, palette_size=palette_size)
+        s3, palette_used = quantize_palette(s2, palette_size=palette_size)
+
     stage3_dir = staging_dir / "03_palette_reduced" / building
     stage3_dir.mkdir(parents=True, exist_ok=True)
     stage3_path = stage3_dir / f"{variant}.png"
@@ -237,6 +256,9 @@ def main() -> int:
                          "Skips 4-corner flood-fill and applies alpha binarization.")
     ap.add_argument("--alpha-threshold", type=int, default=128,
                     help="Alpha binarization threshold when --use-rembg-source (default 128)")
+    ap.add_argument("--tile-mode", action="store_true",
+                    help="Process as opaque tile: skip rembg/flood-fill/alpha, force RGB output. "
+                         "Required for wall/floor tiles — game renders outlines as overlay.")
     args = ap.parse_args()
 
     logging.basicConfig(
@@ -299,6 +321,7 @@ def main() -> int:
                 bg_tolerance=bg_tolerance,
                 use_rembg=args.use_rembg_source,
                 alpha_threshold=args.alpha_threshold,
+                tile_mode=args.tile_mode,
             )
             all_stats.append(stats)
             logging.info(

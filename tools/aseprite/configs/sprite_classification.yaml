@@ -44,10 +44,10 @@ buildings:
     skip_reason: "Game engine decomposes shelter into wall(16×16) + floor(16×16) + furniture tiles. A single 80×80 PNG is not consumable. Concept art retained in concepts_final/shelter/ for future reference."
 
   totem:
-    category: structure                 # New structure — RON defined in Feature 1 (game-dev session)
+    category: furniture                 # Changed from structure — game-dev session 2026-04-19 confirmed totem is furniture
     tile_size: [1, 1]
     png_size: [32, 32]
-    target_dir: "assets/sprites/buildings"
+    target_dir: "assets/sprites/furniture"
     skip_reason: null
     notes: "Stone-material interpretation retained (game-dev session confirmed: stone-totem feels more stone-age than wood)."
 
@@ -98,4 +98,77 @@ buildings:
     tile_size: [2, 1]
     png_size: [64, 32]
     target_dir: "assets/sprites/furniture"
+    skip_reason: null
+
+  # ── Round 2: Wall material tiles (16×16 RGB, top-down, seamless tileable) ──
+  # Use: auto_process --tile-mode (skips rembg/outline/alpha, forces RGB output)
+  granite:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  basalt:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  limestone:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  sandstone:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  oak:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  birch:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  pine:
+    category: walls
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/walls"
+    skip_reason: null
+
+  # ── Round 2: Floor material tiles (16×16 RGB, top-down, seamless tileable) ──
+  packed_earth:
+    category: floors
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/floors"
+    skip_reason: null
+
+  stone_slab:
+    category: floors
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/floors"
+    skip_reason: null
+
+  wood_plank:
+    category: floors
+    tile_size: [1, 1]
+    png_size: [16, 16]
+    target_dir: "assets/sprites/floors"
     skip_reason: null
