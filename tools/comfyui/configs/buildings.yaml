@@ -161,21 +161,31 @@ buildings:
 
   lean_to:
     positive: >
-      simple primitive lean-to shelter bed viewed from 3/4 perspective,
-      stone age sleeping place, either slanted hide canvas propped up by sticks,
-      or simple grass and hide bedding on the ground,
-      wooden support poles optional, animal skin or woven grass,
-      rustic resting spot, isolated single object on transparent background,
-      pixel art, 64x32 wide game sprite, horizontal composition,
-      earthy brown and cream palette, primitive construction
+      simple wooden lean-to frame viewed from the side,
+      two short wooden poles on left, two taller wooden poles on right,
+      one flat slanted roof made of animal hide or woven grass thatch
+      stretched from tall poles down to short poles,
+      triangular profile visible from side, sparse open construction,
+      bare dirt ground underneath with a small pile of grass or folded hide
+      serving as a bedroll on the floor,
+      rustic primitive bushcraft shelter frame,
+      clearly see the sloped roof angle,
+      isolated single object on transparent background,
+      pixel art, 64x32 wide horizontal game sprite,
+      earthy brown wood and tan hide palette,
+      side profile view
     negative: >
-      bed with mattress, pillows, modern bedroom,
-      tent full enclosure, complete hut, walls, shelter exterior,
+      cave, cavern, cave entrance, dark opening, hole in ground,
+      dirt mound, earth mound, hill, raised ground, burrow, tunnel,
+      complete tent, dome tent, yurt, tipi, wigwam, full enclosure,
+      pile of dirt, pile of earth, pile of stones,
+      two separate objects, split composition, fragmented,
+      grass patches alone, empty ground, empty frame,
+      3/4 perspective, top-down view, overhead, isometric,
+      front view, straight-on view, portrait orientation,
+      scenery, landscape, mountains, forest, sky, horizon,
+      people, characters, animals, fire, smoke,
       decorative patterns, carved wood, metal fittings,
-      furniture like chairs tables, chest of drawers,
-      landscape, scene, outdoor environment, mountains,
-      background elements, scene context, multiple beds,
-      cartoon, anime, realistic photo, 3D render,
-      characters, people, animals
-    seed: 213
+      cartoon, anime, realistic photograph, 3D render
+    seed: 214
     batch_size: 16
