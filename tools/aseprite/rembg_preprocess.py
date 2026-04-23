@@ -18,18 +18,17 @@ from pathlib import Path
 
 from PIL import Image
 
-try:
-    from rembg import remove, new_session
-except ImportError:
-    print("ERROR: rembg not installed. Run: pip install rembg onnxruntime", file=sys.stderr)
-    sys.exit(1)
-
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%H:%M:%S",
 )
+
+try:
+    from rembg import remove, new_session
+except ImportError:
+    logging.error("rembg not installed. Run: pip install rembg onnxruntime")
+    sys.exit(1)
 
 
 def process_building(

@@ -14,9 +14,13 @@ Usage:
 
 import argparse
 import json
+import logging
 import shutil
+import sys
 from pathlib import Path
 from PIL import Image
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
 def verify_tile(path):
@@ -37,7 +41,7 @@ def main():
 
     selection_path = args.review_dir / "selection.json"
     if not selection_path.exists():
-        print(f"ERROR: {selection_path} not found")
+        logging.error(f"{selection_path} not found")
         return 1
 
     selection = json.loads(selection_path.read_text())
@@ -47,12 +51,12 @@ def main():
     for category, dst_root in [("walls", args.walls_dst),
                                 ("floors", args.floors_dst)]:
         if category not in selection:
-            print(f"WARN: '{category}' not in selection.json, skipping")
+            logging.warning(f"'{category}' not in selection.json, skipping")
             continue
         for mat, files in selection[category].items():
             # SKIP_V1 sentinel — preserve existing v1 tiles unchanged
             if files == ["SKIP_V1"] or (len(files) >= 1 and files[0] == "SKIP_V1"):
-                print(f"  {category}/{mat}: SKIP_V1 (preserving v1 tiles)")
+                logging.info(f"  {category}/{mat}: SKIP_V1 (preserving v1 tiles)")
                 continue
 
             if len(files) != 3:
@@ -80,7 +84,7 @@ def main():
 
             dst_dir = dst_root / mat
             if args.dry_run:
-                print(f"[dry-run] {category}/{mat}: {[f.name for f in src_paths]} → {dst_dir}/1-3.png")
+                logging.info(f"[dry-run] {category}/{mat}: {[f.name for f in src_paths]} → {dst_dir}/1-3.png")
                 continue
 
             dst_dir.mkdir(parents=True, exist_ok=True)
@@ -92,19 +96,18 @@ def main():
                 dst = dst_dir / f"{idx}.png"
                 shutil.copy2(src, dst)
                 written.append(f"{category}/{mat}/{idx}.png ← {src.name}")
-                print(f"  {category}/{mat}: {src.name} → {idx}.png")
+                logging.info(f"  {category}/{mat}: {src.name} → {idx}.png")
 
     if errors:
-        print(f"\n{len(errors)} errors:")
+        logging.error(f"{len(errors)} error(s):")
         for e in errors:
-            print(f"  ERROR: {e}")
+            logging.error(f"  {e}")
         return 1
 
     if not args.dry_run:
-        print(f"\nWrote {len(written)} tiles to game tree.")
+        logging.info(f"Wrote {len(written)} tiles to game tree.")
     return 0
 
 
 if __name__ == "__main__":
-    import sys
     sys.exit(main())

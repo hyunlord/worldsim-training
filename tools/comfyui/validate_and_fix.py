@@ -5,6 +5,7 @@ Converts UI-format workflow to API-format, submits to ComfyUI,
 checks for execution errors, patches JSON, retries until success.
 """
 import json
+import logging
 import time
 import urllib.request
 import urllib.error
@@ -15,6 +16,8 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(_SCRIPT_DIR))
 from config import COMFYUI_URL, MAX_ITERATIONS
 from config import TIMEOUT_VALIDATE as TIMEOUT_SEC
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 WORKFLOWS_DIR = _SCRIPT_DIR / "workflows"
 
@@ -171,9 +174,9 @@ def submit_and_wait(api_workflow):
 
 def validate_workflow(path, skip_agent=False):
     """Execute a single workflow end-to-end. Returns (success, detail)."""
-    print(f"\n{'='*60}")
-    print(f"  {path.name}")
-    print(f"{'='*60}")
+    logging.info(f"\n{'='*60}")
+    logging.info(f"  {path.name}")
+    logging.info(f"{'='*60}")
 
     with open(path) as f:
         ui_wf = json.load(f)
@@ -181,13 +184,13 @@ def validate_workflow(path, skip_agent=False):
     # For agent workflow, override LoadImage to use a valid image
     # (it references "example.png" which may not exist)
     if skip_agent:
-        print("  Skipping (IPAdapter requires reference image upload)")
+        logging.info("  Skipping (IPAdapter requires reference image upload)")
         return True, "skipped"
 
     try:
         api_wf = ui_to_api(ui_wf)
     except Exception as e:
-        print(f"  FAIL: UI->API conversion error: {e}")
+        logging.error(f"  FAIL: UI->API conversion error: {e}")
         return False, str(e)
 
     # Reduce batch size for faster validation
@@ -195,20 +198,20 @@ def validate_workflow(path, skip_agent=False):
         if node["class_type"] == "EmptyLatentImage":
             node["inputs"]["batch_size"] = 1
 
-    print("  Submitting to ComfyUI...", flush=True)
+    logging.info("  Submitting to ComfyUI...")
     t0 = time.time()
     success, detail = submit_and_wait(api_wf)
     elapsed = time.time() - t0
 
     if success:
         images = detail.get("images", [])
-        print(f"  PASS ({elapsed:.1f}s)")
+        logging.info(f"  PASS ({elapsed:.1f}s)")
         for img in images:
-            print(f"    -> ~/ComfyUI/output/{img}")
+            logging.info(f"    -> ~/ComfyUI/output/{img}")
         return True, detail
     else:
-        print(f"  FAIL: phase={detail.get('phase', '?')}")
-        print(f"    {detail.get('detail', '')[:500]}")
+        logging.error(f"  FAIL: phase={detail.get('phase', '?')}")
+        logging.error(f"    {detail.get('detail', '')[:500]}")
         return False, detail
 
 
@@ -217,9 +220,9 @@ def main():
     try:
         stats = http_get("/system_stats")
         vram = stats["devices"][0]["vram_total"] / 1e9
-        print(f"ComfyUI server up (VRAM: {vram:.0f}GB)")
+        logging.info(f"ComfyUI server up (VRAM: {vram:.0f}GB)")
     except Exception as e:
-        print(f"ComfyUI not reachable at {COMFYUI_URL}: {e}")
+        logging.error(f"ComfyUI not reachable at {COMFYUI_URL}: {e}")
         sys.exit(1)
 
     results = {}
@@ -246,29 +249,29 @@ def main():
         }
         actual = {n["class_type"] for n in api_wf.values()}
         if expected == actual:
-            print(f"\n{'='*60}")
-            print(f"  agent_body_ipadapter.json")
-            print(f"{'='*60}")
-            print(f"  PASS (API conversion verified, {len(api_wf)} nodes)")
-            print(f"  Skipped execution (requires reference image upload)")
+            logging.info(f"\n{'='*60}")
+            logging.info("  agent_body_ipadapter.json")
+            logging.info(f"{'='*60}")
+            logging.info(f"  PASS (API conversion verified, {len(api_wf)} nodes)")
+            logging.info("  Skipped execution (requires reference image upload)")
             results["agent_body_ipadapter.json"] = True
         else:
             missing = expected - actual
             extra = actual - expected
-            print(f"  FAIL: node mismatch. missing={missing}, extra={extra}")
+            logging.error(f"  FAIL: node mismatch. missing={missing}, extra={extra}")
             results["agent_body_ipadapter.json"] = False
     except Exception as e:
-        print(f"  FAIL: {e}")
+        logging.error(f"  FAIL: {e}")
         results["agent_body_ipadapter.json"] = False
 
     # Summary
-    print(f"\n{'='*60}")
-    print(f"  RESULTS")
-    print(f"{'='*60}")
+    logging.info(f"\n{'='*60}")
+    logging.info("  RESULTS")
+    logging.info(f"{'='*60}")
     all_ok = True
     for name, ok in results.items():
         status = "PASS" if ok else "FAIL"
-        print(f"  {status} {name}")
+        logging.info(f"  {status} {name}")
         if not ok:
             all_ok = False
 

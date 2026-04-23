@@ -6,11 +6,14 @@ Uses only stdlib (subprocess, urllib, json, time, pathlib) — no external deps.
 from __future__ import annotations
 
 import json
+import logging
 import subprocess
 import time
 import urllib.request
 import urllib.error
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 
 class ServerStartupError(Exception):
@@ -94,7 +97,7 @@ class ServerManager:
 
         # Step 1 — fast path: server is already responsive ----------------
         if self.is_alive():
-            print("[setup] Reusing existing ComfyUI server")
+            _log.info("Reusing existing ComfyUI server")
             return True
 
         # Step 2 — look for a server process that hasn't finished booting -
@@ -105,7 +108,7 @@ class ServerManager:
             text=True,
         )
         if proc.stdout.strip():
-            print("[setup] Server process found (mid-startup), waiting for ready signal...")
+            _log.info("Server process found (mid-startup), waiting for ready signal...")
             need_launch = False
 
         # Step 3 — launch serve.sh ----------------------------------------
@@ -122,9 +125,7 @@ class ServerManager:
                 start_new_session=True,  # detach from Claude Code's group
             )
             self._child_pid = child.pid
-            print(
-                f"[setup] Launched ComfyUI (pid={child.pid}, log={self.log_path})"
-            )
+            _log.info(f"Launched ComfyUI (pid={child.pid}, log={self.log_path})")
 
         # Step 4 — poll readiness -----------------------------------------
         start = time.monotonic()
@@ -132,7 +133,7 @@ class ServerManager:
         while time.monotonic() < deadline:
             if self.is_alive():
                 elapsed = time.monotonic() - start
-                print(f"[setup] Server ready after {elapsed:.1f}s")
+                _log.info(f"Server ready after {elapsed:.1f}s")
                 return True
             time.sleep(self.poll_interval_s)
 
