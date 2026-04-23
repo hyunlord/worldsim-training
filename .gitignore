@@ -27,6 +27,10 @@ eggs/
 .eggs/
 lib/
 lib64/
+
+# Exception: tools/comfyui/lib/ is production pipeline code, not a Python venv
+!tools/comfyui/lib/
+!tools/comfyui/lib/*.py
 parts/
 sdist/
 var/
