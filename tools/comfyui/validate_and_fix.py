@@ -11,10 +11,12 @@ import urllib.error
 import sys
 from pathlib import Path
 
-COMFYUI_URL = "http://127.0.0.1:8188"
-WORKFLOWS_DIR = Path(__file__).parent / "workflows"
-MAX_ITERATIONS = 5
-TIMEOUT_SEC = 180
+_SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(_SCRIPT_DIR))
+from config import COMFYUI_URL, MAX_ITERATIONS
+from config import TIMEOUT_VALIDATE as TIMEOUT_SEC
+
+WORKFLOWS_DIR = _SCRIPT_DIR / "workflows"
 
 
 def http_get(path, timeout=10):

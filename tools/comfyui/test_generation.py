@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Smoke test: generate a simple pixel art sprite via ComfyUI API."""
 import json, time, urllib.request, sys
+from pathlib import Path
 
-COMFYUI_URL = "http://127.0.0.1:8188"
+_SCRIPT_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(_SCRIPT_DIR))
+from config import COMFYUI_URL
 
 
 def queue_test_prompt():
