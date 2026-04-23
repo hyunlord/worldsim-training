@@ -1,0 +1,51 @@
+# Round 2 floor material prompt catalog — 3 materials × 3 variants = 9 PNGs
+# Each material generates 1024×1024 via SDXL + Pixel Art XL LoRA.
+# auto_process --tile-mode downscales to 16×16 RGB (no alpha, no outline).
+#
+# Seeds: 172-174 (away from walls seed range 162-168).
+
+version: 1
+
+global:
+  style_prefix: >
+    seamless tileable pixel art floor texture, top-down overhead view looking straight down,
+    flat uniform ground surface filling entire frame, 16-color earthy stone-age palette,
+    pixel-perfect crisp edges, no anti-aliasing, no dithering
+
+  negative_prompt: >
+    outline, border, frame, vignette, edge shadow,
+    transparent background, alpha channel, transparency,
+    perspective, isometric, side view, angled view,
+    wall, vertical surface, side elevation,
+    object, furniture, item, character,
+    anti-aliased, blurry, gradient, soft edges,
+    scene, landscape, sky, mountain, horizon,
+    black border, dark edges, shaded corners
+
+buildings:
+  packed_earth:
+    positive: >
+      seamless packed dirt floor texture from above,
+      warm brown earth color, compacted soil surface,
+      subtle footprint impressions and light stains,
+      natural ground texture viewed straight down
+    seed: 172
+    batch_size: 3
+
+  stone_slab:
+    positive: >
+      seamless stone slab floor texture from above,
+      gray stone tiles with subtle cracks and joints,
+      weathered rock surface with minor wear marks,
+      solid stone flooring viewed straight down
+    seed: 173
+    batch_size: 3
+
+  wood_plank:
+    positive: >
+      seamless wood plank floor texture from above,
+      horizontal wooden planks running across,
+      warm brown wood grain, visible plank seams,
+      aged wood flooring viewed straight down
+    seed: 174
+    batch_size: 3
